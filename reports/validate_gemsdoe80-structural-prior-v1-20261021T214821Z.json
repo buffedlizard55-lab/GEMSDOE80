@@ -74,5 +74,8 @@
   "template": {
     "available": false,
     "pass": false
-  }
+  },
+  "superseded": true,
+  "superseded_by": "placeholder-revalidation.json",
+  "warning": "Historical self-consistency report only. Template comparison now FAILS shape and transform; DO NOT SUBMIT."
 }

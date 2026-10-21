@@ -1,70 +1,97 @@
 {
-  "experiment": 1,
-  "budget": "experiment 1 of 3; hard stop at 3 experiments or 2 hours; no weekly submission slot spent",
-  "lane": "H1 geothermal structural-propensity composite (unsupervised, label-free)",
-  "hypothesis": "A pixel-wise fault probability built from label-free geophysical bands of training_features.tif (surface conductivity / depth to conductive base; dilatation rate, shear strain rate, 2nd strain-rate invariant; isostatic gravity anomaly + slope; magnetics RTP/TMI anomaly + vertical & horizontal slope; earthquake density) ranks geothermal structural zones above background. It targets physical proxies of active faulting and fluid flow rather than USGS/INGENIOUS catalogue membership, so it can surface faults missing from the catalogue.",
-  "mechanism": "Locate feature bands by description metadata; percentile-normalize each band to [0,1] on valid pixels; average bands; apply mild contrast (x^1.25); write NaN where features are null. Output: single-band float32 GeoTIFF, EPSG:32611, 100 m, values in [0,1], nodata where features are null.",
-  "named_non_fault_mimic": "Lithologic or stratigraphic boundaries can produce gravity/magnetic/conductivity contrasts and localized strain without displacement (false positives).",
-  "holdout_dti": {
+  "hypothesis": "Compensated gravity step under cover (queue only; no experiment run)",
+  "mechanism": "Signed paired gravity curvature with an aligned basement-depth step",
+  "non_fault_mimic": "Intrusive density contact",
+  "holdout": {
     "label": "HOLDOUT-DTI",
-    "evaluator_version": "GEMS distance-weighted Tversky, alpha=0.2, beta=0.8, triangular kernel R=300 m (3 px at 100 m)",
+    "evaluator_version": null,
     "withheld_positive_count": null,
     "score": null,
     "ci95": null,
-    "status": "NOT RUN: labels.tif is auth-gated on DrivenData (login required) and cannot be downloaded from this environment, so no holdout score or CI exists. Do not treat any projection as a score."
+    "status": "Not evaluated: shared evaluator/cache and assigned lane absent"
   },
-  "correlation_overlap_vs_registry": {
-    "rank_correlation": null,
-    "dot_fraction_within_3px": null,
-    "status": "NOT RUN: no registry rasters are provided with the public competition data, so the lane duplicate check (>0.90 rank correlation, >70% of dots within 3 px) cannot be executed."
-  },
-  "leakage_canary": {
-    "available": false,
-    "status": "NOT RUN: per-feature AUC vs held-out labels requires labels.tif; no AUC > 0.90 leakage signal can be confirmed or excluded."
+  "registry": {
+    "surface_rank_correlation": null,
+    "final_dot_overlap_within_3px": null,
+    "status": "Not evaluated: complete registry absent; no placement performed"
   },
   "raster_sha256": "0afa36baf428e73f817bf53e623a1d2b279ff2852dec814bc8a444ee6781b858",
-  "raster_zip_sha256": "aceaf3f407139f8d0884c8f85d3901351f6088256024ab2f5590add2d70796c5",
-  "validator_output": {
-    "status": "PARTIAL (self-checks only; official template unavailable)",
-    "no_nan_inside_footprint": true,
-    "values_in_0_1": true,
-    "observed_value_range": [0.05, 0.9],
-    "crs_shape_transform_match": null,
-    "crs": "EPSG:32611",
-    "shape": [3000, 4000],
-    "transform": [100.0, 0.0, 250000.0, 0.0, -100.0, 4450000.0],
-    "note": "Exact CRS/shape/geotransform match vs data/sample_submission.tif is UNVERIFIED because the DrivenData bundle requires login. File is internally well-formed but is an illustrative fallback grid (approximate Walker Lane box), not the official competition grid."
-  },
-  "submission": {
-    "name": "gemsdoe80-structural-prior-v1-20261021T214821Z",
-    "note": "Unsupervised geothermal structural-propensity prior (strain, potential-field gradients, conductivity, seismicity), normalized [0,1]; label-free.",
-    "note_length_chars": 135,
-    "download_url": "./submissions/gemsdoe80-structural-prior-v1-20261021T214821Z.tif",
+  "raster_role": "Inherited synthetic placeholder only; no new raster generated",
+  "validator": {
+    "format_valid": false,
     "download_ready": false,
     "organizer_confirmed": false,
-    "verdict_on_file": "Do not submit as-is: regenerate against data/sample_submission.tif and validate first."
+    "prediction": "docs/submissions/gemsdoe80-structural-prior-v1-20261021T214821Z.tif",
+    "template": "data/sample_submission.tif",
+    "checks": {
+      "driver": "GTiff",
+      "band_count": 1,
+      "template_band_count": 1,
+      "shape_matches": false,
+      "crs_matches": true,
+      "transform_matches": false,
+      "template_has_crs": true,
+      "prediction_dtype": [
+        "float32"
+      ],
+      "finite_values": true,
+      "no_nan_or_infinite_inside_footprint": true,
+      "template_footprint_covered": false
+    },
+    "errors": [
+      "Prediction height/width do not match template",
+      "Prediction affine transform does not exactly match template"
+    ],
+    "value_range": [
+      0.05000000074505806,
+      0.8999999761581421
+    ],
+    "nan_inside_footprint": null,
+    "crs": "EPSG:32611",
+    "shape": [
+      3000,
+      4000
+    ],
+    "transform": [
+      100.0,
+      0.0,
+      250000.0,
+      0.0,
+      -100.0,
+      4450000.0
+    ],
+    "sha256": "0afa36baf428e73f817bf53e623a1d2b279ff2852dec814bc8a444ee6781b858",
+    "holdout": {
+      "available": false
+    },
+    "leakage_canary": {
+      "available": false
+    },
+    "lane_check": {
+      "available": false,
+      "note": "no registry raster provided with public competition data"
+    },
+    "values_in_0_1": true,
+    "format_ready": false,
+    "promotion_blockers": [
+      "Shared hide-and-recover HOLDOUT-DTI and CI unavailable",
+      "Per-feature leakage canary unavailable",
+      "Surface and final-dot registry comparisons unavailable",
+      "Current holdout best and weekly cap unverified"
+    ]
   },
+  "submission": {
+    "name": null,
+    "note": "Blocked: inherited TIFF fails grid checks; no new candidate generated or promoted.",
+    "download_ready": false,
+    "weekly_slots_used_this_session": 0
+  },
+  "experiments_this_session": 0,
   "verdict": "negative",
-  "verdict_reason": "Holdout DTI uncomputable (labels auth-gated) and exact submission-grid match unverifiable (sample template auth-gated). Not promotable; this is a negative-result deliverable.",
-  "next_actions": [
-    "Obtain the DrivenData bundle manually (login required): training_features.tif, labels.tif, sample_submission.tif, 1m_DEM_links.csv into data/.",
-    "python scripts/prepare_data.py (confirm official grid).",
-    "python scripts/generate_submission.py --template data/sample_submission.tif --features data/training_features.tif.",
-    "python scripts/validate_submission.py docs/submissions/<name>.tif --template data/sample_submission.tif --labels data/labels.tif --features data/training_features.tif.",
-    "Run registry duplicate check; holdout DTI must beat current best before spending a submission slot."
-  ],
-  "links": {
-    "competition": "https://www.drivendata.org/competitions/306/competition-doe-gems/",
-    "problem_description": "https://www.drivendata.org/competitions/306/competition-doe-gems/page/967/",
-    "about": "https://www.drivendata.org/competitions/306/competition-doe-gems/page/968/",
-    "data_page": "https://www.drivendata.org/competitions/306/competition-doe-gems/data/",
-    "leaderboard": "https://www.drivendata.org/competitions/306/competition-doe-gems/leaderboard/",
-    "reference_solution": "https://github.com/drivendataorg/gems-prize-reference-solution",
-    "geodawn_usgs": "https://www.usgs.gov/data/geodawn-airborne-magnetic-and-radiometric-surveys-northwestern-great-basin-nevada-and",
-    "geodawn_sciencebase": "https://www.sciencebase.gov/catalog/item/657e1d85d34e23d3533209f7",
-    "ingenious": "https://gbcge.org/current-projects/ingenious/",
-    "epsg_32611": "https://epsg.io/32611",
-    "tversky": "https://en.wikipedia.org/wiki/Tversky_index",
-    "submission_pdf": "https://docs.nlr.gov/docs/fy26osti/96647.pdf"
-  }
+  "blockers": [
+    "No single method paragraph designates lane",
+    "Shared cached stack, evaluate_holdout.py and submission_writer.py absent",
+    "Complete registry and current holdout best absent",
+    "Owner mirror integrity verified; organizer authenticity unverified"
+  ]
 }
