@@ -1,0 +1,7 @@
+# Competition rasters and cached/generated research artifacts must not be committed.
+data/
+artifacts/
+__pycache__/
+*.py[cod]
+.venv/
+.pytest_cache/

@@ -1,0 +1,32 @@
+{
+  "hypothesis": "Tentative candidate: DEM-derived drainage-network lateral deflection and opposing catchment imbalance can indicate unmapped structure-controlled permeability or deformation. Not tested.",
+  "mechanism": "A concealed fault may organize channel orientations or basin geometry away from mapped catalogue traces; this mechanism is a hypothesis and must be separated from terrain and land-use controls.",
+  "named_non_fault_mimic": "Lithologic boundary-controlled drainage and erosional capture (also possible: landslides, roads, or ditches).",
+  "holdout_dti": {
+    "label": "HOLDOUT-DTI",
+    "evaluator_version": null,
+    "withheld_positive_count": null,
+    "score": null,
+    "ci95": null,
+    "status": "NOT RUN: training labels, shared evaluator, and feature stack are absent."
+  },
+  "correlation_overlap_vs_registry": {
+    "rank_correlation": null,
+    "dot_fraction_within_3px": null,
+    "status": "NOT RUN: no candidate raster or registry rasters in this checkout."
+  },
+  "raster_sha256": null,
+  "validator_output": {
+    "status": "BLOCKED: no prediction TIFF or official sample template; rasterio/numpy are not installed.",
+    "no_nan_inside_footprint": null,
+    "values_in_0_1": null,
+    "crs_shape_transform_match": null
+  },
+  "submission": {
+    "name": null,
+    "note": "DEM drainage deflection and catchment imbalance; candidate only, not validated.",
+    "download_ready": false,
+    "organizer_confirmed": false
+  },
+  "verdict": "negative"
+}
