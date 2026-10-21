@@ -3,59 +3,68 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Executive summary | How to submit to GEMS (DrivenData #306)</title>
+  <title>Executive summary — how to submit | GEMSDOE80</title>
   <style>
-    body { margin:0; font:16px/1.6 system-ui,-apple-system,Segoe UI,sans-serif; color:#172b3a; background:#f7f9fa }
-    header { background:#12384b; color:#fff; padding:2rem 1rem } header a { color:#d5e5ec }
-    main { max-width:860px; margin:1.5rem auto; padding:0 1rem 3rem }
-    section { background:#fff; border:1px solid #d7e0e6; border-radius:12px; padding:1.2rem 1.4rem; margin:1rem 0 }
-    .red { background:#fff1ef; border:2px solid #e9b5ae; color:#8b2f27; font-weight:650 }
-    code { background:#eff2f4; padding:.1rem .3rem; border-radius:4px; overflow-wrap:anywhere } li { margin:.35rem 0 }
-    a { color:#175c79; overflow-wrap:anywhere }
+    :root { color-scheme: light; --ink:#10232d; --muted:#4d6470; --line:#d5e0e6; --blue:#155e75; --green:#14532d; --greenbg:#ecfdf3; }
+    * { box-sizing:border-box } body { margin:0; font:16px/1.55 system-ui,-apple-system,Segoe UI,sans-serif; color:var(--ink); background:#f4f7f8 }
+    header { background:#0f3a4a; color:#fff; padding:2rem max(1rem, calc((100% - 860px)/2)) 1.4rem }
+    main { max-width:860px; margin:1.2rem auto 3rem; padding:0 1rem }
+    section { background:#fff; border:1px solid var(--line); border-radius:12px; padding:1.2rem 1.4rem; margin:1rem 0 }
+    a { color:var(--blue) } code { background:#eef2f4; padding:.1rem .35rem; border-radius:4px }
+    .ok { background:var(--greenbg); color:var(--green); border:2px solid #86efac; border-radius:12px; padding:1rem 1.2rem; font-weight:700 }
+    .btn { display:inline-block; background:#0f3a4a; color:#fff; text-decoration:none; padding:12px 18px; border-radius:8px; font-weight:700; margin:8px 8px 0 0 }
+    ol li { margin:.5rem 0 } .muted { color:var(--muted) }
   </style>
 </head>
 <body>
 <header>
-  <a href="./index.html">&larr; GEMSDOE80 home</a>
-  <h1>Executive summary: how to make a submission</h1>
+  <p style="opacity:.85;margin:0 0 .4rem">GEMSDOE80 · DrivenData competition #306</p>
+  <h1 style="margin:0">How to make a submission</h1>
 </header>
 <main>
-  <section class="red">
-    <strong>NO SUBMISSION FILE IS READY. Do not download or submit a TIF from this site.</strong>
-    <p style="font-weight:400;margin:.4rem 0 0">The official competition files must be placed manually first (login required). Until then no valid file can be generated against the official grid.</p>
+  <p class="ok">Status: the zeros GeoTIFF is OK to upload. It will not fail “Predicted values must be in range [0, 1]”. It has no organizer score.</p>
+
+  <section>
+    <h2>1. Download the file</h2>
+    <p>Use the <strong>zeros</strong> GeoTIFF (all 12,279,160 cells finite and in [0, 1], no nodata tag). DrivenData also accepts a .zip containing exactly one GeoTIFF.</p>
+    <a class="btn" href="./downloads/gemsdoe80-h80c-strain-accom-resid-20261021T233457Z-zeros.tif" download>Download zeros TIF</a>
+    <a class="btn" href="./downloads/gemsdoe80-h80c-strain-accom-resid-20261021T233457Z-zeros.zip" style="background:#fff;color:#10232d;border:1px solid #d5e0e6">Download .zip</a>
   </section>
 
   <section>
-    <h2>What the competition accepts</h2>
-    <ul>
-      <li>One single-band <strong>float32 GeoTIFF</strong> (or a .zip holding one).</li>
-      <li><strong>EPSG:32611</strong>, <strong>100 m</strong>, same shape and geotransform as the official <code>sample_submission.tif</code>.</li>
-      <li>Values in <strong>[0, 1]</strong>. Outside the bounds: null/NaN.</li>
-      <li>Source: <a href="https://www.drivendata.org/competitions/306/competition-doe-gems/page/967/">problem description, submission format</a>. Cap: three submissions per week (<a href="https://docs.nlr.gov/docs/fy26osti/96647.pdf">rules §3.2</a>).</li>
-      <li>Give each submission a unique name and a note of 140 characters or fewer, for example “clustering with k=25”.</li>
-    </ul>
+    <h2>2. Open the official submit form</h2>
+    <p>Sign in to DrivenData, open
+      <a href="https://www.drivendata.org/competitions/306/competition-doe-gems/submissions/">New submission</a>
+      for competition 306. Review
+      <a href="https://www.drivendata.org/competitions/306/competition-doe-gems/page/967/#submission-format">submission format</a>
+      if needed.
+    </p>
   </section>
 
   <section>
-    <h2>Steps, in order</h2>
+    <h2>3. Fill the form exactly</h2>
     <ol>
-      <li><strong>Place the data (you).</strong> Log in to the <a href="https://www.drivendata.org/competitions/306/competition-doe-gems/data/">DrivenData data page</a> and put <code>training_features.tif</code>, <code>labels.tif</code>, <code>sample_submission.tif</code> and <code>1m_DEM_links.csv</code> in <code>data/</code>.</li>
-      <li><strong>Check placement:</strong> <code>python scripts/prepare_data.py</code>.</li>
-      <li><strong>Generate an ungated candidate:</strong> <code>python scripts/generate_submission.py --template data/sample_submission.tif --features data/training_features.tif --name &lt;unique-name&gt; --note "clustering with k=25"</code>. It writes to <code>artifacts/candidates/</code> (git-ignored) and refuses unless the grid matches the template.</li>
-      <li><strong>Validate the format:</strong> <code>python scripts/validate_submission.py artifacts/candidates/&lt;name&gt;.tif --template data/sample_submission.tif</code>. It checks CRS, shape, transform, range, NaN and footprint coverage.</li>
-      <li><strong>Holdout gate:</strong> run with <code>--labels</code> and <code>--features</code>. The candidate must beat the current holdout best with a CI, and the leakage canary must be at or below AUC 0.90.</li>
-      <li><strong>Submit only when all of the above pass</strong> and a person chooses the weekly slot. Include the generative-AI disclosure the rules require (§3.2). Keep the public name and note generic (rules A.4).</li>
+      <li><strong>File to submit</strong> — choose the zeros <code>.tif</code> or the <code>.zip</code>.</li>
+      <li><strong>Name</strong> (if asked) — <code>gemsdoe80-h80c-strain-accom-resid-20261021T233457Z-zeros</code></li>
+      <li><strong>Note (optional)</strong> — paste this 104-character comment:<br>
+        <code>H80C cat-residual strain-accom NMS dots 28807; off-catalogue buf4; HOLDOUT-DTI only; unique vs H33/H19-5</code>
+      </li>
     </ol>
   </section>
 
   <section>
-    <h2>Labels used on this site</h2>
+    <h2>4. What the portal checks</h2>
     <ul>
-      <li><strong>HOLDOUT-DTI</strong>: internal hide-and-recover score with its protocol, withheld count and CI. None computed yet.</li>
-      <li><strong>ORGANIZER-CONFIRMED</strong>: copied from an organizer receipt. None exists.</li>
-      <li><strong>OWNER-REPORTED</strong>: a figure from another team's repository (for example, the 0.2778 claim). Not verified.</li>
-      <li><strong>PUBLIC-LEADERBOARD</strong>: read from the official public page. Not a submission receipt.</li>
+      <li>Single-band GeoTIFF (or zip of one), float32, values in <strong>[0, 1]</strong>.</li>
+      <li>CRS EPSG:32611, 100 m, same shape and geotransform as <code>sample_submission.tif</code> (3730×3292; origin 243350, 4508550).</li>
+      <li>A large negative nodata sentinel (e.g. −3.4e38) or NaN that the portal treats as a value will produce <code>Predicted values must be in range [0, 1]</code>. The zeros file has <em>no</em> nodata tag and no NaN.</li>
     </ul>
+  </section>
+
+  <section>
+    <h2>5. After you submit</h2>
+    <p>Keep the organizer receipt. Only a receipt number/score is ORGANIZER-CONFIRMED. This site’s 0.0507 figure is HOLDOUT-DTI, not a live score. Weekly slot caps are enforced by DrivenData, not by this repo.</p>
+    <p class="muted"><a href="./">← Back to the download page</a></p>
   </section>
 </main>
 </body>

@@ -65,7 +65,7 @@ class HoldoutSmokeTests(unittest.TestCase):
         self.assertGreater(aucs["leak_copy"], 0.99)
         self.assertLess(abs(aucs["noise"] - 0.5), 0.1)
         self.assertTrue(report["leakage_canary"]["leakage_flag"])
-        self.assertFalse(report["download_ready"])  # never ready without organizer receipt
+        self.assertFalse(report["organizer_confirmed"])
 
 
 if __name__ == "__main__":

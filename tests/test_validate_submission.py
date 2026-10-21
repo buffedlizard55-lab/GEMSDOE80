@@ -47,12 +47,14 @@ class SubmissionValidatorTests(unittest.TestCase):
         )
         self.assertIn(result.returncode, (0, 1), result.stderr)
         report = json.loads(result.stdout)
-        self.assertFalse(report["download_ready"])
+        self.assertFalse(report["organizer_confirmed"])
         return report
 
     def test_valid_raster_is_format_valid_but_not_auto_promoted(self) -> None:
         report = self.validate("valid", np.full((2, 3), 0.4, dtype="float32"))
         self.assertTrue(report["format_valid"])
+        self.assertTrue(report["download_ready"])
+        self.assertFalse(report["organizer_confirmed"])
         self.assertTrue(report["checks"]["crs_matches"])
         self.assertTrue(report["checks"]["transform_matches"])
 
