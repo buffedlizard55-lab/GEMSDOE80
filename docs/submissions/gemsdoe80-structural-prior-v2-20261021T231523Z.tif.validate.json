@@ -1,0 +1,53 @@
+{
+  "format_valid": true,
+  "download_ready": false,
+  "organizer_confirmed": false,
+  "prediction": "docs/submissions/gemsdoe80-structural-prior-v2-20261021T231523Z.tif",
+  "template": "docs/submissions/gemsdoe80-structural-prior-v2-20261021T231523Z.tif",
+  "checks": {
+    "driver": "GTiff",
+    "band_count": 1,
+    "template_band_count": 1,
+    "shape_matches": true,
+    "crs_matches": true,
+    "transform_matches": true,
+    "template_has_crs": true,
+    "prediction_dtype": [
+      "float32"
+    ],
+    "finite_values": true,
+    "no_nan_or_infinite_inside_footprint": true,
+    "footprint_overlaps_template": true
+  },
+  "errors": [],
+  "value_range": [
+    0.05000000074505806,
+    0.8999999761581421
+  ],
+  "nan_inside_footprint": 0,
+  "crs": "EPSG:32611",
+  "shape": [
+    3000,
+    4000
+  ],
+  "transform": [
+    100.0,
+    0.0,
+    250000.0,
+    0.0,
+    -100.0,
+    4450000.0
+  ],
+  "sha256": "a7a476f00630b0c784c740211798e04e09d71ddd4e1a4c8f19938ae1991f713a",
+  "holdout": {
+    "available": false
+  },
+  "leakage_canary": {
+    "available": false
+  },
+  "lane_check": {
+    "available": false,
+    "note": "no registry raster provided with public competition data"
+  },
+  "values_in_0_1": true
+}

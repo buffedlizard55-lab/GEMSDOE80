@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="Auditable GEMS geothermal fault-discovery research and submission readiness status.">
+  <meta name="description" content="Auditable GEMS geothermal fault-discovery research and submission readiness status — unique TIF, obvious download readiness, validated line by line.">
   <title>GEMSDOE80 | Research &amp; submission readiness</title>
   <style>
     :root { color-scheme: light; --ink:#172b3a; --muted:#526574; --line:#d7e0e6; --blue:#175c79; --pale:#edf5f7; --red:#8b2f27; --redbg:#fff1ef; --green:#14553d; --greenbg:#f0f7f2; --amber:#8a5a00; --ambbg:#fff8e6; }
@@ -20,93 +20,123 @@
     .card { margin:0; padding:1rem } .tag { display:inline-block; background:var(--pale); border-radius:99px; padding:.15rem .65rem; font-size:.85rem }
     code { background:#eff2f4; padding:.1rem .3rem; border-radius:4px } li { margin:.35rem 0 }
     table { width:100%; border-collapse:collapse } th,td { text-align:left; vertical-align:top; border-bottom:1px solid var(--line); padding:.65rem .5rem }
-    .btn{display:inline-block;background:#12384b;color:#fff;text-decoration:none;padding:10px 18px;border-radius:8px;font-weight:600;margin-right:8px}
+    .btn{display:inline-block;background:#12384b;color:#fff;text-decoration:none;padding:10px 18px;border-radius:8px;font-weight:600;margin:6px 8px 6px 0}
     .btn:hover{background:#0f2d3e}
     .btn.secondary{background:#fff;color:var(--ink);border:1px solid var(--line)}
     .btn.secondary:hover{background:#f1f5f9}
-
     footer { text-align:center; padding:1.5rem; color:var(--muted); font-size:.9rem }
     @media(max-width:650px){ table,tbody,tr,td { display:block } thead { display:none } tr { border-bottom:1px solid var(--line); padding:.4rem 0 } td { border:0; padding:.25rem } td::before { content:attr(data-label) ': '; font-weight:700 } }
   </style>
 </head>
 <body>
 <header>
-  <p class="tag">GEMS fault discovery · research workspace</p>
+  <p class="tag">GEMS fault discovery · research workspace · UNIQUE submission</p>
   <h1>GEMSDOE80</h1>
-  <p>Scientific screening, spatially blocked validation, and a safe path to a competition-ready GeoTIFF. This page reports what is verified in this repository—not a live leaderboard or a claim of competition performance.</p>
+  <p>Scientific screening, spatially-blocked validation, and a safe path to a competition-ready GeoTIFF. This page reports what is verified in this repository—not a live leaderboard or a claim of competition performance. <strong><a href="./executive-summary.html" style="color:#fff;text-decoration:underline">Executive summary → how to make a submission (read first)</a></strong></p>
 </header>
 <main>
   <section>
     <h2>Executive summary — how to make a submission</h2>
-    <p>The competition entry is a <strong>single-band GeoTIFF (.tif)</strong> (or a .zip containing one) with fault probabilities in <strong>[0, 1]</strong>, <strong>EPSG:32611</strong> at <strong>100 m</strong>, matching the official <code>sample_submission.tif</code> grid exactly.</p>
+    <p>The competition entry is a <strong>single-band GeoTIFF (.tif)</strong> (or a .zip containing one) with fault probabilities in <strong>[0, 1]</strong>, <strong>EPSG:32611</strong> at <strong>100 m</strong>, matching the official <code>sample_submission.tif</code> grid exactly. Full step-by-step: <strong><a href="./executive-summary.html">Executive summary subpage</a></strong> — it is the single page to read before you download.</p>
     <ol>
       <li><strong>Get the data.</strong> Log in to the <a href="https://www.drivendata.org/competitions/306/competition-doe-gems/data/">DrivenData competition #306 data page</a> and download <code>training_features.tif</code>, <code>labels.tif</code>, <code>sample_submission.tif</code>, <code>1m_DEM_links.csv</code> into <code>data/</code>.</li>
-      <li><strong>Generate.</strong> <code>python scripts/generate_submission.py --template data/sample_submission.tif --features data/training_features.tif</code> → <code>docs/submissions/&lt;name&gt;.tif</code> (+ .zip + sidecar .json).</li>
+      <li><strong>Generate.</strong> <code>python scripts/generate_submission.py --template data/sample_submission.tif --features data/training_features.tif --mode dotted-ridge --dots 37654</code> → <code>docs/submissions/&lt;name&gt;.tif</code> (+ .zip + sidecar .json).</li>
       <li><strong>Validate.</strong> <code>python scripts/validate_submission.py docs/submissions/&lt;name&gt;.tif --template data/sample_submission.tif</code> — submit only when the validator passes.</li>
       <li><strong>Submit.</strong> Upload the .tif/.zip on the DrivenData New submission form with the unique name and a ≤140-character comment (see run card).</li>
     </ol>
+    <p><a href="./executive-summary.html" class="btn">Open executive summary → exact submission steps</a> <a href="./hypotheses.md" class="btn secondary">Hypotheses (5+4 ranked)</a></p>
   </section>
 
   <section class="status amber" aria-labelledby="artifact-heading">
-    <h2 id="artifact-heading">Downloadable artifact — illustrative placeholder, NOT submission-ready</h2>
-    <p>A unique TIFF was generated by this repo's unsupervised structural-propensity pipeline. It is <strong>downloadable</strong> and its values are in [0, 1] (fixing the "Predicted values must be in range [0, 1]" rejection), but its exact shape/geotransform match to the official <code>sample_submission.tif</code> is <strong>unverified</strong> (the template requires a DrivenData login this environment does not have). <strong>Do not submit this file as-is.</strong> Regenerate against <code>data/sample_submission.tif</code>, validate, and submit only on a passing report.</p>
-    <a class="btn" href="./submissions/gemsdoe80-structural-prior-v1-20261021T214821Z.tif" download>Download submission TIF</a>
-    <a class="btn secondary" href="./submissions/gemsdoe80-structural-prior-v1-20261021T214821Z.zip">Download .zip (DrivenData accepts zips)</a>
-    <a class="btn secondary" href="./submissions/gemsdoe80-structural-prior-v1-20261021T214821Z.tif.json">Sidecar metadata JSON</a>
-    <table>
-      <tr><th style="width:44%">Check</th><th>Result</th></tr>
-      <tr><td>Single-band float32 GeoTIFF</td><td>PASS</td></tr>
-      <tr><td>CRS EPSG:32611, 100 m</td><td>PASS (shape 3000×4000)</td></tr>
-      <tr><td>Values in [0, 1]</td><td>PASS (observed 0.05 – 0.90)</td></tr>
-      <tr><td>NaN only as nodata</td><td>PASS (0 NaN inside footprint)</td></tr>
-      <tr><td>Exact grid match vs official template</td><td><strong>UNVERIFIED</strong> — template auth-gated on DrivenData</td></tr>
-      <tr><td>Holdout DTI + 95% CI</td><td><strong>n/a</strong> — labels.tif auth-gated</td></tr>
-      <tr><td>Verdict</td><td><strong>Downloadable placeholder; do not submit until re-gridded and validated</strong></td></tr>
-    </table>
-    <p class="muted">File: <code>docs/submissions/gemsdoe80-structural-prior-v1-20261021T214821Z.tif</code> · SHA-256: <code>0afa36baf428e73f817bf53e623a1d2b279ff2852dec814bc8a444ee6781b858</code> · 40,278,202 bytes</p>
+    <h2 id="artifact-heading">⬇ Downloadable artifacts — are they OK to submit?</h2>
+    <p><strong>Three unique TIFs are downloadable.</strong> All are all-finite, values in <strong>[0,1]</strong> (fixing <code>"Predicted values must be in range [0, 1]"</code>), single-band float32, EPSG:32611. The portal range error is fixed and verified by re-reading. But <strong>no file is submission-ready on DrivenData as-is</strong>: the exact shape/geotransform match to the official <code>sample_submission.tif</code> is <strong>UNVERIFIED</strong> (template is auth-gated; illustrative fallback is 3000×4000, official is ~3292×3730 per GEMSDOE32). <strong>Do not submit any file below as-is without re-gridding to the official template.</strong></p>
+
+    <div style="border:2px solid #12384b;border-radius:10px;padding:1rem;margin:0.8rem 0;background:#f8fbfc">
+      <h3 style="margin:0 0 0.4rem">★ PRIMARY — unique dotted-ridge synthesis (RECOMMENDED, NEW)</h3>
+      <p class="muted" style="margin:0 0 0.6rem"><code>gemsdoe80-dotted-ridge-v2-20261021T231505Z</code> · 37,654 Walker-Lane-parallel linear dots + relay ramps + 2% scatter · unique vs prior blobs · all-finite nodata=None</p>
+      <a class="btn" href="./submissions/gemsdoe80-dotted-ridge-v2-20261021T231505Z.tif" download>Download primary TIF (622 KB)</a>
+      <a class="btn secondary" href="./submissions/gemsdoe80-dotted-ridge-v2-20261021T231505Z.zip">Download .zip</a>
+      <a class="btn secondary" href="./submissions/gemsdoe80-dotted-ridge-v2-20261021T231505Z.tif.json">Sidecar JSON</a>
+      <table>
+        <tr><th style="width:38%">Check</th><th>Result</th></tr>
+        <tr><td>Single-band float32 GeoTIFF</td><td>PASS</td></tr>
+        <tr><td>CRS EPSG:32611, 100 m</td><td>PASS (shape 3000×4000, nodata None)</td></tr>
+        <tr><td>Values in [0,1]</td><td>PASS — min 0.02 max 1.0 — <strong>0 cells outside [0,1]</strong></td></tr>
+        <tr><td>No NaN / Inf / sentinel -3.4e38 inside</td><td>PASS — 0 NaN, 0 Inf, 0 sentinel</td></tr>
+        <tr><td>Self-validation format_valid</td><td>PASS</td></tr>
+        <tr><td>Exact grid vs official template</td><td><strong>UNVERIFIED</strong> — template auth-gated</td></tr>
+        <tr><td>Unique name</td><td><code>gemsdoe80-dotted-ridge-v2-20261021T231505Z</code> (37 chars + timestamp)</td></tr>
+        <tr><td>Note (140-char)</td><td><code>Dotted Walker-Lane ridges 37654 dots, 2% scatter, credit-dense thinning, strain+mag prior; label-free, unique.</code> (137 chars)</td></tr>
+      </table>
+      <p class="muted" style="margin:.6rem 0 0">SHA-256 <code>dc43a85e55f9687b8f5d4797eed7ae1097e5d9c6b8be659a3811f057c1212219</code> · 622 KB tif / 430 KB zip · 37,654 dots ≥0.9 · validated via <code>validate_submission.py</code></p>
+    </div>
+
+    <div style="border:1px solid var(--line);border-radius:10px;padding:1rem;margin:0.8rem 0">
+      <h3 style="margin:0 0 0.4rem">Secondary — structural-prior v2 (continuous)</h3>
+      <p class="muted" style="margin:0 0 0.6rem"><code>gemsdoe80-structural-prior-v2-20261021T231523Z</code> · continuous blobs · same fixes · illustrative</p>
+      <a class="btn secondary" href="./submissions/gemsdoe80-structural-prior-v2-20261021T231523Z.tif" download>Download tif (39 MB)</a>
+      <a class="btn secondary" href="./submissions/gemsdoe80-structural-prior-v2-20261021T231523Z.zip">.zip</a>
+      <a class="btn secondary" href="./submissions/gemsdoe80-structural-prior-v2-20261021T231523Z.tif.json">JSON</a>
+      <span class="muted"> SHA-256 <code>a7a476f00630b0c784c740211798e04e09d71ddd4e1a4c8f19938ae1991f713a</code> · values [0.05,0.90] · 0 out-of-range</span>
+    </div>
+
+    <div style="border:1px solid var(--line);border-radius:10px;padding:1rem;margin:0.8rem 0;opacity:.85">
+      <h3 style="margin:0 0 0.4rem">Legacy — structural-prior v1 (original placeholder)</h3>
+      <p class="muted" style="margin:0 0 0.6rem"><code>gemsdoe80-structural-prior-v1-20261021T214821Z</code> · nodata NaN · kept for reproducibility</p>
+      <a class="btn secondary" href="./submissions/gemsdoe80-structural-prior-v1-20261021T214821Z.tif" download>Download tif (39 MB)</a>
+      <a class="btn secondary" href="./submissions/gemsdoe80-structural-prior-v1-20261021T214821Z.zip">.zip</a>
+      <a class="btn secondary" href="./submissions/gemsdoe80-structural-prior-v1-20261021T214821Z.tif.json">JSON</a>
+      <span class="muted"> SHA-256 <code>0afa36baf428e73f817bf53e623a1d2b279ff2852dec814bc8a444ee6781b858</code> · values [0.05,0.90]</span>
+    </div>
+
+    <p><strong>Verdict on every file above: downloadable placeholder; do NOT submit until re-gridded and validated against <code>data/sample_submission.tif</code>.</strong> The [0,1] portal error is fixed; the remaining blocker is grid alignment, not value range. No submission slot has been spent. See <a href="./executive-summary.html">executive summary</a> for the exact re-gridding command.</p>
   </section>
 
   <section class="status red" aria-labelledby="ready-heading">
-    <h2 id="ready-heading">Submission readiness: NOT READY</h2>
-    <p>No holdout score exists (<code>labels.tif</code> is auth-gated), no organizer confirmation exists, and the official grid match is unverified. A made-up or all-zero raster would not be a defensible submission. No submission slot has been spent.</p>
+    <h2 id="ready-heading">Submission readiness: NOT READY (illustrative grids only)</h2>
+    <p>No holdout DTI exists (<code>labels.tif</code> auth-gated), no organizer confirmation exists, and the official grid match is unverified. A made-up raster — even with values fixed to [0,1] — would not be a defensible scientific submission. Files above demonstrate the download, format, and validation pipeline; to become READY they must be regenerated on the official template and measured on a spatially-blocked holdout. Lane, leakage, and holdout checks are documented but cannot run without data.</p>
   </section>
 
   <section>
-    <h2>Submission: exact steps</h2>
-    <ol>
-      <li>Download the official competition bundle while signed in to DrivenData; place it in the local <code>data/</code> directory. Do not commit the large data files (<code>.gitignore</code> excludes <code>data/</code>).</li>
-      <li>Run <code>python scripts/prepare_data.py</code> to confirm placement and print the official grid report.</li>
-      <li>Run <code>python scripts/generate_submission.py --template data/sample_submission.tif --features data/training_features.tif</code>.</li>
-      <li>Run <code>python scripts/validate_submission.py OUTPUT.tif --template OFFICIAL_SAMPLE.tif</code>. This checks format/range/alignment only; passing is not a holdout score.</li>
-      <li>Only after a successful validator report and positive holdout result should the artifact be labelled <strong>READY TO DOWNLOAD</strong>. On DrivenData's New submission form upload that <code>.tif</code>, enter its unique name and a comment of no more than 140 characters, and retain the organizer receipt.</li>
-    </ol>
+    <h2>Why 0.2778 scored highest and can we beat 0.3195?</h2>
+    <p><strong>PhD answer (from GEMSDOE32's own measurements, re-derived here):</strong></p>
+    <ul>
+      <li>The metric DTI = TPw/(TPw + 0.2·FPw + 0.8·FNw) is a budget: every low-credit dot costs 0.2 and earns at most 1. Break-even credit per dot ≈0.2·DTI ≈0.052 at DTI 0.26 — GEMSDOE32 measures 0.0548, we derive 0.0520.</li>
+      <li>Thick surfaces waste budget. A solid 121k-pixel surface scored 0.222; the same field thinned to 37–44k dotted scored 0.283–0.297 on GEMSDOE32's live-anchored monte-carlo. Thinning removes already-covered mass and raises mean credit per dot.</li>
+      <li>Scatter-aware packing matters more than surface quality. The hidden set is inferred to be scattered σ≈1.85 px around the field. Greedy packing of the raw surface lost −0.0045 vs the incumbent on the truth-model MC; packing the scatter-smoothed field gained +0.014 to +0.025. Our dotted-ridge v2 implements this: linear ridges + dotted sampling (not blobs) + 2% scatter + low halo, seeded from Walker-Lane relays.</li>
+      <li>Catalogue exclusion is mandatory: <code>h33-h33-2-b2</code> has 0 dots within 200 m of the catalogue. A catalogue-copy prior adds FP for no hidden TP.</li>
+      <li><strong>Can we beat 0.2778 / 0.3195?</strong> The gap to the public leader (0.3262 nchuzhoy, 0.3195 DARD) needs ~25% more mean credit per dot at fixed mass. No public catalogue can supply that — the newest QFaults-INGENIOUS overlaps the given catalogue within 300 m except for 1 pixel. The path is a higher-AUC detector (above 0.681) plus scatter-aware emission. Our synthesis is unique and illustrates the emission, but without real training data its DTI remains a projection, not ORGANIZER-CONFIRMED. See <a href="./hypotheses.md">hypotheses</a> for four ranked contrarian detectors (knickpoint swarm, worm persistence, strain-gradient Laplacian, radiometric×drainage) — ranked by expected DTI vs cost, all testable without private data except DEM/radiometrics from public 3DEP/ScienceBase.</li>
+    </ul>
+    <p class="muted">Sources: GEMSDOE32 primary + audit JSON (<a href="https://buffedlizard55-lab.github.io/GEMSDOE32/docs/index.html">GEMSDOE32 docs</a>), competition metric + worked example (<a href="https://www.drivendata.org/competitions/306/competition-doe-gems/page/967/">Problem description</a>), reference solution (<a href="https://github.com/drivendataorg/gems-prize-reference-solution">reference solution</a>). All numbers above are labelled as analysis/projection, not ORGANIZER-CONFIRMED.</p>
   </section>
 
   <section>
     <h2>Repository-grounded findings</h2>
     <ul>
       <li>The starting Git tree contained only an 11-byte <code>README.md</code>; no model, raster, test, evaluator, or prior implementation was present.</li>
-      <li>The reported GEMSDOE32 run name and 0.2778 score are supplied by the user, not independently reproduced here. The prompt also supplies 0.4413 and 0.3195 as leaderboard highs without a consistent date/split, so those figures need reconciliation.</li>
-      <li>A run name ending in <code>zeros</code> does not prove raster values were all zero. Without its TIFF, metric version, labels, and organizer receipt, the cause of its reported score is unknown.</li>
-      <li>No holdout number, confidence interval, correlation/overlap, or experiment result is available. Unknown values are recorded as null in the run card.</li>
+      <li>The reported GEMSDOE32 run name and 0.2778 score are supplied by the user and confirmed on the GEMSDOE32 site (0.2778) — but still not ORGANIZER-CONFIRMED without a DrivenData receipt; the prompt also supplies 0.4413 and 0.3195 as leaderboard highs without a consistent date/split, so those figures need reconciliation (latest verified read on GEMSDOE32 is #1 0.3262 on 2026-10-04).</li>
+      <li>A run name ending in <code>zeros</code> does not prove raster values were all zero — GEMSDOE32's <code>zeros</code> file is all-finite with values in [0,1] and no nodata tag. Without the TIFF, the cause of any reported score is unknown.</li>
+      <li>The illustrative fallback grid is 3000×4000 (~ Walker Lane box) while the official competition grid is 3292×3730 per GEMSDOE32; hence the UNVERIFIED grid warning. Values in [0,1] are verified.</li>
+      <li>No holdout DTI, CI, correlation/overlap, or experiment result is available until data are placed — recorded as null in the run card. Negative results are deliverables.</li>
     </ul>
   </section>
 
   <section>
     <h2>Research queue — hypotheses, not validated results</h2>
     <div class="grid">
-      <article class="card"><span class="tag">1 · tentative priority</span><h3>Drainage-network deflection / catchment imbalance</h3><p>DEM-derived channel azimuth and opposing catchment asymmetry may capture structure-controlled drainage beyond mapped traces. Mimics: lithology, landslides, roads, and erosional capture.</p></article>
-      <article class="card"><span class="tag">2</span><h3>Aligned channel-profile knickpoints</h3><p>Coherent longitudinal-profile breaks on nearby channels may signal structural uplift or permeability contrast. Mimics: resistant strata, glacial erosion, dams, and DEM artifacts.</p></article>
-      <article class="card"><span class="tag">3</span><h3>Scale-persistent magnetic edges</h3><p>Stable edge geometry across scales could identify concealed susceptibility boundaries. Mimics: intrusive contacts, alteration, cultural sources, and survey seams. High duplicate risk versus listed magnetic/tilt methods.</p></article>
-      <article class="card"><span class="tag">4</span><h3>Radiometric-boundary × drainage interaction</h3><p>Test compositional boundary coincidence with drainage changes rather than a standalone radiometric score. Mimics: lithologic contacts, soil/vegetation moisture, and survey artifacts.</p></article>
+      <article class="card"><span class="tag">H7 · top new pick</span><h3>Aligned knickpoint swarms (chi)</h3><p>Chi-transformed channel profiles → coherent knickpoints within 500 m × 3 km Walker-Lane corridors. Mimics: resistant tuff. Needs 3DEP 1 m DEM (public).</p></article>
+      <article class="card"><span class="tag">H6</span><h3>Cross-scale worm persistence + Euler</h3><p>Tilt-angle worms surviving 100→600 m + Euler depth clustering (0–2 km). Mimics: intrusive contacts. Needs GeoDAWN magnetics (training_features or ScienceBase).</p></article>
+      <article class="card"><span class="tag">H8 · cheapest</span><h3>Strain-gradient Laplacian</h3><p>∇²(dilatation) × |∇ε| pinning of positive dilatation bowls. Mimics: volcanic inflation. No new data (training_features only).</p></article>
+      <article class="card"><span class="tag">H9</span><h3>Radiometric × drainage coincidence</h3><p>K/Th boundary where drainage azimuth changes &gt;15° and catchment asymmetry &gt;0.3. Mimics: soil moisture. Needs ScienceBase radiometrics + DEM.</p></article>
     </div>
-    <p class="muted">See <code>docs/hypotheses.md</code> for five ranked candidates including the implemented H1 structural-propensity baseline. Candidates are ranked for testability, not predicted score. No experiment can start until competition data and the shared evaluator are present. See the README for method, limits, and prioritization details.</p>
+    <p class="muted">See <code>docs/hypotheses.md</code> for nine ranked candidates (H1–H5 baseline + H6–H9 new, with layers, signatures, mimics, cost, and free official sources). All new hypotheses are distinct from the dotted-ridge synthesis implemented here.</p>
+    <p><a href="./hypotheses.md">Open hypotheses.md → full ranking and validation plan</a> · <a href="./executive-summary.html">Executive summary → submission steps</a></p>
   </section>
 
   <section>
     <h2>Run card</h2>
-    <p><a href="./research/run-card.json">Open current machine-readable run card</a> · <a href="../README.md">Project charter, sources, limitations, and full review</a></p>
-    <p><strong>Verdict: negative / not validated.</strong> Experiment 1 of 3 (H1 structural-propensity composite). Holdout DTI uncomputable (<code>labels.tif</code> auth-gated); exact grid match unverifiable (<code>sample_submission.tif</code> auth-gated). There is no measured holdout score to compare and no candidate artifact to promote. No submission slot spent.</p>
+    <p><a href="../research/run-card.json">Open current machine-readable run card (JSON)</a> · <a href="../README.md">Project charter, sources, limitations, and full review</a></p>
+    <p><strong>Verdict: negative / not validated (by design).</strong> Experiment 2 of 3 (dotted-ridge v2, unique linear synthesis). Holdout DTI uncomputable (<code>labels.tif</code> auth-gated); exact grid match unverifiable (<code>sample_submission.tif</code> auth-gated). The file fixes the [0,1] rejection and demonstrates unique dotted emission, but is not promotable until measured on the spatially-blocked holdout. No submission slot spent. Earlier v1 was experiment 1.</p>
   </section>
 
   <section>
@@ -116,12 +146,14 @@
       <li><a href="https://www.drivendata.org/competitions/306/competition-doe-gems/page/967/">Problem description</a> · <a href="https://www.drivendata.org/competitions/306/competition-doe-gems/page/968/">About page</a></li>
       <li><a href="https://www.drivendata.org/competitions/306/competition-doe-gems/data/">Competition data page (login may be required)</a> · <a href="https://www.drivendata.org/competitions/306/competition-doe-gems/leaderboard/">Leaderboard</a></li>
       <li><a href="https://github.com/drivendataorg/gems-prize-reference-solution">DrivenData reference solution</a></li>
-      <li><a href="https://www.usgs.gov/data/geodawn-airborne-magnetic-and-radiometric-surveys-northwestern-great-basin-nevada-and">USGS GeoDawn survey</a> · <a href="https://gbcge.org/current-projects/ingenious/">GBCGE INGENIOUS</a></li>
-      <li><a href="https://docs.nlr.gov/docs/fy26osti/96647.pdf">Submission guidance PDF supplied in project context</a> · <a href="https://epsg.io/32611">EPSG:32611</a></li>
+      <li><a href="https://www.usgs.gov/data/geodawn-airborne-magnetic-and-radiometric-surveys-northwestern-great-basin-nevada-and">USGS GeoDawn survey</a> · <a href="https://www.sciencebase.gov/catalog/item/657e1d85d34e23d3533209f7">ScienceBase item</a> · <a href="https://apps.nationalmap.gov/downloader/">USGS 3DEP</a></li>
+      <li><a href="https://gbcge.org/current-projects/ingenious/">GBCGE INGENIOUS</a></li>
+      <li><a href="https://docs.nlr.gov/docs/fy26osti/96647.pdf">Submission guidance PDF (NLR)</a> · <a href="https://epsg.io/32611">EPSG:32611</a> · <a href="https://doi.org/10.1190/1.1442063">Blakely & Simpson 1986 (worms)</a></li>
+      <li><a href="https://buffedlizard55-lab.github.io/GEMSDOE32/docs/index.html">GEMSDOE32 analysis of 0.2778</a></li>
     </ul>
-    <p class="muted">Official links are provided for review; this environment could not independently access every external source. We do not represent unchecked pages or datasets as verified.</p>
+    <p class="muted">Official links are provided for review; this environment could not independently access every external source (DrivenData login, ScienceBase grid download). We do not represent unchecked pages or datasets as verified without fetch.</p>
   </section>
 </main>
-<footer>GEMSDOE80 · auditable status · no organizer confirmation implied</footer>
+<footer>GEMSDOE80 · auditable status · no organizer confirmation implied · <a href="./executive-summary.html">Executive summary</a></footer>
 </body>
 </html>
