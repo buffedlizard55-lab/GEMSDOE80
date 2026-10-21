@@ -51,15 +51,16 @@ def main() -> int:
     ap.add_argument("--features", default=str(ROOT / "data" / "training_features.tif"))
     ap.add_argument("--labels", default=str(ROOT / "data" / "labels.tif"))
     ap.add_argument("--out-dir", default=str(ROOT / "docs" / "downloads"))
+    ap.add_argument("--out", default=None, help="Ignored compatibility flag (H80-C writes a zeros/nan pair).")
     args = ap.parse_args()
 
     template, features, labels_p = Path(args.template), Path(args.features), Path(args.labels)
     if not template.is_file():
-        print("[STATUS] NOT SUBMISSION-READY: missing sample_submission.tif")
+        print("[STATUS] BLOCKED: NOT SUBMISSION-READY: missing sample_submission.tif")
         print("[ACTION] Place the official template in data/ and re-run.")
         return 2
     if not features.is_file() or not labels_p.is_file():
-        print("[STATUS] NOT SUBMISSION-READY: missing training_features.tif or labels.tif")
+        print("[STATUS] BLOCKED: NOT SUBMISSION-READY: missing training_features.tif or labels.tif")
         return 2
 
     tpl = load_template(template)

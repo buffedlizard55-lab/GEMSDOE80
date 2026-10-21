@@ -84,13 +84,13 @@ def dti_weighted(pred, gt, resolution_m=RESOLUTION_M, alpha=ALPHA, beta=BETA):
     for dy in range(-R, R + 1):
         for dx in range(-R, R + 1):
             d = math.hypot(dy, dx)
-            if 0 < d <= R:
+            if d <= R:  # include the pixel itself (k(0)=1)
                 offs.append((dy, dx, float(d)))
     k_by_off = [(dy, dx, triangular_kernel(np.array([d]), R)[0]) for dy, dx, d in offs]
 
     H, W = p.shape
     padded = np.pad(p, R, mode="constant", constant_values=0.0)
-    local_max = np.full((H, W), -1.0, dtype=np.float64)
+    local_max = np.zeros((H, W), dtype=np.float64)
     for dy, dx, k in k_by_off:
         shifted = padded[R + dy : R + dy + H, R + dx : R + dx + W]
         local_max = np.maximum(local_max, shifted * k)
@@ -106,8 +106,8 @@ def dti_weighted(pred, gt, resolution_m=RESOLUTION_M, alpha=ALPHA, beta=BETA):
     gt_mask = g > 0
     pred_pos = p > 0
 
-    tp_w = float(np.where(gt_mask, local_max, 0.0).sum())
-    fn_w = float((1.0 - np.where(gt_mask, local_max, 0.0)).clip(min=0.0).sum())
+    tp_w = float(local_max[gt_mask].sum()) if gt_mask.any() else 0.0
+    fn_w = float((1.0 - local_max[gt_mask]).clip(min=0.0).sum()) if gt_mask.any() else 0.0
     fp_w = float((p[pred_pos] * (1.0 - kmap[pred_pos])).sum())
 
     dti = tp_w / (tp_w + alpha * fp_w + beta * fn_w + 1e-12)
@@ -232,10 +232,19 @@ def build_report(prediction: Path, template: Path):
             if not in_range:
                 errors.append("Prediction values must be in range [0, 1]")
 
-            nan_inside = int((~valid & pred_mask).sum())  # NaN where prediction claims data
+            nan_inside = int((~np.isfinite(values) & template_mask).sum())
             report["nan_inside_footprint"] = nan_inside
+            report["missing_inside_footprint"] = nan_inside
             if nan_inside:
-                errors.append(f"{nan_inside} NaN pixels inside the prediction footprint")
+                errors.append(f"{nan_inside} NaN pixels inside the template footprint")
+            checks["no_nan_or_infinite_inside_footprint"] = nan_inside == 0
+            # Finite values anywhere (including a numeric nodata sentinel) must be in [0, 1].
+            finite_all = np.isfinite(values)
+            if finite_all.any() and not bool(((values[finite_all] >= 0.0) & (values[finite_all] <= 1.0)).all()):
+                in_range = False
+                report["values_in_0_1"] = False
+                if "Prediction values must be in range [0, 1]" not in errors:
+                    errors.append("Prediction values must be in range [0, 1]")
 
             footprint_overlap = bool((pred_mask & template_mask).any()) if pred_mask.any() else False
             checks["footprint_overlaps_template"] = footprint_overlap

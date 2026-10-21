@@ -1,0 +1,53 @@
+{
+  "format_valid": true,
+  "download_ready": false,
+  "organizer_confirmed": false,
+  "prediction": "docs/submissions/gemsdoe80-dotted-ridge-v2-20261021T231505Z.tif",
+  "template": "docs/submissions/gemsdoe80-dotted-ridge-v2-20261021T231505Z.tif",
+  "checks": {
+    "driver": "GTiff",
+    "band_count": 1,
+    "template_band_count": 1,
+    "shape_matches": true,
+    "crs_matches": true,
+    "transform_matches": true,
+    "template_has_crs": true,
+    "prediction_dtype": [
+      "float32"
+    ],
+    "finite_values": true,
+    "no_nan_or_infinite_inside_footprint": true,
+    "footprint_overlaps_template": true
+  },
+  "errors": [],
+  "value_range": [
+    0.019999999552965164,
+    1.0
+  ],
+  "nan_inside_footprint": 0,
+  "crs": "EPSG:32611",
+  "shape": [
+    3000,
+    4000
+  ],
+  "transform": [
+    100.0,
+    0.0,
+    250000.0,
+    0.0,
+    -100.0,
+    4450000.0
+  ],
+  "sha256": "dc43a85e55f9687b8f5d4797eed7ae1097e5d9c6b8be659a3811f057c1212219",
+  "holdout": {
+    "available": false
+  },
+  "leakage_canary": {
+    "available": false
+  },
+  "lane_check": {
+    "available": false,
+    "note": "no registry raster provided with public competition data"
+  },
+  "values_in_0_1": true
+}

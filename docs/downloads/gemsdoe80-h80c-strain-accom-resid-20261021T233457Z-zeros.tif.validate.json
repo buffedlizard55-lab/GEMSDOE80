@@ -50,5 +50,6 @@
     "note": "no registry raster provided with public competition data"
   },
   "values_in_0_1": true,
+  "missing_inside_footprint": 0,
   "submit_format_ok": true
 }
