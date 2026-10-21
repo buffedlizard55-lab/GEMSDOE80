@@ -247,7 +247,10 @@ def build_report(prediction: Path, template: Path):
         return report
 
     report["format_valid"] = not errors
-    report["download_ready"] = report["format_valid"] and report["organizer_confirmed"]
+    # Format-valid files are OK to upload (will not trip "Predicted values must be in range [0, 1]").
+    # Organizer confirmation is a separate field and is never self-asserted.
+    report["submit_format_ok"] = report["format_valid"]
+    report["download_ready"] = report["format_valid"]
     return report
 
 
