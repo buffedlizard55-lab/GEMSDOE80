@@ -14,7 +14,7 @@
 #   3. Then run:
 #        python scripts/prepare_data.py
 #        python scripts/generate_submission.py --template data/sample_submission.tif --features data/training_features.tif
-#        python scripts/validate_submission.py submissions/<name>.tif
+#        python scripts/validate_submission.py docs/submissions/<name>.tif --template data/sample_submission.tif
 #
 set -euo pipefail
 
@@ -38,7 +38,7 @@ After placing the files:
   python "$REPO_DIR/scripts/generate_submission.py" \\
       --template "$DATA_DIR/sample_submission.tif" \\
       --features "$DATA_DIR/training_features.tif"
-  python "$REPO_DIR/scripts/validate_submission.py" submissions/<name>.tif
+  python "$REPO_DIR/scripts/validate_submission.py" "$REPO_DIR/docs/submissions/<name>.tif" --template "$DATA_DIR/sample_submission.tif"
 
 EOF
 exit 0

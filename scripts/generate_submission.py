@@ -7,13 +7,11 @@ Pipeline stage: inference -> submission raster.
 Design (unsupervised, leakage-safe):
   * No training labels are used to build the surface, so there is no label
     leakage into the submission.
-  * If data/sample_submission.tif (official DrivenData template) is present,
-    its CRS / geotransform / shape / dtype are used EXACTLY. DrivenData
-    requires the submission to match the submission format's CRS, shape and
-    geotransform; using the official template guarantees conformance.
-  * If the template is absent (data are auth-gated on DrivenData and cannot be
-    downloaded here), an illustrative grid is built and explicitly flagged as
-    NOT submission-ready.
+  * It REQUIRES data/sample_submission.tif (official DrivenData template) and
+    data/training_features.tif. Without them it exits 2 and writes nothing: the
+    grid is never guessed and no synthetic structure is ever generated. The
+    feature grid must match the template's shape, CRS and geotransform exactly,
+    otherwise it exits 3.
 
 The probability surface combines label-free geophysical/geological bands of
 training_features.tif (found by their band-description metadata, robust to band
@@ -55,7 +53,7 @@ from rasterio.transform import from_bounds
 
 REPO = Path(__file__).resolve().parents[1]
 DATA = REPO / "data"
-SUBMISSIONS = REPO / "site" / "submissions"
+SUBMISSIONS = REPO / "docs" / "submissions"
 
 # Competition format (official DrivenData specification).
 CRS = "EPSG:32611"          # UTM zone 11N
@@ -63,15 +61,6 @@ RESOLUTION_M = 100.0        # 100 m resolution
 DTYPE = "float32"
 NODATA = np.nan             # null outside the valid footprint
 VAL_MIN, VAL_MAX = 0.0, 1.0
-
-# Illustrative fallback grid (only when the official template is unavailable).
-# These bounds are an approximate Walker Lane box and are NOT the competition
-# grid. They must be replaced by data/sample_submission.tif before any real
-# submission is made.
-FALLBACK = dict(
-    xmin=250_000.0, xmax=650_000.0, ymin=4_150_000.0, ymax=4_450_000.0,
-)
-
 
 def sha256_file(path: Path) -> str:
     h = hashlib.sha256()
@@ -191,30 +180,6 @@ def build_surface_from_features(feature_path: Path):
     return surface, transform, crs, height, width, terms
 
 
-def illustrative_grid():
-    """Fallback illustrative grid (NOT submission-ready, no official grid match)."""
-    width = int(round((FALLBACK["xmax"] - FALLBACK["xmin"]) / RESOLUTION_M))
-    height = int(round((FALLBACK["ymax"] - FALLBACK["ymin"]) / RESOLUTION_M))
-    transform = from_bounds(
-        FALLBACK["xmin"], FALLBACK["ymin"], FALLBACK["xmax"], FALLBACK["ymax"],
-        width, height,
-    )
-    xs = np.arange(width) * RESOLUTION_M + FALLBACK["xmin"]
-    ys = FALLBACK["ymax"] - np.arange(height) * RESOLUTION_M
-    X, Y = np.meshgrid(xs, ys)
-    surface = np.full((height, width), 0.05, dtype=np.float32)
-    # synthetic structural zones (illustrative only - no real data used)
-    for (cx, cy, a, sig, peak) in [
-        (420_000, 4_300_000, 45.0, 90_000, 0.9),
-        (560_000, 4_220_000, 60.0, 70_000, 0.75),
-        (310_000, 4_380_000, 35.0, 60_000, 0.65),
-    ]:
-        d = np.sqrt((X - cx) ** 2 + (Y - cy) ** 2)
-        surface = np.maximum(surface, peak * np.exp(-(d / sig) ** 2))
-    surface = np.clip(surface, VAL_MIN, VAL_MAX)
-    return surface, transform, "EPSG:32611", height, width, [], True
-
-
 def write_geotiff(path: Path, surface: np.ndarray, transform, crs, height: int, width: int):
     profile = dict(
         driver="GTiff",
@@ -226,13 +191,17 @@ def write_geotiff(path: Path, surface: np.ndarray, transform, crs, height: int, 
         crs=crs,
         nodata=NODATA,
         compress="lzw",
-        tiled=True,
-        blockxsize=min(256, width),
-        blockysize=min(256, height),
+        tiled=False,  # GeoTIFF tiles must be multiples of 16; strips avoid that constraint
     )
-    with rasterio.open(path, "w", **profile) as dst:
-        dst.write(surface.astype(np.float32), 1)
-        dst.set_band_description(1, "fault_probability")
+    try:
+        with rasterio.open(path, "w", **profile) as dst:
+            dst.write(surface.astype(np.float32), 1)
+            dst.set_band_description(1, "fault_probability")
+    except Exception:
+        # never leave a partial or unreadable raster where a submission could pick it up
+        if path.exists():
+            path.unlink()
+        raise
 
 
 def make_sidecar(name, path, surface, transform, crs, height, width, illustrative, terms):
@@ -285,41 +254,32 @@ def main():
 
     template = Path(args.template)
     features = Path(args.features)
-    SUBMISSIONS.mkdir(parents=True, exist_ok=True)
 
+    # Refuse rather than fabricate: no template -> no grid; no features -> no evidence.
+    missing = [str(p) for p in (template, features) if not p.is_file()]
+    if missing:
+        print("[BLOCKED] No submission written. Missing input(s):", ", ".join(missing))
+        print("[BLOCKED] DrivenData data needs login; place competition files in data/ manually (see scripts/download_competition_data.sh).")
+        print("[BLOCKED] This script never invents a grid or synthetic structure.")
+        return 2
+
+    SUBMISSIONS.mkdir(parents=True, exist_ok=True)
     stamp = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
     name = f"gemsdoe80-structural-prior-v1-{stamp}"
     out = Path(args.out) if args.out else SUBMISSIONS / f"{name}.tif"
 
-    illustrative = False
-    terms = []
-    if template.exists():
-        print(f"[INFO] Using official submission template: {template}")
-        with rasterio.open(template) as src:
-            surface_template = np.full((src.height, src.width), np.nan, dtype=np.float32)
-            transform, crs, height, width = src.transform, src.crs, src.height, src.width
-        if features.exists():
-            print(f"[INFO] Building surface from features: {features}")
-            surface, _, _, h2, w2, terms = build_surface_from_features(features)
-            if (h2, w2) != (height, width):
-                print("[WARN] feature grid does not match template grid; writing template-masked surface")
-                surface = np.full((height, width), np.nan, dtype=np.float32)
-                surface[:min(h2, height), :min(w2, width)] = surface[:min(h2, height), :min(w2, width)]
-            else:
-                surface = surface
-        else:
-            print("[WARN] training_features.tif not found; flat illustrative surface on official grid")
-            surface = surface_template
-            illustrative = True
-    else:
-        print("[WARN] sample_submission.tif not found (DrivenData download requires login).")
-        print("[WARN] Building ILLUSTRATIVE fallback grid - NOT submission-ready until re-gridded to the official template.")
-        surface, transform, crs, height, width, terms, illustrative = illustrative_grid()
+    with rasterio.open(template) as src:
+        t_h, t_w, t_crs, t_tr = src.height, src.width, src.crs, src.transform
+    surface, transform, crs, height, width, terms = build_surface_from_features(features)
+    if (height, width) != (t_h, t_w) or transform != t_tr or str(crs) != str(t_crs):
+        print("[FAIL] features grid does not match the official template grid; refusing to write.")
+        print(f"       features: {height}x{width} {crs} {transform}")
+        print(f"       template: {t_h}x{t_w} {t_crs} {t_tr}")
+        return 3
 
     write_geotiff(out, surface, transform, crs, height, width)
-    report = make_sidecar(name, out, surface, transform, crs, height, width, illustrative, terms)
+    report = make_sidecar(name, out, surface, transform, crs, height, width, False, terms)
     report["sha256"] = sha256_file(out)
-    report["sha256_sidecar"] = report["sha256"]
     sidecar_path = out.with_suffix(".tif.json")
     sidecar_path.write_text(json.dumps(report, indent=2))
     zip_path = write_zip(out)
@@ -329,9 +289,7 @@ def main():
     print(f"[OK] Wrote {out}  sha256={report['sha256']}")
     print(f"[OK] Wrote {sidecar_path}")
     print(f"[OK] Wrote {zip_path}")
-    if illustrative:
-        print("[STATUS] ILLUSTRATIVE ONLY - not verified against the official submission grid.")
-        print("[ACTION] Download data/sample_submission.tif from DrivenData (login required), place it in data/, and re-run.")
+    print("[NEXT] Run scripts/validate_submission.py with --template and --labels to validate; download_ready stays false until organizer receipt.")
     return 0
 
 

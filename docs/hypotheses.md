@@ -1,117 +1,93 @@
-# Candidate geological hypotheses (GEMS Prize Challenge)
+# Candidate geological hypotheses — GEMS fault prediction
 
-Status: proposed, not yet validated on the competition holdout — the training
-labels are auth-gated on DrivenData (login required) and cannot be downloaded
-from this sandbox. Ranked by expected DTI improvement vs implementation cost.
-None of these is implemented anywhere else in this repo (repo was empty at
-session start); none copies any previous GEMSDOE submission.
+**Status (2026-10-21): none validated.** The holdout cannot be computed: `labels.tif` and
+`training_features.tif` are behind the DrivenData login. Ranks below are *qualitative priors* for
+testability and cost. **No expected DTI gain is given as a number, because no number can be
+justified before a holdout run.** Any figure shown later must be labelled HOLDOUT-DTI with its
+protocol, count and CI.
 
-Competition context (official DrivenData pages):
-- Task: pixel-wise fault probability, GeoDAWN region, northwestern Great Basin
-  (Nevada + eastern California).
-- Metric: distance-weighted Tversky index, alpha=0.2, beta=0.8, triangular
-  kernel R=300 m (3 px at 100 m).
-- Submission: single-band float32 GeoTIFF, EPSG:32611, 100 m, values in
-  [0,1], exact CRS/shape/geotransform of the official sample_submission.tif.
-  https://www.drivendata.org/competitions/306/competition-doe-gems/page/967/
+Scoring facts (official page, "Performance metric"): DTI = TP_w / (TP_w + 0.2·FP_w + 0.8·FN_w),
+triangular kernel R = 300 m = 3 px. Test faults are expert-labelled faults that are **not** in the
+USGS database, so a prior that copies the catalogue is expected to score poorly on the test set.
+(A third-party log argues the same thing with its own data. That claim is not verified here; see `docs/irregularities.md` IR-22.)
 
-Test labels are faults deliberately EXCLUDED from the current public USGS /
-INGENIOUS catalogue, so a catalogue-copy prior scores near zero on the hidden
-test set. Every hypothesis below targets structure NOT already catalogued.
+## Candidates
 
-## H1 — Geothermal structural-propensity composite (unsupervised; implemented in scripts/generate_submission.py)
+### C1 — Linear ridge continuity from magnetic edges (highest expected discovery value)
+- **Layers:** magnetics RTP and TMI, and their vertical and horizontal slope bands
+  (`training_features.tif`; exact band names unverified, see IR-08).
+- **Signature:** long, continuous ridges in the horizontal-gradient magnitude or Hessian ridge
+  response, kept only if they connect over ≥ 2 km. Targets concealed fault traces that show as
+  linear magnetic contrasts before they reach the surface.
+- **Why it can find uncatalogued faults:** the USGS catalogue is built from mapped surface traces.
+  A linear magnetic discontinuity that is not on the map is exactly the missing-fault class.
+- **Named non-fault mimic:** intrusive dikes and lithologic contacts (linear magnetic contrast, no
+  displacement); survey-line artefacts. GeoDAWN Area 2 flight lines are 400 m apart (USGS page), so
+  fine linear artefacts are under-sampled there.
+- **Difference from the repo:** H1 (`scripts/generate_submission.py`) averages |slope| magnitudes
+  with no linearity or continuity test.
+- **Cost:** low–medium (CPU, features already provided).
+- **Validation:** holdout after data placement (run E2 below).
 
-Layers: training_features.tif bands (surface conductivity / depth to conductive
-base; dilatation rate, shear strain rate, 2nd strain invariant; isostatic
-gravity anomaly + slope; magnetics RTP/TMI anomaly + vertical & horizontal
-slope; earthquake density).
-Signature: magnitude/edge response of deformation and potential-field bands,
-combined with conductivity and seismicity — i.e. where the crust is actively
-dilating/shearing, where gravity/magnetics mark density or magnetic contrasts,
-where rocks are conductive, and where seismicity concentrates.
-Why it catches uncatalogued faults: it responds to physical proxies of active
-faulting and fluid pathways, not to membership in the USGS/INGENIOUS catalogue.
-Non-fault mimic: lithological or stratigraphic boundaries can produce gravity/
-magnetic/conductivity contrasts and localized strain without displacement.
-Differs from repo implementations: nothing else exists in this repo; this is
-the baseline submission surface.
-Expected DTI improvement: moderate (baseline); cost: low (no new data, CPU).
+### C2 — Multi-physics coincidence gating (cheapest test of the H1 idea)
+- **Layers:** magnetics edge response (from C1), isostatic-gravity horizontal gradient, conductivity
+  or depth-to-conductive-base contrast, strain-rate magnitude, earthquake density.
+- **Signature:** pixels where at least three *independent* property contrasts coincide within a
+  300 m radius. Built as a min or geometric mean across terms, not H1's arithmetic mean.
+- **Why it can find uncatalogued faults:** a fault zone is expected to perturb several properties at
+  once. Single-layer anomalies are cheap to produce, and a coincidence rule suppresses them.
+- **Named non-fault mimic:** lithologic contacts that change density, magnetisation and conductivity
+  together.
+- **Difference from the repo:** H1 is an arithmetic mean over terms. C2 is a coincidence (AND-type)
+  rule with a spatial radius.
+- **Cost:** low.
+- **Validation:** holdout after data placement (run E3 below).
 
-## H2 — 1 m lidar DEM scarp / lineament density + curvature (needs DEM data)
+### C3 — Metric-aware emission (scoring-side, not a new fault signal)
+- **Layers:** whichever probability surface is chosen (H1, C1 or C2).
+- **Mechanism:** the FP term is Σ p(x)·(1 − k), so low-confidence mass costs 0.2 per unit, and the
+  FN term costs 0.8 per missed label. Emitting dots at a spacing matched to the 3 px kernel, and
+  thresholding p on low-confidence pixels, trades a small FP cost for recall. The effect is
+  measured on the holdout only.
+- **Named mimic:** none; this optimises the scorer, not geology. Any apparent gain can come from
+  dot density alone, so it must be reported against a density-matched control.
+- **Difference from prior GEMSDOE sites:** they thin dots using catalogue proximity. A third-party
+  audit records a catalogue-proxy DTI of 0.0067 for the file behind the 0.2778 claim (IR-05). That
+  proxy is itself disputed (IR-19), so it cannot rank candidates.
+- **Cost:** very low.
 
-Layers: 1 m DEM links (1m_DEM_links.csv, 3DEP lidar) downsampled to 100 m;
-derived: curvature, slope, lineament density, hillshade edge response.
-Signature: subtle scarps and linear topographic breaks at sub-catalogue scale.
-Why it catches uncatalogued faults: many Quaternary faults in the region have
-subtle surface expression below mapping resolution; 1 m lidar reveals scarps
-the catalogue misses. INGENIOUS/USGS expert labels were partly derived from
-such remote-sensing inspection.
-Non-fault mimic: glacial/periglacial or alluvial geomorphic lineations.
-Cost: medium (DEM download is public via USGS 3DEP/TNM; the link CSV is
-auth-gated on DrivenData but 3DEP DEM tiles are publicly downloadable).
-Expected DTI improvement: moderate-high.
+### C4 — 1 m lidar scarp and lineament detection (high value, blocked here)
+- **Layers:** 1 m DEM tiles listed in `1m_DEM_links.csv` (DrivenData login) or public USGS 3DEP
+  tiles (not reachable from this sandbox; obtainability **not verified** in this session).
+- **Signature:** sub-metre scarps and linear topographic breaks, detected with curvature and
+  hillshade-edge filters, then resampled to 100 m.
+- **Mimic:** glacial and alluvial lineations, roads, canal banks.
+- **Status:** cannot be validated without the DEM tiles. Listed for the user to decide whether the
+  download is worth the effort.
 
-## H3 — GeoDAWN radiometric alteration signature (K/Th/eU ratios)
+### C5 — Catalogue distance-decay negative control (baseline)
+- **Purpose:** a control, not a candidate. If a catalogue-only prior scores well on the internal
+  holdout, the holdout is leaking. Any candidate must beat this control on the same holdout.
 
-Layers: GeoDAWN airborne radiometrics (public via USGS ScienceBase item
-657e1d85d34e23d3533209f7).
-Signature: potassium/thorium or uranium anomalies associated with
-hydrothermal alteration along blind fault zones.
-Why it catches uncatalogued faults: blind geothermal faults host alteration
-halos with no mapped surface trace.
-Non-fault mimic: sedimentary facies changes produce radiometric contrasts.
-Cost: medium (ScienceBase download; public, no login).
-Expected DTI improvement: low-moderate.
+## Ranking (qualitative)
 
-## H4 — Earthquake density × dilatation rate (seismogenic geothermal structures)
+| Rank | Candidate | Expected discovery value | Cost | Blocked by |
+|---|---|---|---|---|
+| 1 | C1 ridge continuity | high (if magnetic lineaments coincide with new faults) | low–medium | labels + features download |
+| 2 | C2 coincidence gating | medium | low | labels + features download |
+| 3 | C3 metric-aware emission | none on its own; affects score mechanics | very low | holdout |
+| 4 | C4 lidar scarps | high | high | DEM download, not reachable here |
+| 5 | C5 control | none (sanity check) | very low | labels |
 
-Layers: training_features earthquake density band + dilatation rate band.
-Signature: co-located seismicity and present-day crustal dilatation.
-Why it catches uncatalogued faults: active geothermal shear zones produce
-microseismicity without Quaternary surface rupture mapped in the catalogue.
-Non-fault mimic: volcanic or induced seismicity clusters not on mappable faults.
-Cost: low (uses provided features only).
-Expected DTI improvement: low-moderate.
+## Validation order (budget: 3 experiments or 2 h; no submission slot)
 
-## H5 — Distance-decay prior from catalogue faults (base model; weak for new faults)
+E1 is tooling and does not count against the experiment budget. E2–E4 are the three experiments.
 
-Layers: USGS Quaternary Fault & Fold Database + INGENIOUS fault vectors.
-Signature: exponential/distance decay from mapped traces.
-Why it catches uncatalogued faults: it mostly doesn't — included as the
-negative control / baseline that the other hypotheses must beat.
-Non-fault mimic: n/a (it is the catalogue itself).
-Cost: very low.
-Expected DTI improvement: near zero on the held-out new-fault test set.
+1. **E1 (done, tooling only):** repair the validator DTI and canary; unit tests pass. Not a
+   competition experiment.
+2. **E2:** H1 baseline on the holdout (sets the reference "holdout best").
+3. **E3:** C1 on the same holdout. Promote only if it beats E2 with a CI that does not overlap.
+4. **E4:** C2 or C3 layered on the winner. This is the third and last experiment in the budget.
 
-## Ranking (expected DTI gain | cost | data needed)
-
-| Rank | Hypothesis | Expected DTI gain | Cost | Data needed (free, official) |
-|------|------------|-------------------|------|------------------------------|
-| 1 | H1 structural-propensity composite | moderate | low | training_features.tif (DrivenData, login) |
-| 2 | H4 earthquake density × dilatation | low-moderate | low | training_features.tif (DrivenData, login) |
-| 3 | H2 lidar scarp/lineament density | moderate-high | medium | 1m_DEM_links.csv (DrivenData login) + USGS 3DEP tiles (public) |
-| 4 | H3 radiometric alteration | low-moderate | medium | USGS ScienceBase GeoDAWN (public) |
-| 5 | H5 catalogue distance-decay | ~0 | very low | USGS Quaternary Faults (public) |
-
-## Validation plan (parallel-run protocol)
-
-1. Run H1 on the spatially-blocked holdout: withhold whole fault segments
-   (buffered), derive every feature only from visible faults, score pooled DTI
-   (alpha 0.2, beta 0.8, 300 m triangular kernel). Report HOLDOUT-DTI with
-   95% CI.
-2. Leakage canary: AUC of each feature band alone vs held-out labels; AUC >
-   0.90 = leakage until proven otherwise.
-3. Lane check: raster rank-correlation > 0.90 or > 70% of dots within 3 px of a
-   registry raster => duplicate lane; log and stop.
-4. Only promote a candidate that beats the current holdout best; promotion to
-   a real submission slot is a separate step within the weekly cap.
-
-Sources (official, for manual review):
-- Competition description & metric: https://www.drivendata.org/competitions/306/competition-doe-gems/page/967/
-- Data page (login): https://www.drivendata.org/competitions/306/competition-doe-gems/data/
-- Reference solution: https://github.com/drivendataorg/gems-prize-reference-solution
-- GeoDAWN (USGS ScienceBase): https://www.usgs.gov/data/geodawn-airborne-magnetic-and-radiometric-surveys-northwestern-great-basin-nevada-and
-- GeoDAWN item: https://www.sciencebase.gov/catalog/item/657e1d85d34e23d3533209f7
-- INGENIOUS (GBCGE): https://gbcge.org/current-projects/ingenious/
-- EPSG:32611: https://epsg.io/32611
-- Tversky index: https://en.wikipedia.org/wiki/Tversky_index
+A submission slot is spent only after a candidate beats the current holdout best and the validator
+passes. Weekly cap: three submissions (official rules §3.2).
