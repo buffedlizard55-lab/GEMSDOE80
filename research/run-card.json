@@ -1,58 +1,118 @@
 {
-  "hypothesis": "Compensated gravity step under cover (queue only; no experiment run)",
-  "mechanism": "Signed paired gravity curvature with an aligned basement-depth step",
-  "non_fault_mimic": "Intrusive density contact",
-  "holdout": {
+  "session": "2026-10-21 (UTC)",
+  "budget": "Experiments: 0 of 3 run on competition data. Tooling repair E1 done (does not count). Hard stop: 3 experiments or 2 hours.",
+  "experiments": [
+    {
+      "id": "E1",
+      "type": "tooling repair (not a competition experiment)",
+      "what": "Repaired shared validator DTI (FN_w summed over background, centre pixel excluded from TP window), replaced the single-scalar bootstrap with a segment-level cluster bootstrap, fixed the leakage canary (positives and negatives), removed invented Gaussian zones from the generator, and made the generator refuse to write without the official template and features. Later in the session: segments use 8-connectivity (4-connected fragments could leak across the split); the visible-fault buffer is a Euclidean disk of radius 3 px; the GeoTIFF writer no longer requests tiles (16-multiple error on 40-column grids) and deletes any partial output on failure.",
+      "evidence": "tests/test_dti_and_generator.py (hand-computed DTI 0.370370 for the single-neighbour toy case; perfect prediction 1.0; FN_w counts GT pixels only; generator refuses with exit code 2) and tests/test_holdout_pipeline.py (canary flags a label copy at AUC > 0.99 and does not flag noise). All 11 tests pass, including a generator round trip on a 40-column grid (tiling bug fixed).",
+      "status": "done",
+      "scientific_claim": "none; synthetic test data only"
+    },
+    {
+      "id": "E2",
+      "type": "competition experiment",
+      "hypothesis": "H1 baseline: label-free structural-propensity composite (docs/hypotheses.md)",
+      "status": "NOT RUN",
+      "reason": "training_features.tif and labels.tif are behind the DrivenData login and cannot be downloaded from this sandbox (verified: DrivenData, Dropbox, ScienceBase file server and epsg.io unreachable from the shell)."
+    },
+    {
+      "id": "E3",
+      "type": "competition experiment",
+      "hypothesis": "C1 linear ridge continuity from magnetic edges (docs/hypotheses.md)",
+      "status": "NOT RUN",
+      "reason": "Same blocker as E2."
+    },
+    {
+      "id": "E4",
+      "type": "competition experiment",
+      "hypothesis": "C2 coincidence gating, or C3 metric-aware emission, layered on the best of E2/E3",
+      "status": "NOT RUN",
+      "reason": "Depends on E2 and E3."
+    }
+  ],
+  "hypothesis": "No candidate hypothesis has been tested. The H1 baseline and C1/C2 are proposed in docs/hypotheses.md.",
+  "mechanism": "Not applicable: no candidate raster was generated.",
+  "named_non_fault_mimic": "Not applicable for this session. Candidate-specific mimics are listed in docs/hypotheses.md.",
+  "holdout_dti": {
     "label": "HOLDOUT-DTI",
-    "evaluator_version": null,
-    "withheld_positive_count": null,
     "score": null,
+    "withheld_positive_count": null,
     "ci95": null,
-    "status": "Not evaluated: shared evaluator/cache and assigned lane absent"
+    "evaluator_version": "project re-implementation of the official definition (alpha 0.2, beta 0.8, R=300 m), repaired this session",
+    "status": "NOT COMPUTED: labels.tif unavailable."
   },
-  "registry": {
-    "surface_rank_correlation": null,
-    "final_dot_overlap_within_3px": null,
-    "status": "Not evaluated: complete registry absent; no placement performed"
+  "organizer_confirmed_scores": {
+    "label": "ORGANIZER-CONFIRMED",
+    "entries": [],
+    "note": "No submission receipt exists for this project. No slot has been spent."
   },
-  "raster_sha256": "0afa36baf428e73f817bf53e623a1d2b279ff2852dec814bc8a444ee6781b858",
-  "raster_role": "Inherited synthetic placeholder only; no new raster generated",
-  "validator": {
-    "format_valid": false,
+  "leaderboard_reads": {
+    "label": "PUBLIC-LEADERBOARD (official page read, not a submission receipt)",
+    "read_utc": "2026-10-21",
+    "source": "https://www.drivendata.org/competitions/306/competition-doe-gems/leaderboard/",
+    "top_score": 0.4413,
+    "rank_48_score": 0.2778,
+    "score_0_3195_present_in_ranks_1_to_50": false
+  },
+  "correlation_overlap_vs_registry": {
+    "rank_correlation": null,
+    "dot_fraction_within_3px": null,
+    "status": "NOT RUN: no candidate raster and no registry rasters are available."
+  },
+  "leakage_canary": {
+    "available": false,
+    "tested_on_synthetic_data": "passes: label copy flagged, noise not flagged (tests/test_holdout_pipeline.py)",
+    "status": "NOT RUN on competition data."
+  },
+  "raster_sha256": null,
+  "validator_output": {
+    "status": "No candidate raster exists. Validator is repaired and tested (11/11 tests)."
+  },
+  "submission": {
+    "name": null,
+    "note": null,
     "download_ready": false,
     "organizer_confirmed": false,
-    "prediction": "docs/submissions/gemsdoe80-structural-prior-v1-20261021T214821Z.tif",
-    "template": "data/sample_submission.tif",
-    "checks": {
-      "driver": "GTiff",
-      "band_count": 1,
-      "template_band_count": 1,
-      "shape_matches": false,
-      "crs_matches": true,
-      "transform_matches": false,
-      "template_has_crs": true,
-      "prediction_dtype": [
-        "float32"
-      ],
-      "finite_values": true,
-      "no_nan_or_infinite_inside_footprint": true,
-      "template_footprint_covered": false
-    },
-    "errors": [
-      "Prediction height/width do not match template",
-      "Prediction affine transform does not exactly match template"
-    ],
-    "value_range": [
-      0.05000000074505806,
-      0.8999999761581421
-    ],
-    "nan_inside_footprint": null,
-    "crs": "EPSG:32611",
-    "shape": [
+    "verdict_on_file": "No submission file. Do not submit. The previous placeholder was removed (see docs/irregularities.md IR-02)."
+  },
+  "verdict": "negative",
+  "verdict_reason": "No candidate reached a holdout. Competition data are blocked from this environment. The previous TIF was invalid and has been removed. Negative results are deliverables.",
+  "next_actions": [
+    "User: place training_features.tif, labels.tif, sample_submission.tif and 1m_DEM_links.csv in data/ on a logged-in machine (or in this workspace).",
+    "Run: python scripts/prepare_data.py (confirms file presence and the official grid).",
+    "Run E2: H1 baseline holdout via scripts/validate_submission.py with --labels and --features. Record HOLDOUT-DTI with count and CI.",
+    "Run E3: C1 ridge continuity on the same holdout. Promote only if it beats E2 with non-overlapping CI.",
+    "Confirm the deadline (IR-11) and the AI-use disclosure wording (IR-12) with the organizer before any submission.",
+    "Only then select a slot. Three submissions per week (rules section 3.2)."
+  ],
+  "links": {
+    "competition": "https://www.drivendata.org/competitions/306/competition-doe-gems/",
+    "problem_description": "https://www.drivendata.org/competitions/306/competition-doe-gems/page/967/",
+    "about": "https://www.drivendata.org/competitions/306/competition-doe-gems/page/968/",
+    "data_page_login": "https://www.drivendata.org/competitions/306/competition-doe-gems/data/",
+    "leaderboard": "https://www.drivendata.org/competitions/306/competition-doe-gems/leaderboard/",
+    "rules_pdf": "https://docs.nlr.gov/docs/fy26osti/96647.pdf",
+    "reference_solution": "https://github.com/drivendataorg/gems-prize-reference-solution",
+    "geodawn_usgs": "https://www.usgs.gov/data/geodawn-airborne-magnetic-and-radiometric-surveys-northwestern-great-basin-nevada-and",
+    "geodawn_sciencebase": "https://www.sciencebase.gov/catalog/item/657e1d85d34e23d3533209f7",
+    "epsg_32611": "https://epsg.io/32611"
+  },
+  "session_scope": "2026-10-21 (UTC); merged with main (PR #4, PR #5) in this session",
+  "template_pin_from_main": {
+    "status": "OWNER-MIRROR HASH PIN ONLY. Organizer authenticity UNVERIFIED. Not restored in this session (data/ absent).",
+    "source_manifest": "research/evidence/gems32-data-manifest.json (sample_submission sha256 2176d08e…54d35cbc, 1599597 bytes, from owner repo GEMSDOE24)",
+    "grid_claimed_by_pin": "3730 x 3292, EPSG:32611, origin (243350, 4508550), 100 m"
+  },
+  "placeholder_revalidation_on_main": {
+    "report": "reports/placeholder-revalidation.json",
+    "result": "format_valid false; shape and transform fail against the pinned template",
+    "prediction_shape": [
       3000,
       4000
     ],
-    "transform": [
+    "prediction_transform": [
       100.0,
       0.0,
       250000.0,
@@ -60,38 +120,30 @@
       -100.0,
       4450000.0
     ],
-    "sha256": "0afa36baf428e73f817bf53e623a1d2b279ff2852dec814bc8a444ee6781b858",
-    "holdout": {
-      "available": false
-    },
-    "leakage_canary": {
-      "available": false
-    },
-    "lane_check": {
-      "available": false,
-      "note": "no registry raster provided with public competition data"
-    },
-    "values_in_0_1": true,
-    "format_ready": false,
-    "promotion_blockers": [
-      "Shared hide-and-recover HOLDOUT-DTI and CI unavailable",
-      "Per-feature leakage canary unavailable",
-      "Surface and final-dot registry comparisons unavailable",
-      "Current holdout best and weekly cap unverified"
+    "value_range": [
+      0.05000000074505806,
+      0.8999999761581421
+    ],
+    "errors": [
+      "Prediction height/width do not match template",
+      "Prediction affine transform does not exactly match template"
     ]
   },
-  "submission": {
-    "name": null,
-    "note": "Blocked: inherited TIFF fails grid checks; no new candidate generated or promoted.",
-    "download_ready": false,
-    "weekly_slots_used_this_session": 0
+  "mirror_restore": {
+    "script": "scripts/restore_mirrors.py (present on main)",
+    "run_in_this_session": false,
+    "reason": "Restores owner-mirror copies of competition inputs (about 420 MB core). Licensing and organizer authenticity undecided (IR-01)."
   },
-  "experiments_this_session": 0,
-  "verdict": "negative",
-  "blockers": [
-    "No single method paragraph designates lane",
-    "Shared cached stack, evaluate_holdout.py and submission_writer.py absent",
-    "Complete registry and current holdout best absent",
-    "Owner mirror integrity verified; organizer authenticity unverified"
-  ]
+  "slots": {
+    "weekly_cap": 3,
+    "used_this_session": 0
+  },
+  "ci": {
+    "workflow": ".github/workflows/checks.yml",
+    "runs": "pip install -r requirements.txt; python -m pytest -q"
+  },
+  "tests": {
+    "count": 17,
+    "status": "pass locally (includes main's footprint regression tests)"
+  }
 }
