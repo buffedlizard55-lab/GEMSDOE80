@@ -1,0 +1,37 @@
+{
+  "generated_at_utc": "2026-10-21T23:15:24.647682+00:00",
+  "submission_file": "gemsdoe80-structural-prior-v2-20261021T231523Z.tif",
+  "submission_name": "gemsdoe80-structural-prior-v2-20261021T231523Z",
+  "mode": "structural-prior",
+  "format": {
+    "driver": "GTiff",
+    "dtype": "float32",
+    "count": 1,
+    "crs": "EPSG:32611",
+    "resolution_m": 100.0,
+    "height": 3000,
+    "width": 4000,
+    "transform": [
+      100.0,
+      0.0,
+      250000.0,
+      0.0,
+      -100.0,
+      4450000.0
+    ],
+    "nodata": null,
+    "value_range_in_[0,1]": true
+  },
+  "valid_pixel_count": 12000000,
+  "valid_pixel_fraction": 1.0,
+  "value_min": 0.05000000074505806,
+  "value_max": 0.8999999761581421,
+  "illustrative_fallback": true,
+  "note": "Unsupervised geothermal structural-propensity prior; no training labels used; not copied from any previous GEMSDOE submission.",
+  "template_match_pending": true,
+  "sha256": "a7a476f00630b0c784c740211798e04e09d71ddd4e1a4c8f19938ae1991f713a",
+  "sha256_sidecar": "a7a476f00630b0c784c740211798e04e09d71ddd4e1a4c8f19938ae1991f713a",
+  "zip_sha256": "ded8db432cc1162587ee015ee16a795c04bc49035ed7baf13c18ea9d0d58e7a0",
+  "current_status": "REJECTED: illustrative artifact; template shape/transform mismatch",
+  "download_ready": false
+}

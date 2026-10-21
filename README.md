@@ -89,3 +89,7 @@ Other official sources (not independently fetched here):
 
 Next session must restore the shared infrastructure and assigned lane before pursuing
 hypothesis 1. No manual visual sign-off can substitute for the automated gates.
+
+Parallel integration note: two v2 illustrative TIFFs added by PR #4 are retained for audit.
+Both also fail template shape/transform checks; see `reports/*v2*-revalidation.json`.
+They are not eligible submissions.
