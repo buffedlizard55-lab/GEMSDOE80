@@ -1,30 +1,33 @@
 {
-  "format_valid": true,
+  "format_valid": false,
   "download_ready": false,
   "organizer_confirmed": false,
   "prediction": "docs/submissions/gemsdoe80-dotted-ridge-v2-20261021T231505Z.tif",
-  "template": "docs/submissions/gemsdoe80-dotted-ridge-v2-20261021T231505Z.tif",
+  "template": "data/sample_submission.tif",
   "checks": {
     "driver": "GTiff",
     "band_count": 1,
     "template_band_count": 1,
-    "shape_matches": true,
+    "shape_matches": false,
     "crs_matches": true,
-    "transform_matches": true,
+    "transform_matches": false,
     "template_has_crs": true,
     "prediction_dtype": [
       "float32"
     ],
     "finite_values": true,
     "no_nan_or_infinite_inside_footprint": true,
-    "footprint_overlaps_template": true
+    "template_footprint_covered": false
   },
-  "errors": [],
+  "errors": [
+    "Prediction height/width do not match template",
+    "Prediction affine transform does not exactly match template"
+  ],
   "value_range": [
     0.019999999552965164,
     1.0
   ],
-  "nan_inside_footprint": 0,
+  "nan_inside_footprint": null,
   "crs": "EPSG:32611",
   "shape": [
     3000,
@@ -49,5 +52,12 @@
     "available": false,
     "note": "no registry raster provided with public competition data"
   },
-  "values_in_0_1": true
+  "values_in_0_1": true,
+  "format_ready": false,
+  "promotion_blockers": [
+    "Shared hide-and-recover HOLDOUT-DTI and CI unavailable",
+    "Per-feature leakage canary unavailable",
+    "Surface and final-dot registry comparisons unavailable",
+    "Current holdout best and weekly cap unverified"
+  ]
 }

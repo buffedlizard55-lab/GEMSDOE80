@@ -30,5 +30,8 @@
   "template_match_pending": true,
   "sha256": "0afa36baf428e73f817bf53e623a1d2b279ff2852dec814bc8a444ee6781b858",
   "sha256_sidecar": "0afa36baf428e73f817bf53e623a1d2b279ff2852dec814bc8a444ee6781b858",
-  "zip_sha256": "aceaf3f407139f8d0884c8f85d3901351f6088256024ab2f5590add2d70796c5"
+  "zip_sha256": "aceaf3f407139f8d0884c8f85d3901351f6088256024ab2f5590add2d70796c5",
+  "current_status": "REJECTED: synthetic placeholder; grid mismatch confirmed against pinned owner mirror",
+  "download_ready": false,
+  "latest_validator": "../run-card.json"
 }

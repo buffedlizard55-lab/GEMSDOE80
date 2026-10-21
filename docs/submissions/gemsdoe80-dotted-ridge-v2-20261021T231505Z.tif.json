@@ -31,5 +31,7 @@
   "template_match_pending": true,
   "sha256": "dc43a85e55f9687b8f5d4797eed7ae1097e5d9c6b8be659a3811f057c1212219",
   "sha256_sidecar": "dc43a85e55f9687b8f5d4797eed7ae1097e5d9c6b8be659a3811f057c1212219",
-  "zip_sha256": "f60c11f2582e10ff944b80ee1501eb28a84cd3ff1b3e4f2293f50f6c0f9026a9"
+  "zip_sha256": "f60c11f2582e10ff944b80ee1501eb28a84cd3ff1b3e4f2293f50f6c0f9026a9",
+  "current_status": "REJECTED: illustrative artifact; template shape/transform mismatch",
+  "download_ready": false
 }
