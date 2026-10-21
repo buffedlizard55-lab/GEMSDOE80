@@ -30,6 +30,7 @@
 <body>
 <header>
   <p class="tag">GEMS Prize (DrivenData #306) · research and submission workspace</p>
+  <p><a href="executive-summary.html" style="color:#fff;font-weight:600">&rarr; Executive summary: how to make a submission</a></p>
   <h1>GEMSDOE80</h1>
   <p>Submission status, verified official facts, and the exact path to a valid GeoTIFF. Every number on this page is labelled. Nothing here is a claimed competition score.</p>
 </header>
@@ -47,9 +48,9 @@
     <ol>
       <li><strong>You place the data.</strong> On a logged-in machine, download the four files from the <a href="https://www.drivendata.org/competitions/306/competition-doe-gems/data/">DrivenData data page</a> into <code>data/</code>. Keep them out of git.</li>
       <li><strong>Check placement:</strong> <code>python scripts/prepare_data.py</code> prints the official grid.</li>
-      <li><strong>Generate:</strong> <code>python scripts/generate_submission.py --template data/sample_submission.tif --features data/training_features.tif</code>. It refuses (exit 2 or 3) unless the grid matches the template exactly.</li>
-      <li><strong>Validate:</strong> <code>python scripts/validate_submission.py docs/submissions/&lt;name&gt;.tif --template data/sample_submission.tif --labels data/labels.tif --features data/training_features.tif</code>. It checks the format, the range, and the NaN rule, and reports an internal holdout DTI with a CI and the leakage canary.</li>
-      <li><strong>Submit</strong> only when validation passes and a person chooses the slot. Give the file a unique name and a note of 140 characters or fewer. Include the generative-AI disclosure the rules require. Keep the public name and note generic.</li>
+      <li><strong>Generate:</strong> <code>python scripts/generate_submission.py --template data/sample_submission.tif --features data/training_features.tif --name &lt;unique-name&gt; --note "clustering with k=25"</code>. It writes an <strong>ungated candidate</strong> to <code>artifacts/candidates/</code> (git-ignored) and refuses (exit 2 or 3) unless the grid matches the template exactly.</li>
+      <li><strong>Validate:</strong> <code>python scripts/validate_submission.py artifacts/candidates/&lt;name&gt;.tif --template data/sample_submission.tif --labels data/labels.tif --features data/training_features.tif</code>. It checks the format, the range, and the NaN rule, and reports an internal holdout DTI with a CI and the leakage canary.</li>
+      <li><strong>Submit</strong> only when validation passes, the holdout gate passes, and a person chooses the slot. Give the file a unique name and a note of 140 characters or fewer. Include the generative-AI disclosure the rules require. Keep the public name and note generic.</li>
     </ol>
   </section>
 

@@ -98,5 +98,52 @@
     "geodawn_usgs": "https://www.usgs.gov/data/geodawn-airborne-magnetic-and-radiometric-surveys-northwestern-great-basin-nevada-and",
     "geodawn_sciencebase": "https://www.sciencebase.gov/catalog/item/657e1d85d34e23d3533209f7",
     "epsg_32611": "https://epsg.io/32611"
+  },
+  "session_scope": "2026-10-21 (UTC); merged with main (PR #4, PR #5) in this session",
+  "template_pin_from_main": {
+    "status": "OWNER-MIRROR HASH PIN ONLY. Organizer authenticity UNVERIFIED. Not restored in this session (data/ absent).",
+    "source_manifest": "research/evidence/gems32-data-manifest.json (sample_submission sha256 2176d08e…54d35cbc, 1599597 bytes, from owner repo GEMSDOE24)",
+    "grid_claimed_by_pin": "3730 x 3292, EPSG:32611, origin (243350, 4508550), 100 m"
+  },
+  "placeholder_revalidation_on_main": {
+    "report": "reports/placeholder-revalidation.json",
+    "result": "format_valid false; shape and transform fail against the pinned template",
+    "prediction_shape": [
+      3000,
+      4000
+    ],
+    "prediction_transform": [
+      100.0,
+      0.0,
+      250000.0,
+      0.0,
+      -100.0,
+      4450000.0
+    ],
+    "value_range": [
+      0.05000000074505806,
+      0.8999999761581421
+    ],
+    "errors": [
+      "Prediction height/width do not match template",
+      "Prediction affine transform does not exactly match template"
+    ]
+  },
+  "mirror_restore": {
+    "script": "scripts/restore_mirrors.py (present on main)",
+    "run_in_this_session": false,
+    "reason": "Restores owner-mirror copies of competition inputs (about 420 MB core). Licensing and organizer authenticity undecided (IR-01)."
+  },
+  "slots": {
+    "weekly_cap": 3,
+    "used_this_session": 0
+  },
+  "ci": {
+    "workflow": ".github/workflows/checks.yml",
+    "runs": "pip install -r requirements.txt; python -m pytest -q"
+  },
+  "tests": {
+    "count": 17,
+    "status": "pass locally (includes main's footprint regression tests)"
   }
 }

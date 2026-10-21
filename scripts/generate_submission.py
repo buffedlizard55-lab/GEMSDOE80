@@ -53,7 +53,8 @@ from rasterio.transform import from_bounds
 
 REPO = Path(__file__).resolve().parents[1]
 DATA = REPO / "data"
-SUBMISSIONS = REPO / "docs" / "submissions"
+CANDIDATES = REPO / "artifacts" / "candidates"  # git-ignored; never the Pages folder
+NOTE_MAX = 140
 
 # Competition format (official DrivenData specification).
 CRS = "EPSG:32611"          # UTM zone 11N
@@ -250,7 +251,12 @@ def main():
     ap.add_argument("--template", default=str(DATA / "sample_submission.tif"))
     ap.add_argument("--features", default=str(DATA / "training_features.tif"))
     ap.add_argument("--out", default=None)
+    ap.add_argument("--name", default=None, help="unique submission name (default: timestamped)")
+    ap.add_argument("--note", default="", help=f"short note, at most {NOTE_MAX} characters")
     args = ap.parse_args()
+    if len(args.note) > NOTE_MAX:
+        print(f"[BLOCKED] --note is {len(args.note)} characters; the limit is {NOTE_MAX}.")
+        return 4
 
     template = Path(args.template)
     features = Path(args.features)
@@ -263,10 +269,10 @@ def main():
         print("[BLOCKED] This script never invents a grid or synthetic structure.")
         return 2
 
-    SUBMISSIONS.mkdir(parents=True, exist_ok=True)
+    CANDIDATES.mkdir(parents=True, exist_ok=True)
     stamp = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
-    name = f"gemsdoe80-structural-prior-v1-{stamp}"
-    out = Path(args.out) if args.out else SUBMISSIONS / f"{name}.tif"
+    name = args.name or f"gemsdoe80-structural-prior-v1-{stamp}"
+    out = Path(args.out) if args.out else CANDIDATES / f"{name}.tif"
 
     with rasterio.open(template) as src:
         t_h, t_w, t_crs, t_tr = src.height, src.width, src.crs, src.transform
@@ -279,6 +285,9 @@ def main():
 
     write_geotiff(out, surface, transform, crs, height, width)
     report = make_sidecar(name, out, surface, transform, crs, height, width, False, terms)
+    report["note_for_submission_form"] = args.note
+    report["status"] = "CANDIDATE-UNGATED: holdout gate not run. Do not download or submit."
+    report["download_ready"] = False
     report["sha256"] = sha256_file(out)
     sidecar_path = out.with_suffix(".tif.json")
     sidecar_path.write_text(json.dumps(report, indent=2))
@@ -289,7 +298,8 @@ def main():
     print(f"[OK] Wrote {out}  sha256={report['sha256']}")
     print(f"[OK] Wrote {sidecar_path}")
     print(f"[OK] Wrote {zip_path}")
-    print("[NEXT] Run scripts/validate_submission.py with --template and --labels to validate; download_ready stays false until organizer receipt.")
+    print("[STATUS] CANDIDATE-UNGATED: this file is NOT approved for download or submission.")
+    print("[NEXT] validate_submission.py (format), then the holdout gate; only then copy to docs/submissions/.")
     return 0
 
 

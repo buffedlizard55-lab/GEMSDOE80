@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Executive summary | How to submit to GEMS (DrivenData #306)</title>
+  <style>
+    body { margin:0; font:16px/1.6 system-ui,-apple-system,Segoe UI,sans-serif; color:#172b3a; background:#f7f9fa }
+    header { background:#12384b; color:#fff; padding:2rem 1rem } header a { color:#d5e5ec }
+    main { max-width:860px; margin:1.5rem auto; padding:0 1rem 3rem }
+    section { background:#fff; border:1px solid #d7e0e6; border-radius:12px; padding:1.2rem 1.4rem; margin:1rem 0 }
+    .red { background:#fff1ef; border:2px solid #e9b5ae; color:#8b2f27; font-weight:650 }
+    code { background:#eff2f4; padding:.1rem .3rem; border-radius:4px; overflow-wrap:anywhere } li { margin:.35rem 0 }
+    a { color:#175c79; overflow-wrap:anywhere }
+  </style>
+</head>
+<body>
+<header>
+  <a href="./index.html">&larr; GEMSDOE80 home</a>
+  <h1>Executive summary: how to make a submission</h1>
+</header>
+<main>
+  <section class="red">
+    <strong>NO SUBMISSION FILE IS READY. Do not download or submit a TIF from this site.</strong>
+    <p style="font-weight:400;margin:.4rem 0 0">The official competition files must be placed manually first (login required). Until then no valid file can be generated against the official grid.</p>
+  </section>
+
+  <section>
+    <h2>What the competition accepts</h2>
+    <ul>
+      <li>One single-band <strong>float32 GeoTIFF</strong> (or a .zip holding one).</li>
+      <li><strong>EPSG:32611</strong>, <strong>100 m</strong>, same shape and geotransform as the official <code>sample_submission.tif</code>.</li>
+      <li>Values in <strong>[0, 1]</strong>. Outside the bounds: null/NaN.</li>
+      <li>Source: <a href="https://www.drivendata.org/competitions/306/competition-doe-gems/page/967/">problem description, submission format</a>. Cap: three submissions per week (<a href="https://docs.nlr.gov/docs/fy26osti/96647.pdf">rules §3.2</a>).</li>
+      <li>Give each submission a unique name and a note of 140 characters or fewer, for example “clustering with k=25”.</li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>Steps, in order</h2>
+    <ol>
+      <li><strong>Place the data (you).</strong> Log in to the <a href="https://www.drivendata.org/competitions/306/competition-doe-gems/data/">DrivenData data page</a> and put <code>training_features.tif</code>, <code>labels.tif</code>, <code>sample_submission.tif</code> and <code>1m_DEM_links.csv</code> in <code>data/</code>.</li>
+      <li><strong>Check placement:</strong> <code>python scripts/prepare_data.py</code>.</li>
+      <li><strong>Generate an ungated candidate:</strong> <code>python scripts/generate_submission.py --template data/sample_submission.tif --features data/training_features.tif --name &lt;unique-name&gt; --note "clustering with k=25"</code>. It writes to <code>artifacts/candidates/</code> (git-ignored) and refuses unless the grid matches the template.</li>
+      <li><strong>Validate the format:</strong> <code>python scripts/validate_submission.py artifacts/candidates/&lt;name&gt;.tif --template data/sample_submission.tif</code>. It checks CRS, shape, transform, range, NaN and footprint coverage.</li>
+      <li><strong>Holdout gate:</strong> run with <code>--labels</code> and <code>--features</code>. The candidate must beat the current holdout best with a CI, and the leakage canary must be at or below AUC 0.90.</li>
+      <li><strong>Submit only when all of the above pass</strong> and a person chooses the weekly slot. Include the generative-AI disclosure the rules require (§3.2). Keep the public name and note generic (rules A.4).</li>
+    </ol>
+  </section>
+
+  <section>
+    <h2>Labels used on this site</h2>
+    <ul>
+      <li><strong>HOLDOUT-DTI</strong>: internal hide-and-recover score with its protocol, withheld count and CI. None computed yet.</li>
+      <li><strong>ORGANIZER-CONFIRMED</strong>: copied from an organizer receipt. None exists.</li>
+      <li><strong>OWNER-REPORTED</strong>: a figure from another team's repository (for example, the 0.2778 claim). Not verified.</li>
+      <li><strong>PUBLIC-LEADERBOARD</strong>: read from the official public page. Not a submission receipt.</li>
+    </ul>
+  </section>
+</main>
+</body>
+</html>

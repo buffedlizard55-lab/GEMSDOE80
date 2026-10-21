@@ -34,9 +34,9 @@ The entry is **one single-band float32 GeoTIFF** (or a `.zip` holding one), with
    `1m_DEM_links.csv` into `data/` (git-ignored; never commit them).
 2. `python scripts/prepare_data.py` → confirms placement and prints the official grid.
 3. `python scripts/generate_submission.py --template data/sample_submission.tif --features data/training_features.tif`
-   → writes to `docs/submissions/` **only if** the features grid equals the template grid; otherwise it refuses (exit 3)
+   → writes an **ungated candidate** to `artifacts/candidates/` (git-ignored, never the Pages folder) only if the features grid equals the template grid; otherwise it refuses (exit 3). Add `--name` (unique) and `--note` (≤140 characters), e.g. `--name dotted-ridge-k25 --note "clustering with k=25"`.
    or, with missing inputs, writes nothing (exit 2).
-4. `python scripts/validate_submission.py docs/submissions/<name>.tif --template data/sample_submission.tif --labels data/labels.tif --features data/training_features.tif`
+4. `python scripts/validate_submission.py artifacts/candidates/<name>.tif --template data/sample_submission.tif --labels data/labels.tif --features data/training_features.tif`
    → format checks, internal holdout DTI with a CI, and the leakage canary.
 5. Submit only when the validator passes **and** a human decides the slot. `download_ready` stays `false` until an
    organizer receipt is recorded. Include the generative-AI disclosure (rules §3.2) and keep the public name and
@@ -110,6 +110,8 @@ Public-leaderboard numbers are **not** organizer receipts and are not used as HO
 
 ```
 GEMSDOE80/
+├── .github/workflows/checks.yml    CI: pip install -r requirements.txt; pytest
+├── requirements.txt                numpy, rasterio, scipy, pytest
 ├── README.md                       this file (status, method, and the full session prompt in the Appendix)
 ├── index.html                      GitHub Pages root → docs/
 ├── docs/
@@ -117,11 +119,15 @@ GEMSDOE80/
 │   ├── sources.md                  source register with verification labels
 │   ├── irregularities.md           IR-01 … IR-22, flagged for review
 │   ├── hypotheses.md               candidates C1–C5 with layers, signatures, mimics, ranks
-│   └── submissions/README.md       no submission file exists yet
+│   ├── executive-summary.html      subpage: how to submit
+│   └── submissions/README.md       validated files only; currently empty
 ├── research/run-card.json          machine-readable run card (E1 tooling; E2–E4 not run)
+├── research/evidence/              GEMSDOE32 audit, data manifest (owner-mirror pins), reference README
+├── reports/                        validator and revalidation reports (placeholder failures kept as evidence)
 ├── scripts/
 │   ├── download_competition_data.sh   manual placement instructions (login required)
 │   ├── prepare_data.py             checks data/ and prints the template grid
+│   ├── restore_mirrors.py          owner-mirror restore with SHA-256 pins. PRESENT BUT NOT RUN (IR-01: licensing undecided)
 │   ├── generate_submission.py      refuses without template and features; grid-checked [0,1] writer
 │   └── validate_submission.py      format checks; repaired DTI; segment-bootstrap CI; canary
 ├── tests/
@@ -226,6 +232,17 @@ that the project succeeds. Under the current evidence that path is to get the da
 produced false confidence.
 
 ---
+
+## 11b. Merge record (this session, PR #6)
+
+Main advanced in parallel through PR #4 and PR #5 while this branch was open. The merge kept:
+
+- **From main:** footprint coverage and sentinel rules in the validator; the fail-closed posture; the
+  pinned owner-mirror manifest and `restore_mirrors.py` (not run); GitHub Actions CI; the revalidation
+  reports as forensic evidence; the parallel-lane candidates C6–C9 in `docs/hypotheses.md`.
+- **From this branch:** a working holdout (segment bootstrap, 8-connectivity, disk buffer, canary) and a
+  generator that writes ungated candidates to `artifacts/candidates/` with `--name` and `--note`.
+- **Removed from the Pages tree:** the v1 and v2 placeholder rasters (IR-23). Git history keeps them.
 
 ## Appendix — Session prompt (project charter; re-read at the start of every session)
 

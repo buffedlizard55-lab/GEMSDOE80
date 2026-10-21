@@ -78,6 +78,43 @@ USGS database, so a prior that copies the catalogue is expected to score poorly 
 | 3 | C3 metric-aware emission | none on its own; affects score mechanics | very low | holdout |
 | 4 | C4 lidar scarps | high | high | DEM download, not reachable here |
 | 5 | C5 control | none (sanity check) | very low | labels |
+| 6 | C6 compensated gravity step under cover (`iso_grav_anom`, `depth_to_base_surf`) | medium-high | medium | core cache missing |
+| 7 | C7 conductive damage-zone double edge (`cond_surf`, `depth_to_base_surf`) | medium | medium | core cache missing |
+| 8 | C8 radiometric alteration asymmetry (GeoDAWN K/Th/U, `rtp`) | medium | high (ratio provenance unverified) | lithology provenance |
+| 9 | C9 asymmetric incision across a candidate line (raw DEM) | high if raw DEM is obtained | high | raw 3DEP DEM not accessed here |
+
+### C6 — Compensated gravity step under cover (from the parallel lane, main PR #4)
+- **Layers:** `iso_grav_anom`, `depth_to_base_surf`.
+- **Signature:** paired opposite-sign second derivatives, with a basement-depth step oriented normal to the inferred boundary. Targets displacement beneath basin cover.
+- **Named mimic:** intrusive density contact.
+- **Difference from the repo:** requires signed cross-field step geometry, not average absolute anomalies or H33 straight-boundary coherence.
+- **Cost:** medium. The core mirror is listed (not verified or used here).
+
+### C7 — Conductive damage-zone double edge (from main)
+- **Layers:** `cond_surf`, `depth_to_base_surf`.
+- **Signature:** two parallel, opposite-gradient conductivity edges enclosing a narrow zone, corroborated by a depth step. May indicate unmapped fractured rock.
+- **Named mimic:** clay-rich sediment ribbon.
+- **Difference:** detects a bounded zone, not a single coherent gradient or a scalar conductivity.
+- **Cost:** medium. Shared core cache missing.
+
+### C8 — Radiometric alteration asymmetry (from main)
+- **Layers:** GeoDAWN K/Th/U and `rtp`.
+- **Signature:** cross-strike K/Th residuals after lithology stratification, with a magnetic low. Tests alteration along buried fluid pathways.
+- **Named mimic:** weathering and soil redistribution.
+- **Difference:** signed cross-strike contrast, not a scalar average.
+- **Cost:** high. Ratio and lithology provenance unverified.
+
+### C9 — Asymmetric incision across a candidate line (from main)
+- **Layers:** raw DEM and derived catchments (3DEP, not accessed here).
+- **Signature:** drainage-area-normalised channel steepness on opposing flanks. Persistent asymmetry could indicate concealed differential uplift.
+- **Named mimic:** resistant lithologic boundary.
+- **Difference:** requires flow-routing elevations, not detrended elevations.
+- **Cost:** high; blocked on a verified raw DEM access route.
+
+Predicting fault traces is not direct prediction of geothermal vents or temperature. None of the
+candidates is described as proven; each is a falsifiable mechanism.
+
+---
 
 ## Validation order (budget: 3 experiments or 2 h; no submission slot)
 
@@ -91,3 +128,23 @@ E1 is tooling and does not count against the experiment budget. E2–E4 are the 
 
 A submission slot is spent only after a candidate beats the current holdout best and the validator
 passes. Weekly cap: three submissions (official rules §3.2).
+
+## External sources and obtainability
+
+* Raw DEM: USGS 3DEP / The National Map, https://apps.nationalmap.gov/downloader/ .
+* Radiometrics: USGS GeoDAWN release https://doi.org/10.5066/P93LGLVQ .
+* Lithology: USGS State Geologic Map Compilation https://doi.org/10.3133/ds1052 .
+
+These official source URLs are leads, **not accessed/availability-verified datasets in this
+session**. Network access is limited to GitHub and package registries. External-dependent
+candidates remain blocked rather than being proposed as immediately viable.
+
+## Top-candidate preflight
+
+No experiment run. Before generating a surface: identify the assigned lane, restore the
+shared cached stack, `evaluate_holdout.py`, `submission_writer.py`, registry and current best;
+withhold entire fault segments and buffers, rebuild catalogue features from visible faults,
+mask visible faults pixel-exactly, run every feature's AUC canary with positives AND negatives,
+and evaluate pooled HOLDOUT-DTI with segment/block-bootstrap CI. Compare the surface before
+placement, then compare final dots. Stop on correlation >0.90 OR overlap >70% within 3 px.
+Do not substitute a synthetic trial, pixel split, mean of fold DTIs, or one-value bootstrap.

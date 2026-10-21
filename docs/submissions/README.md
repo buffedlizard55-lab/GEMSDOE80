@@ -1,12 +1,16 @@
-# Submission files
+# Submission files (validated only)
 
-**Status: no submission-ready TIF exists in this repository.**
+**Status: empty. No file here is approved for download or submission.**
 
-The earlier placeholder raster (`gemsdoe80-structural-prior-v1-20261021T214821Z`) was removed on
-2026-10-21. It was built from invented Gaussian "structural zones" on a 3000×4000 grid that does not
-match any verified official grid, so it must not be downloaded or submitted. It remains in git
-history if an audit is needed.
+A file is copied into this folder only after all of these pass, and never by the generator:
 
-A file appears here only when `scripts/generate_submission.py` succeeds against the official
-`data/sample_submission.tif` and `data/training_features.tif`, and `scripts/validate_submission.py`
-passes. Even then `download_ready` stays `false` until an organizer receipt is recorded.
+1. `scripts/generate_submission.py` writes a candidate to `artifacts/candidates/` (git-ignored).
+2. `scripts/validate_submission.py` reports `format_valid: true` against the official
+   `sample_submission.tif` (grid, CRS, transform, values in [0,1], NaN outside the footprint).
+3. The candidate beats the current holdout best on the internal HOLDOUT-DTI protocol, with a CI,
+   and the leakage canary is at or below AUC 0.90.
+4. A person chooses the weekly slot (three per week, official rules §3.2).
+
+The earlier placeholder rasters (`gemsdoe80-structural-prior-v1/v2`, `gemsdoe80-dotted-ridge-v2`) were
+removed from this folder. Their validation reports are kept under `reports/`. The rasters themselves are
+in git history and fail the official grid check.

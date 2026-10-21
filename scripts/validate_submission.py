@@ -284,12 +284,37 @@ def build_report(prediction: Path, template: Path):
                 errors.append("Prediction values must be in range [0, 1]")
 
             nan_inside = int((~valid & pred_mask).sum())  # NaN where prediction claims data
-            report["nan_inside_footprint"] = nan_inside
             if nan_inside:
                 errors.append(f"{nan_inside} NaN pixels inside the prediction footprint")
 
             footprint_overlap = bool((pred_mask & template_mask).any()) if pred_mask.any() else False
             checks["footprint_overlaps_template"] = footprint_overlap
+
+            # The TEMPLATE, never the candidate's own nodata mask, defines required coverage.
+            # A candidate cannot hide holes by declaring them nodata.
+            if checks["shape_matches"]:
+                required = template_mask
+                holes = int((required & (~pred_mask | ~np.isfinite(values))).sum())
+                checks["template_footprint_nonempty"] = bool(required.any())
+                checks["template_footprint_covered"] = holes == 0
+                report["nan_inside_footprint"] = int((required & ~np.isfinite(values)).sum())
+                report["missing_inside_footprint"] = holes
+                if not required.any():
+                    errors.append("Template footprint is empty")
+                if holes:
+                    errors.append(f"{holes} missing/nonfinite pixels inside template footprint")
+            else:
+                checks["template_footprint_covered"] = False
+                report["nan_inside_footprint"] = None
+                report["missing_inside_footprint"] = None
+
+            # Finite sentinels (e.g. -9999 masked as nodata) must still fail the range rule.
+            finite_raw = np.isfinite(values)
+            if np.any(finite_raw & ((values < 0) | (values > 1))):
+                errors.append("Finite values outside [0, 1], including masked sentinels")
+                report["values_in_0_1"] = False
+            if np.isinf(values).any():
+                errors.append("Infinite values are not permitted")
 
             report["sha256"] = sha256_file(prediction)
 
@@ -298,7 +323,15 @@ def build_report(prediction: Path, template: Path):
         return report
 
     report["format_valid"] = not errors
-    report["download_ready"] = report["format_valid"] and report["organizer_confirmed"]
+    report["format_ready"] = report["format_valid"]
+    # Promotion is a separate, evidence-gated selector step; format validity never sets this.
+    report["download_ready"] = False
+    report["promotion_blockers"] = [
+        "Shared hide-and-recover HOLDOUT-DTI and CI unavailable unless --labels/--features supplied",
+        "Per-feature leakage canary unavailable unless --labels/--features supplied",
+        "Registry duplicate check (rank correlation > 0.90 or > 70% dots within 3 px) not run",
+        "Current holdout best and weekly cap unverified",
+    ]
     return report
 
 
