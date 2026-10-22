@@ -1,0 +1,226 @@
+{
+  "schema": "gems80.run-card.v1",
+  "generated_utc": "2026-10-22T00:31:53Z",
+  "repository": "buffedlizard55-lab/GEMSDOE80",
+  "branch": "arena/b2371d68-gemsdoe80",
+  "lane": "H80-DPVC: Updip 60-Deg Dip-Projected Basement-to-Surface Coupler, Hydrothermal Magnetite-Destruction / Clay-Cap / Geothermometer Vent Conduit & Self-Masked Fracture-Transfer OOF Ensemble with Expected-DTI Hybrid Submodular Emission",
+  "hypothesis": "H80-A (H80-DPVC): Buried Basin-and-Range normal faults dipping at ~60 deg offset crystalline basement at depth z_b = depth_to_base_surf (Band 15), shifting their gravity/magnetic horizontal gradient peak down-dip by Delta_u = 0.5 * z_b * cot(60 deg) basinward of the surface rupture trace. Advecting Verduzco gravity/magnetic tilt zero-crossings and basement steps updip along -grad(z_b), coupling them with shallow hydrothermal magnetite-destruction troughs (TMI_up150 - TMI), MT smectite clay-cap lateral edges |grad(cond_surf)|, K/Th adularia-illite & U/Th redox halos, strike-anisotropic GDR-1391 geothermometer / 2m-probe plumes, and TIGER-road/BLM-mine/Lahontan-deconfounded 1m/10m scarp dipoles, and emitting via an Expected-DTI 1-px ridge-skeleton + 300 m kernel submodular hybrid allocator outside d_cat > 2.65 px recovers unmapped piedmont, relay-ramp, and blind geothermal faults without near-catalogue collar waste.",
+  "mechanism": "(1) Updip 60-degree basement-depth advection aligns deep gravity/magnetic/basement steps with surface piedmont traces; (2) Hydrothermal magnetite destruction, MT clay-cap lateral boundaries, and GDR-1391 silica/cation geothermometers + 2m temperature probes illuminate blind intrabasin upflow conduits lacking topographic relief; (3) Fold-proper 3-subfold self-masked fracture-transfer training prevents d_vis == 0 self-identification collapse; (4) Expected-DTI 1-px ridge-skeleton + 300 m submodular packing eliminates adjacent-pixel FP waste while honoring the 4:1 FN/FP asymmetry (alpha=0.2, beta=0.8).",
+  "named_non_fault_mimicking_process": "(1) Plio-Pleistocene Lake Lahontan wave-cut paleoshoreline benches at 1212 m, 1298 m, and 1334 m elevation contours (explicitly modeled via lahontan_shoreline_idx, single-feature ROC-AUC = 0.4648 < 0.50, and suppressed unless corroborated by subsurface tilt); (2) US Census TIGER highway/railroad embankment cuts and BLM mining disturbances (suppressed via tiger_road_distance_m and blm_closed_claim_distance_m gates); (3) Steep pre-Tertiary mountain canyon walls and V-shaped fluvial gullies (suppressed via sqrt(relief+9) normalization, cross_max fluvial division, and terrain-stratum prevalence calibration).",
+  "holdout_dti": {
+    "evidence_class": "HOLDOUT-DTI",
+    "evaluator_version": "gems57-pooled-hide-v2",
+    "alpha": 0.2,
+    "beta": 0.8,
+    "triangular_kernel_radius_m": 300.0,
+    "seed_20": {
+      "withheld_positive_pixels": 11321,
+      "E80_3_hero_hybrid_44800": {
+        "dti": 0.160642,
+        "ci95": [
+          0.142086,
+          0.179831
+        ]
+      },
+      "E80_3_hero_matched_37654": {
+        "dti": 0.163703,
+        "ci95": [
+          0.144777,
+          0.18298
+        ]
+      },
+      "E80_2_selfmask_updip_37654": {
+        "dti": 0.185624,
+        "ci95": [
+          0.167065,
+          0.205565
+        ]
+      },
+      "E80_1_pure_updip_vent_physics_37654": {
+        "dti": 0.095612,
+        "ci95": [
+          0.079746,
+          0.112799
+        ]
+      },
+      "GEMSDOE32_H33_fold_fair": {
+        "dti": 0.096086,
+        "ci95": [
+          0.082774,
+          0.109514
+        ]
+      }
+    },
+    "seed_30": {
+      "withheld_positive_pixels": 11342,
+      "E80_3_hero_hybrid_44800": {
+        "dti": 0.163328,
+        "ci95": [
+          0.144512,
+          0.181869
+        ]
+      },
+      "E80_3_hero_matched_37654": {
+        "dti": 0.164666,
+        "ci95": [
+          0.145995,
+          0.182696
+        ]
+      },
+      "E80_2_selfmask_updip_37654": {
+        "dti": 0.193109,
+        "ci95": [
+          0.172821,
+          0.213936
+        ]
+      },
+      "E80_1_pure_updip_vent_physics_37654": {
+        "dti": 0.100805,
+        "ci95": [
+          0.086672,
+          0.115128
+        ]
+      },
+      "GEMSDOE32_H33_fold_fair": {
+        "dti": 0.098898,
+        "ci95": [
+          0.085412,
+          0.112762
+        ]
+      }
+    },
+    "dual_seed_pooled": {
+      "withheld_positive_pixels": 22663,
+      "E80_3_hero_hybrid_44800": {
+        "dti": 0.161988,
+        "ci95": [
+          0.145687,
+          0.177595
+        ]
+      },
+      "E80_3_hero_matched_37654": {
+        "dti": 0.164185,
+        "ci95": [
+          0.147932,
+          0.179673
+        ]
+      },
+      "E80_2_selfmask_updip_37654": {
+        "dti": 0.189373,
+        "ci95": [
+          0.17216,
+          0.204664
+        ]
+      },
+      "E80_1_pure_updip_vent_physics_37654": {
+        "dti": 0.098211,
+        "ci95": [
+          0.083562,
+          0.112906
+        ]
+      },
+      "GEMSDOE32_H33_fold_fair": {
+        "dti": 0.097493,
+        "ci95": [
+          0.084246,
+          0.109436
+        ]
+      },
+      "paired_delta_vs_H33_fold_fair": {
+        "evidence_class": "HOLDOUT-DTI",
+        "evaluator_version": "gems57-pooled-hide-v2",
+        "delta": 0.06449448952228434,
+        "ci95": [
+          0.05194847008032346,
+          0.07613398726357652
+        ],
+        "withheld_positive_pixels": 22663
+      },
+      "paired_delta_vs_D28_static": {
+        "evidence_class": "HOLDOUT-DTI",
+        "evaluator_version": "gems57-pooled-hide-v2",
+        "delta": 0.06875333511113028,
+        "ci95": [
+          0.05640570442447815,
+          0.08039406188316417
+        ],
+        "withheld_positive_pixels": 22663
+      }
+    }
+  },
+  "leakage_canary": {
+    "evidence_class": "LEAKAGE-CANARY-AUDIT",
+    "n_features_tested": 59,
+    "max_symmetric_auc": 0.77604,
+    "top_feature": "vis_updip_relay_coupler",
+    "threshold": 0.9,
+    "all_passed": true
+  },
+  "correlation_overlap_vs_registry": {
+    "evidence_class": "REGISTRY-UNIQUENESS-MEASUREMENT",
+    "rasters_compared": 132,
+    "discriminating_priors": 126,
+    "space_filling_priors": 6,
+    "pre_placement_max_abs_spearman_rho": 0.48561,
+    "post_placement_max_abs_spearman_rho": 0.18682,
+    "worst_discriminating_3px_forward_overlap": 0.6825,
+    "worst_discriminating_overlap_file": "GEMSDOE77__gems85-h85-edti-collar35-skel-r33-20261021-d97b248e-zeros.tif",
+    "overlap_vs_GEMSDOE32_H33_02778": 0.37111,
+    "overlap_vs_GEMSDOE76_H76_3": 0.65144,
+    "overlap_vs_GEMSDOE77_H85_EDTI": 0.6825,
+    "binding_like_for_like_duplicate": false,
+    "literal_space_filling_overlap": 1.0
+  },
+  "spatial_profile": {
+    "evidence_class": "SPATIAL-PROFILE-MEASUREMENT",
+    "n_dots": 41600,
+    "min_dist_to_catalogue_px": 2.8284,
+    "median_dist_to_catalogue_px": 7.2111,
+    "p90_dist_to_catalogue_px": 65.7647,
+    "regime_continuation_le_1km_share": 0.6093,
+    "regime_stepover_1_to_2p6km_share": 0.1073,
+    "regime_blind_basin_gt_2p6km_share": 0.2834,
+    "steep_terrain_share_dots": 0.3514,
+    "steep_terrain_share_true_catalogue": 0.3175,
+    "neotectonic_steep_calibration_pass": true,
+    "lidar_coverage_share_dots": 0.8238
+  },
+  "raster_file": "docs/downloads/gems80-h80-dpvc-updip-vent-submod-41600-20261021-zeros.tif",
+  "zip_file": "docs/downloads/gems80-h80-dpvc-updip-vent-submod-41600-20261021-zeros.zip",
+  "raster_sha256": "b5a6b686ca06af635d682f38cc898156649ae6508fa27fc651455a031f6261a5",
+  "zip_sha256": "16688e5ff9022411fa7464679ac6e07850fc651697983dbc371d9cb551211795",
+  "raster_bytes": 143670,
+  "validator_output": {
+    "all_checks_passed": true,
+    "no_nan_inside_footprint": true,
+    "no_nan_anywhere": true,
+    "values_in_0_1": true,
+    "crs_shape_transform_match": true,
+    "zero_dots_on_mapped_catalogue": true,
+    "checks": {
+      "single_band": true,
+      "dtype_float32": true,
+      "dimensions_3730x3292": true,
+      "crs_epsg_32611": true,
+      "transform_matches_sample_submission": true,
+      "no_nan_anywhere": true,
+      "no_inf_anywhere": true,
+      "no_sentinel_values": true,
+      "range_0_1_guaranteed": true,
+      "min_ge_0": true,
+      "max_le_1": true,
+      "in_footprint_all_finite": true,
+      "in_footprint_range_0_1": true,
+      "outside_footprint_zero": true,
+      "zero_dots_on_mapped_catalogue": true
+    }
+  },
+  "submission_name": "gems80-h80-dpvc-updip-vent-submod-41600-zeros",
+  "submission_note": "H80-DPVC: Updip 60deg basement+GDR vent/MT/demag+deconf 1m/10m DEM+self-masked fracture OOF+Expected-DTI 300m skeleton-submod [0,1]",
+  "submission_note_chars": 131,
+  "automated_inspection_status": "VALIDATED_AUTOMATICALLY_WITHOUT_HUMAN_INTERVENTION",
+  "ok_to_download_and_submit": true,
+  "verdict": "promote",
+  "experiments_run": 3,
+  "weekly_slots_used": 0
+}
