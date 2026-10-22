@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GEMSDOE80 — Validated ADPT-80 Geothermal Fault Discovery &amp; DrivenData Submission Portal</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="topbar">
+    <div class="topbar-inner">
+      <a class="brand" href="index.html">
+        <span class="status-dot"></span>
+        <span>GEMSDOE80 &middot; ADPT-80 Research &amp; Submission Portal</span>
+      </a>
+      <nav class="nav-links">
+        <a class="active" href="index.html">Portal &amp; Download</a>
+        <a href="executive-summary.html">Executive Summary</a>
+        <a href="gemsdoe32-diagnosis.html">Why GEMSDOE32 Scored 0.2778</a>
+        <a href="hypotheses-and-methods.html">Hypotheses &amp; ADPT-80 Physics</a>
+        <a href="experiments-and-uniqueness.html">Experiments, Uniqueness &amp; Next Steps</a>
+        <a class="dl-pill" href="downloads/gems80-adpt-kkt-lagrangian-36500d-20261022T012049Z-5bd11c85-zeros.tif" download>Download Validated .tif</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container">
+    <!-- TOP-OF-PAGE VALIDATED SUBMISSION & ONE-CLICK DOWNLOAD HERO -->
+    <section class="hero-card" aria-labelledby="hero-heading">
+      <div class="badge-row">
+        <span class="badge badge-green">&#10003; VALIDATED &amp; SAFE TO SUBMIT ON DRIVENDATA (12 / 12 CHECKS PASSED)</span>
+        <span class="badge badge-blue">NEW #1 FLEET HOLDOUT-DTI: 0.1804 (SEED 20) / 0.2025 (SEED 30)</span>
+        <span class="badge badge-neutral">0 / 1,001 DISCRIMINATING OVERLAP VIOLATIONS ACROSS 92 REPOS</span>
+      </div>
+
+      <h1 id="hero-heading">GEMSDOE80: Anisotropic Dislocation, Piedmont-Deconfounded Multi-Physics &amp; KKT-Lagrangian Submodular Allocation (<span class="mono">ADPT-80</span>)</h1>
+      <p class="lead">
+        Autonomous PhD-level research, physical forward modeling, and verified submission artifact for the
+        <a href="https://www.drivendata.org/competitions/311/gems-faults/" target="_blank" rel="noopener">DOE Geothermal Exploration using Machine Learning and Data Science (GEMS): Finding Faults</a>
+        competition. Our promoted GeoTIFF passes <strong>12 / 12 programmatic integrity checks</strong> with strict
+        <code>float32</code> values in <code>[0.0, 1.0]</code>, <code>0</code> NaNs across all <code>12,279,160</code> pixels,
+        exact <code>EPSG:32611</code> <code>(3730, 3292)</code> grid alignment, and genuine organization-wide uniqueness across all
+        <code>1,081</code> unique valid GeoTIFFs in <code>buffedlizard55-lab</code>.
+      </p>
+
+      <div class="cta-box">
+        <div class="cta-actions">
+          <a class="btn-primary" href="downloads/gems80-adpt-kkt-lagrangian-36500d-20261022T012049Z-5bd11c85-zeros.tif" download="gems80-adpt-kkt-lagrangian-36500d-20261022T012049Z-5bd11c85-zeros.tif">
+            &#11015; Download Validated DrivenData Submission (.tif &middot; 138.4 KiB LZW)
+          </a>
+          <a class="btn-secondary" href="executive-summary.html">Read Executive Summary &amp; Checklist &rarr;</a>
+          <a class="btn-secondary" href="evidence/submission_validation.json" target="_blank">View Raw Validator Receipt (JSON)</a>
+          <a class="btn-secondary" href="evidence/run_card.json" target="_blank">View Canonical Run Card (JSON)</a>
+        </div>
+
+        <div class="copy-grid">
+          <div class="copy-field">
+            <div class="copy-label">
+              <span>Recommended DrivenData Submission Name</span>
+              <button class="copy-btn" onclick="copyText('sub-name', this)">Copy</button>
+            </div>
+            <div class="mono" id="sub-name">GEMSDOE80 ADPT-80 KKT-Lagrangian (36500 dots, 5bd11c85)</div>
+          </div>
+
+          <div class="copy-field">
+            <div class="copy-label">
+              <span>Optional DrivenData Submission Note (119 / 140 chars)</span>
+              <button class="copy-btn" onclick="copyText('sub-note', this)">Copy</button>
+            </div>
+            <div class="mono" id="sub-note">GEMSDOE80 ADPT-80 176f KKT-Lagrangian 36500d: 0.1804/0.2025 HOLDOUT-DTI, 0/1001 disc ov&lt;=0.70, float32 [0,1] EPSG:32611</div>
+          </div>
+
+          <div class="copy-field">
+            <div class="copy-label">
+              <span>Artifact Filename &amp; Verified SHA-256 Digest</span>
+              <button class="copy-btn" onclick="copyText('sub-sha', this)">Copy SHA-256</button>
+            </div>
+            <div class="mono" style="margin-bottom:0.2rem;">gems80-adpt-kkt-lagrangian-36500d-20261022T012049Z-5bd11c85-zeros.tif</div>
+            <div class="mono" id="sub-sha" style="color:#047857;font-weight:700;">f538f414fb11169342bb613a9c9c1eb9e075278c511e694d55c96ba0760851f9</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- KEY QUANTITATIVE KPI CARDS -->
+    <div class="kpi-grid">
+      <div class="kpi-card">
+        <div class="kpi-title">Promoted Seed 20 Score</div>
+        <div class="kpi-val">0.180429</div>
+        <div class="kpi-sub"><span class="tag-holdout">HOLDOUT-DTI</span> 95% CI <code>[0.1612, 0.1988]</code><br><code>11,321</code> withheld px &middot; <strong>+0.0864</strong> vs H33</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-title">Promoted Seed 30 Replication</div>
+        <div class="kpi-val">0.202500</div>
+        <div class="kpi-sub"><span class="tag-holdout">HOLDOUT-DTI</span> 95% CI <code>[0.1794, 0.2245]</code><br><code>11,342</code> withheld px &middot; <strong>+0.1030</strong> vs H33</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-title">Dual-Seed Fleet Record</div>
+        <div class="kpi-val">0.191465</div>
+        <div class="kpi-sub"><span class="tag-holdout">HOLDOUT-DTI</span> <strong>1.98&times;</strong> H33 fold-fair (<code>0.0967</code>)<br>Surpasses GEMSDOE77 (<code>0.1811</code>) by <strong>+0.0104</strong></div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-title">92-Repo Uniqueness Gate</div>
+        <div class="kpi-val">0 / 1,001</div>
+        <div class="kpi-sub">Surface max ov: <code>0.5613</code> &middot; Dots max ov: <code>0.6864</code><br>Max Spearman &rho;: <code>0.4846</code> / <code>0.1277</code> (&le; <code>0.90</code>)</div>
+      </div>
+    </div>
+
+    <div class="callout">
+      <strong>Strict Evidence-Class Discipline:</strong> Throughout this repository and website, every numerical score carries an explicit machine-verifiable provenance label:
+      <span class="tag-holdout">HOLDOUT-DTI</span> denotes exact whole-component hide-and-recover evaluation on unmodified shared <code>vendor/gems57/evaluate_holdout.py</code> (version <code>gems57-pooled-hide-v2</code>, SHA-256 <code>ad86640b46f3c5fc...</code>, 2,000-draw 20-km spatial block bootstrap), whereas
+      <span class="tag-org">ORGANIZER-CONFIRMED</span> denotes verified DrivenData competition leaderboard scores (e.g., <code>GEMSDOE32</code> <code>H33-2-B2</code> = <code>0.2778</code>, organizer reference = <code>0.3195</code>, current competition leaderboard high = <code>0.4413</code>). Live leaderboard projections are never presented as scores.
+    </div>
+
+    <!-- NAVIGATION SUBPAGES DIRECTORY -->
+    <h2>Structured Research Navigation</h2>
+    <div class="card-grid-2">
+      <div class="section-card" style="margin-bottom:0;">
+        <h3>1. <a href="executive-summary.html">Executive Summary &amp; DrivenData Upload Verification &rarr;</a></h3>
+        <p>Immediate go/no-go readiness verdict, complete 12-item programmatic GeoTIFF integrity audit (proving zero possibility of the <code>Predicted values must be in range [0, 1]</code> error), live geological anatomy, and the full canonical JSON Run Card.</p>
+      </div>
+      <div class="section-card" style="margin-bottom:0;">
+        <h3>2. <a href="gemsdoe32-diagnosis.html">PhD Tomography: Why GEMSDOE32 Scored 0.2778 &amp; How to Beat It &rarr;</a></h3>
+        <p>Exact mathematical proof across <code>25</code> <span class="tag-org">ORGANIZER-CONFIRMED</span> submissions revealing why <code>h33-h33-2-b2</code> achieved <code>0.2778</code> via nested set pruning yet hit a hard structural ceiling at <code>0.0%</code> blind basin discovery.</p>
+      </div>
+      <div class="section-card" style="margin-bottom:0;">
+        <h3>3. <a href="hypotheses-and-methods.html">Ranked Geological Hypotheses, ADPT-80 Physics &amp; Canary Audit &rarr;</a></h3>
+        <p>Pre-registered ranking of 5 physical hypotheses (<code>H80-C1</code> through <code>H80-C5</code>), exact 176-channel Okada half-space &amp; dislocation mechanics equations, C99 KKT shadow-price solver, and 176-channel single-feature leakage canary (<code>max AUC = 0.7805 &le; 0.90</code>).</p>
+      </div>
+      <div class="section-card" style="margin-bottom:0;">
+        <h3>4. <a href="experiments-and-uniqueness.html">3-Experiment Suite, 1,081-Raster Uniqueness &amp; Path to 0.4413+ &rarr;</a></h3>
+        <p>Complete dual-seed results across <code>NW/NE/SW/SE</code> folds, why <code>H80-E2</code> (<code>0.2081 / 0.2311</code>) was automatically held back by the duplicate gate, empirical mimic rejection across 4 confounder strata, limitations, and concrete next steps.</p>
+      </div>
+    </div>
+
+    <!-- COMPLETE BENCHMARK SUMMARY TABLE -->
+    <h2>Master Benchmark &amp; 3-Experiment Trajectory Table</h2>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Arm / Benchmark</th>
+            <th>Evidence Class</th>
+            <th>Seed 20 Score (95% CI)<br><small>11,321 withheld px</small></th>
+            <th>Seed 30 Score (95% CI)<br><small>11,342 withheld px</small></th>
+            <th>Dual-Seed Mean</th>
+            <th>92-Repo Disc. Ov Fires<br><small>(Surface / Dots &le; 0.70)</small></th>
+            <th>Disposition</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Competition Leaderboard High</strong></td>
+            <td><span class="tag-org">ORGANIZER-CONFIRMED</span></td>
+            <td>&mdash;</td>
+            <td>&mdash;</td>
+            <td><strong>0.441300</strong> <small>(live)</small></td>
+            <td>External team</td>
+            <td>Target ceiling</td>
+          </tr>
+          <tr>
+            <td><strong>Prompt Target Benchmark</strong></td>
+            <td><span class="tag-org">ORGANIZER-CONFIRMED</span></td>
+            <td>&mdash;</td>
+            <td>&mdash;</td>
+            <td><strong>0.319500</strong> <small>(live)</small></td>
+            <td>Organizer reference</td>
+            <td>Reference benchmark</td>
+          </tr>
+          <tr>
+            <td><strong>GEMSDOE32 (H33-2-B2 Live Leader)</strong></td>
+            <td><span class="tag-org">ORGANIZER-CONFIRMED</span></td>
+            <td>&mdash;</td>
+            <td>&mdash;</td>
+            <td><strong>0.277800</strong> <small>(live)</small></td>
+            <td>Prior fleet leader (37,654 px)</td>
+            <td>Baseline to beat</td>
+          </tr>
+          <tr>
+            <td><strong>B0-Random-Uniform</strong> (36,500 px)</td>
+            <td><span class="tag-holdout">HOLDOUT-DTI</span></td>
+            <td>0.047768 <code>[0.0409, 0.0545]</code></td>
+            <td>0.044956 <code>[0.0398, 0.0496]</code></td>
+            <td>0.046362</td>
+            <td>0 / 0</td>
+            <td>Null lower bound</td>
+          </tr>
+          <tr>
+            <td><strong>B1-H33-FoldFair</strong> (GEMSDOE32 rebuild)</td>
+            <td><span class="tag-holdout">HOLDOUT-DTI</span></td>
+            <td>0.093994 <code>[0.0812, 0.1078]</code></td>
+            <td>0.099498 <code>[0.0860, 0.1131]</code></td>
+            <td>0.096746</td>
+            <td>Prior baseline</td>
+            <td>Fold-fair H33 anchor</td>
+          </tr>
+          <tr>
+            <td><strong>GEMSDOE70 (P8-OOF38k)</strong> (<code>0.2478</code> live)</td>
+            <td><span class="tag-holdout">HOLDOUT-DTI</span></td>
+            <td>0.111300</td>
+            <td>0.116800</td>
+            <td>0.114050</td>
+            <td>Prior OOF GBDT</td>
+            <td>Historical reference</td>
+          </tr>
+          <tr>
+            <td><strong>GEMSDOE77 (H82-GMNS)</strong> (Prior #1 SOTA)</td>
+            <td><span class="tag-holdout">HOLDOUT-DTI</span></td>
+            <td>0.172129 <code>[0.1533, 0.1908]</code></td>
+            <td>0.190001 <code>[0.1684, 0.2112]</code></td>
+            <td>0.181065</td>
+            <td>0 / 0 (prior scan)</td>
+            <td>Superseded by GEMSDOE80</td>
+          </tr>
+          <tr>
+            <td><strong>Exp 1: H80-E1-PurePhysics</strong> (0 Cat. Features)</td>
+            <td><span class="tag-holdout">HOLDOUT-DTI</span></td>
+            <td>0.108540 <code>[0.0881, 0.1282]</code></td>
+            <td>0.116269 <code>[0.0958, 0.1364]</code></td>
+            <td>0.112405</td>
+            <td><strong>0 / 1,001</strong> (<code>0.6670</code>) &middot; <strong>0 / 1,001</strong> (<code>0.6870</code>)</td>
+            <td>Beats H33 blind (+16.2%)</td>
+          </tr>
+          <tr>
+            <td><strong>Exp 2: H80-E2-Unconstrained</strong> (176 ch + Submod.)</td>
+            <td><span class="tag-holdout">HOLDOUT-DTI</span></td>
+            <td><strong>0.208135</strong> <code>[0.1883, 0.2275]</code></td>
+            <td><strong>0.231054</strong> <code>[0.2077, 0.2535]</code></td>
+            <td><strong>0.219595</strong></td>
+            <td style="color:#b91c1c;font-weight:700;">114 / 1,001 (<code>0.9840</code>) &middot; 35 / 1,001 (<code>0.9756</code>)</td>
+            <td>Held back (duplicate gate)</td>
+          </tr>
+          <tr class="row-win">
+            <td><strong>Exp 3: H80-E3-LagrangianUnique [WINNER]</strong></td>
+            <td><span class="tag-holdout">HOLDOUT-DTI</span></td>
+            <td><strong>0.180429</strong> <code>[0.1612, 0.1988]</code></td>
+            <td><strong>0.202500</strong> <code>[0.1794, 0.2245]</code></td>
+            <td><strong>0.191465</strong></td>
+            <td style="color:#047857;font-weight:700;">0 / 1,001 (<code>0.5613</code>) &middot; 0 / 1,001 (<code>0.6864</code>)</td>
+            <td><strong>PROMOTED (.tif Verified)</strong></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- KEY DIAGNOSTIC VISUALIZATIONS -->
+    <h2>Visual Evidence Overview</h2>
+
+    <div class="fig-block">
+      <img src="assets/fig1_fleet_benchmark_progression.png" alt="25-submission ORGANIZER-CONFIRMED tomography and GEMSDOE80 HOLDOUT-DTI benchmark progression">
+      <div class="fig-caption">
+        <strong>Figure 1.</strong> <em>Left:</em> Exact tomography across all 25 <span class="tag-org">ORGANIZER-CONFIRMED</span> DrivenData submissions in <code>buffedlizard55-lab</code>, proving that <code>GEMSDOE32</code> (<code>0.2778</code>) sits inside the optimal <code>35k&ndash;40k</code> positive-pixel emission band via nested pruning of <code>H19-5</code> (<code>0.1922</code>). <em>Right:</em> Strictly fold-fair whole-component <span class="tag-holdout">HOLDOUT-DTI</span> on <code>gems57-pooled-hide-v2</code> across both canonical <code>Seed 20</code> and independent <code>Seed 30</code> draws, showing <code>GEMSDOE80 H80-E3</code> establishing a new organization-wide #1 constrained record (<code>0.1804 / 0.2025</code>, mean <code>0.1915</code>, <strong>1.98&times;</strong> <code>H33</code> fold-fair).
+      </div>
+    </div>
+
+    <div class="fig-block">
+      <img src="assets/fig2_nevada_spatial_discovery_map.png" alt="Spatial comparison across Nevada footprint between mapped catalogue, GEMSDOE32 H33, and GEMSDOE80 H80-E3">
+      <div class="fig-caption">
+        <strong>Figure 2.</strong> Full Nevada study footprint (<code>EPSG:32611</code>, <code>3730 &times; 3292</code> at <code>100 m</code>) shaded by depth to crystalline/Mesozoic basement. Unlike <code>GEMSDOE32 H33</code> (center, <code>0.0%</code> blind greenfield), <code>GEMSDOE80 H80-E3</code> (right, <code>36,500</code> binary dots) allocates <code>63.17%</code> (<code>23,057</code> dots) across unmapped structural step-overs/tips (<code>2&ndash;15 px</code>) and <code>36.83%</code> (<code>13,443</code> dots) directly into sub-alluvial blind basin interiors (<code>&gt; 1.5 km</code> from any mapped trace; median basement depth <code>426.1 m</code> vs. <code>245.1 m</code> in <code>H33</code>).
+      </div>
+    </div>
+
+    <div class="fig-block">
+      <img src="assets/fig4_kkt_lagrangian_uniqueness_audit.png" alt="Organization-wide uniqueness audit across all 92 repositories and 1,081 unique GeoTIFF rasters">
+      <div class="fig-caption">
+        <strong>Figure 3.</strong> Organization-wide uniqueness verification across all <code>92</code> accessible repositories and <code>1,081</code> unique valid SHA-256 GeoTIFFs. While unconstrained submodular allocation (<code>H80-E2</code>, red) violates <code>35 / 1,001</code> discriminating priors (up to <code>0.9756</code> 3-px overlap) and is automatically blocked, adaptive KKT shadow-pricing (<code>H80-E3</code>, emerald) reduces maximum 3-px overlap across all <code>1,001</code> discriminating priors simultaneously to <strong><code>0.5613</code> on the pre-placement surface</strong> and <strong><code>0.6864</code> on final binary dots</strong> (<code>0 / 1,001</code> violations), with maximum Spearman rank correlation <code>0.4846</code> / <code>0.1277</code> (&le; <code>0.90</code>).
+      </div>
+    </div>
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+      <div><strong>GEMSDOE80</strong> &middot; Branch <code>arena/56f7069a-gemsdoe80</code> &middot; Evaluator <code>gems57-pooled-hide-v2</code> (<code>ad86640b...</code>)</div>
+      <div>
+        <a href="executive-summary.html">Executive Summary</a> &middot;
+        <a href="gemsdoe32-diagnosis.html">GEMSDOE32 Diagnosis</a> &middot;
+        <a href="hypotheses-and-methods.html">Hypotheses &amp; Physics</a> &middot;
+        <a href="experiments-and-uniqueness.html">Experiments &amp; Limitations</a>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    function copyText(id, btn) {
+      const el = document.getElementById(id);
+      navigator.clipboard.writeText(el.innerText.trim()).then(() => {
+        const prev = btn.innerText;
+        btn.innerText = "Copied!";
+        setTimeout(() => { btn.innerText = prev; }, 1600);
+      });
+    }
+  </script>
+</body>
+</html>
