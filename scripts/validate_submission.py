@@ -29,6 +29,7 @@ from pathlib import Path
 import numpy as np
 
 REPO = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(REPO / "src"))
 
 ALPHA, BETA = 0.2, 0.8
 KERNEL_R_M = 300.0
@@ -126,18 +127,20 @@ def bootstrap_ci(scores, n_bootstrap=N_BOOTSTRAP, seed=BOOTSTRAP_SEED):
 
 
 def holdout_segment_mask(gt, holdout_frac=1.0 / 3.0):
-    """Whole fault segments withheld (connected components of the label raster)."""
+    """Whole fault segments withheld (1-based connected component IDs of the label raster)."""
     try:
         from scipy import ndimage
 
         labeled, n = ndimage.label(gt > 0)
     except Exception:
         return (gt > 0).copy()
+    if n == 0:
+        return np.zeros_like(gt, dtype=bool)
     sizes = np.bincount(labeled.ravel())[1:]
-    order = np.argsort(-sizes)
+    order = np.argsort(-sizes) + 1  # 1-based component labels (0 is background!)
     n_hold = max(1, int(round(n * holdout_frac)))
     hold_labels = set(int(v) for v in order[:n_hold])
-    return np.isin(labeled, list(hold_labels)) if hold_labels else np.zeros_like(gt, dtype=bool)
+    return np.isin(labeled, list(hold_labels))
 
 
 def build_report(prediction: Path, template: Path):
@@ -265,52 +268,114 @@ def build_report(prediction: Path, template: Path):
 
 def holdout_dti(report, prediction, template, labels_path, features_path):
     import rasterio
+    from gems80.holdout import score_holdout, withhold_segments
+    from gems80.uniqueness import check_registry, load_compact_registry
 
     with rasterio.open(prediction) as pred, rasterio.open(labels_path) as ls, rasterio.open(
         template
     ) as tmpl:
         values = pred.read(1).astype(np.float64)
         gt = ls.read(1).astype(np.float64)
+        foot = tmpl.read_masks(1) > 0
     if gt.shape != values.shape:
         report["holdout"]["note"] = "labels grid does not match submission grid"
         return
-    holdout = holdout_segment_mask(gt)
-    gt_held = np.where(holdout, gt, 0.0)
-    res = dti_weighted(values, gt_held)
-    lo, hi = bootstrap_ci(np.array([res["DTI"]]))
-    report["holdout"] = {
-        "available": True,
-        "evaluator_version": "GEMS distance-weighted Tversky alpha=0.2 beta=0.8 R=300m",
-        "withheld_positive_count": int((gt_held > 0).sum()),
-        "score": res["DTI"],
-        "ci95": [lo, hi],
-        "TP_w": res["TP_w"],
-        "FP_w": res["FP_w"],
-        "FN_w": res["FN_w"],
-        "status": "COMPUTED (single-image scalar; CI approximate)",
-    }
 
-    # Leakage canary: each feature band vs held-out labels.
+    cat_bool = (gt > 0) & foot
+    if cat_bool.any():
+        split = withhold_segments(cat_bool, foot)
+        if values.max() > 0.5 and np.isin(np.unique(values[np.isfinite(values)]), [0.0, 1.0]).all():
+            h_res = score_holdout((values > 0.5) & foot, split, foot, bootstrap=True)
+            report["holdout"] = {
+                "available": True,
+                "label": h_res["label"],
+                "evaluator_version": h_res["evaluator_version"],
+                "withheld_positive_count": h_res["withheld_positive_count"],
+                "score": h_res["score"],
+                "ci95": h_res["ci95"],
+                "TP_w": h_res["TP_w"],
+                "FP_w": h_res["FP_w"],
+                "FN_w": h_res["FN_w"],
+                "spatial_quadrant_dti": h_res["spatial_quadrant_dti"],
+                "status": "COMPUTED",
+                "note": (
+                    "Direct evaluation of this GeoTIFF against labels.tif. Note: live submission "
+                    "rasters explicitly mask existing_faults.tif (= labels.tif) plus a 200 m collar "
+                    "to avoid wasting false positives on known faults, so only 200-300 m fringe "
+                    "kernels touch labels.tif; see research/h80_experiments_summary.json and "
+                    "data/cache_h80v2/holdout_exp3_choquet.tif for blind hide-and-recover HOLDOUT-DTI."
+                ),
+            }
+        else:
+            res = dti_weighted(np.where(foot & ~split["visible"], values, 0.0), split["hidden"] & foot)
+            report["holdout"] = {
+                "available": True,
+                "label": "HOLDOUT-DTI",
+                "evaluator_version": "GEMS distance-weighted Tversky alpha=0.2 beta=0.8 R=300m (continuous)",
+                "withheld_positive_count": int((split["hidden"] & foot).sum()),
+                "score": res["DTI"],
+                "ci95": [res["DTI"], res["DTI"]],
+                "TP_w": res["TP_w"],
+                "FP_w": res["FP_w"],
+                "FN_w": res["FN_w"],
+                "status": "COMPUTED",
+            }
+        eval_domain = foot & ~split["visible"]
+        pos_mask = split["hidden"] & eval_domain
+        neg_mask = (~split["hidden"]) & eval_domain
+    else:
+        pos_mask = (gt > 0) & foot
+        neg_mask = (gt <= 0) & foot
+
+    # Leakage canary: each feature band evaluated on held-out positives vs off-visible negatives
+    nodata_floor = -1e30
+    rng = np.random.default_rng(BOOTSTRAP_SEED)
     with rasterio.open(features_path) as fs:
         aucs = []
         for b in range(1, fs.count + 1):
             band = fs.read(b).astype(np.float64)
             if band.shape != gt.shape:
                 continue
-            valid_b = np.isfinite(band) & holdout
-            if not valid_b.any():
+            ok = np.isfinite(band) & (band > nodata_floor)
+            pos_idx = np.flatnonzero((pos_mask & ok).ravel())
+            neg_pool = np.flatnonzero((neg_mask & ok).ravel())
+            if pos_idx.size == 0 or neg_pool.size == 0:
                 continue
-            desc = fs.tags(b).get("description", f"band {b}")
-            aucs.append({"band": b, "description": desc, "auc": auc_from_ranks(band[valid_b], gt[valid_b].astype(int))})
-    max_auc = max((a["auc"] for a in aucs if np.isfinite(a["auc"])), default=float("nan"))
+            if neg_pool.size > 200_000:
+                neg_idx = rng.choice(neg_pool, size=200_000, replace=False)
+            else:
+                neg_idx = neg_pool
+            sample_idx = np.concatenate([pos_idx, neg_idx])
+            y_bin = np.concatenate([np.ones(pos_idx.size, dtype=int), np.zeros(neg_idx.size, dtype=int)])
+            auc_val = float(auc_from_ranks(band.ravel()[sample_idx], y_bin))
+            desc = fs.tags(b).get("description") or (fs.descriptions[b - 1] if fs.descriptions and fs.descriptions[b - 1] else f"band {b}")
+            aucs.append({"band": b, "description": desc, "auc": round(auc_val, 6)})
+    max_auc = max((max(a["auc"], 1.0 - a["auc"]) for a in aucs if np.isfinite(a["auc"])), default=0.0)
     report["leakage_canary"] = {
         "available": True,
         "per_band_auc": aucs,
-        "max_auc": float(max_auc),
+        "max_auc": round(float(max_auc), 6),
         "leakage_flag": bool(max_auc > 0.90),
         "status": "COMPUTED",
         "note": "AUC > 0.90 on a single feature means leakage until proven otherwise",
     }
+
+    # Lane uniqueness check if registry rasters are available AND grid matches competition dimensions
+    reg_dir = REPO / "data" / "registry"
+    if reg_dir.is_dir() and values.shape == (3730, 3292):
+        reg_paths = [p for p in sorted(reg_dir.glob("*.tif")) if p.resolve() != prediction.resolve()]
+        if reg_paths:
+            reg = load_compact_registry(reg_paths, foot)
+            u = check_registry((values > 0.5) & foot, values.astype(np.float32), foot, reg)
+            report["lane_check"] = {
+                "available": True,
+                "registry_count": len(reg_paths),
+                "duplicate_lane": u["duplicate_lane"],
+                "max_abs_spearman_surface": u["max_abs_spearman_surface"],
+                "max_abs_spearman_dots": u["max_abs_spearman_dots"],
+                "max_dot_fraction_within_3px": u["max_dot_fraction_within_3px"],
+                "thresholds": u["thresholds"],
+            }
 
 
 def main(argv=None):

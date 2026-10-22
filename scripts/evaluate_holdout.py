@@ -20,7 +20,7 @@ import rasterio
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 
-from gems80.holdout import score_holdout, withhold_segments  # noqa: E402
+from gems80.holdout import leakage_canary, score_holdout, withhold_segments  # noqa: E402
 from gems80.io_grid import load_labels, load_template  # noqa: E402
 
 

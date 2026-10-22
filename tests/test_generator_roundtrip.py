@@ -27,7 +27,6 @@ def _write(path, arr, desc=None):
                 ds.update_tags(b + 1, description=desc[b])
 
 
-@pytest.mark.skip(reason="H80-C generator requires official 19-band training_features + labels; not a 3-band toy grid")
 def test_generator_roundtrip_non_multiple_of_16(tmp_path):
     rng = np.random.default_rng(1)
     tpl = tmp_path / "sample.tif"
@@ -50,7 +49,6 @@ def test_generator_roundtrip_non_multiple_of_16(tmp_path):
         assert np.nanmin(data) >= 0 and np.nanmax(data) <= 1
 
 
-@pytest.mark.skip(reason="H80-C generator requires official 19-band training_features + labels")
 def test_generator_refuses_grid_mismatch_and_leaves_no_file(tmp_path):
     tpl = tmp_path / "sample.tif"
     feat = tmp_path / "features.tif"
