@@ -30,8 +30,10 @@ def write_pair(mask: np.ndarray, template: Path, labels_path: Path, out_dir: Pat
     foot = tpl["foot"]
     labels = load_labels(labels_path, foot)
     meta = tpl["meta"]
-    clean = (np.asarray(mask, dtype=bool) & foot & ~labels).astype(np.float32)
-    assert clean.shape == (meta["height"], meta["width"])
+    raw = np.asarray(mask)
+    if raw.shape != foot.shape or not np.isfinite(raw).all() or not np.isin(raw, [0, 1]).all():
+        raise ValueError("Binary writer requires finite {0,1} mask on the exact template grid")
+    clean = (raw.astype(bool) & foot & ~labels).astype(np.float32)
 
     out_dir = Path(out_dir)
     out_dir.mkdir(parents=True, exist_ok=True)

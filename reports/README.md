@@ -1,5 +1,6 @@
-# Validator reports
+# Audit reports
 
-`scripts/validate_submission.py` writes `<file>.validate.json` next to each candidate. No reports
-are committed yet because no candidate has been generated: the official competition inputs are
-not present in this environment (see README §1).
+See `review-20261022.md`, `format-audit-20261022.json`, and
+`h80c-reproduction-20261022.json` for the current audit. Older reports
+are historical; the negative run card supersedes prior promotion claims.
+Mirror consistency is not organizer authenticity.

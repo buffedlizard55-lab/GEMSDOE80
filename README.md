@@ -2,16 +2,19 @@
 
 **Re-read this README and `docs/SESSION_PROMPT.md` at the start of every session.**
 
-> **OK TO DOWNLOAD AND SUBMIT (format).**
-> Primary file: [`docs/downloads/gemsdoe80-h80c-strain-accom-resid-20261021T233457Z-zeros.tif`](docs/downloads/gemsdoe80-h80c-strain-accom-resid-20261021T233457Z-zeros.tif)
+> **DOWNLOAD AVAILABLE · FORMAT PASS · NOT APPROVED FOR A WEEKLY SLOT.**
+> Research candidate: [`gemsdoe80 H80-C zeros TIFF`](docs/downloads/gemsdoe80-h80c-strain-accom-resid-20261021T233457Z-zeros.tif).
+> Re-read validation on 2026-10-22: single-band float32; EPSG:32611; 3730×3292;
+> transform (100, 0, 243350, 0, −100, 4508550); finite values in [0,1].
+> Geometry matches the integrity-pinned **owner mirror**, not an authenticated organizer download.
+> Organizer acceptance/performance are **not confirmed**. [Automated receipt](reports/format-audit-20261022.json).
 >
-> Single-band float32, EPSG:32611, 3730×3292, transform (100, 0, 243350, 0, −100, 4508550),
-> **all 12,279,160 cells finite and in [0, 1]**, no nodata tag, 0 NaN, 28,807 off-catalogue unit dots.
-> This encoding avoids DrivenData’s `Predicted values must be in range [0, 1]`.
->
-> **Not organizer-scored.** HOLDOUT-DTI = **0.0507** (evaluator `GEMSDOE80-evaluate_holdout.py-v1`,
-> 18,313 withheld positives; spatial-block range [0.0142, 0.0383]). Verdict **promote** as a
-> packaged candidate. No weekly slot spent.
+> Reproduced **HOLDOUT-DTI 0.05067**, evaluator v2, **18,313 withheld positives**;
+> conditional spatial-block bootstrap 95% interval **[0.04255, 0.05774]**.
+> This is a random whole-component holdout, **not spatially-blocked**. Interval coverage
+> is unverified and excludes fitting/split uncertainty. Verdict **negative**:
+> no matched current-best comparison; no weekly slot spent. The lane has used 3/3 experiments.
+> **No new unique TIFF was generated this session**; renaming the old file would not count.
 
 GitHub Pages: executive summary and the download button are at the top of
 [`docs/index.html`](docs/index.html) · how-to-submit: [`docs/executive-summary.html`](docs/executive-summary.html)
@@ -38,8 +41,8 @@ delete every dot within 2 px of the catalogue, keep 37,654 unit pixels, write
 all-finite zeros on the official 3730×3292 grid. DTI is a covering budget —
 sparse off-catalogue mass beats a thick surface. The 0.2778 figure is
 **not ORGANIZER-CONFIRMED in this checkout** (GEMSDOE32 labelled that file
-UNSCORED / projected 0.2747). Official public leaderboard 2026-10-21:
-**#1 xiaofanhu 0.4413**. Higher scores exist. Beating 0.2778 on the live set
+UNSCORED / projected 0.2747). A prior-session source register reports a leaderboard high of **0.4413** on
+2026-10-21; this audit cannot refresh that non-allowlisted source. It is not a submission receipt. Beating 0.2778 on the live set
 requires a *different* detector that still hits hidden faults. Copying H33 is
 forbidden (lane protocol). H80-C is unique vs that family (Spearman ≈ 0,
 3 px overlap 0.153). Live DTI of H80-C is unknown until a receipt exists.
@@ -70,12 +73,14 @@ Full card: [`research/run-card.json`](research/run-card.json) · hypotheses: [`d
 python3 -m venv .venv && .venv/bin/pip install -r requirements.txt
 # competition rasters in data/ (gitignored): sample_submission.tif, labels.tif, training_features.tif
 python scripts/prepare_data.py
-python scripts/run_h80_experiments.py          # 3-experiment budget
+python scripts/run_h80_experiments.py          # STOP: persistent 3/3 lane budget exhausted
+python scripts/audit_h80c.py                   # fixed reproduction only; no submission
 python scripts/validate_submission.py docs/downloads/<zeros>.tif --template data/sample_submission.tif
-python scripts/evaluate_holdout.py docs/downloads/<zeros>.tif
+python scripts/evaluate_holdout.py docs/downloads/<zeros>.tif  # static diagnostic, NOT validation
 ```
 
-Holdout = hide-and-recover: withhold whole fault segments + buffer, derive
+Current holdout = random whole-component hide-and-recover (not spatially blocked):
+withhold whole fault segments + buffer, derive
 catalogue-based features from visible faults only, mask visible pixels, score
 pooled DTI.
 
@@ -103,8 +108,8 @@ manifest). Not organizer-authenticated.
 - No DrivenData login in this environment; rasters came from GitHub owner mirrors.
 - `sample_submission.tif` mirror contains 60,988 ones on catalogue traces (not
   “total fault absence”); used only as the grid/footprint template.
-- Component-resample bootstrap CI was biased (unique() collisions) and was
-  replaced by a spatial-block min/max of 4 quadrants. Pooled HOLDOUT-DTI is the score.
+- Original bootstrap discarded sample multiplicities. The four-quadrant replacement
+  was not a CI either. Both are superseded by v2 conditional spatial-block bootstrap.
 - Shipped TIF excludes the *full* catalogue, so it scores ~0 against withheld
   catalogue pixels by construction. HOLDOUT-DTI 0.0507 used a visible-only mask.
 - User-cited live highs 0.2778 / 0.3195 / 0.4413 are not mutually dated; 0.4413
@@ -133,7 +138,20 @@ Validate in-project (no human inspector). Follow the parallel-run protocol
 (lane uniqueness 0.90 / 70% @ 3 px; reuse holdout + writer; label HOLDOUT-DTI
 or ORGANIZER-CONFIRMED; leakage canary AUC 0.90; run card; budget 3 experiments
 or 2 hours). Study GEMSDOE32 H33-2-B2 (user-cited 0.2778) and aim higher
-without copying it. Official leaderboard high 0.4413 (2026-10-21). Build GitHub
+without copying it. Historical leaderboard claim 0.4413 (not refreshed in this audit). Build GitHub
 Pages with executive summary first and a one-click TIF. Open a PR and merge.
 No hallucinations. Flag irregularities. Full operational text:
 [`docs/SESSION_PROMPT.md`](docs/SESSION_PROMPT.md).
+
+## Audit / continuation (2026-10-22)
+
+Read [three-pass review](reports/review-20261022.md) before further work. The archived
+charter in `docs/SESSION_PROMPT.md` is a **summary**, not a verbatim copy of the user message.
+New proposals: [unrun, within-lane hypotheses](docs/next-hypotheses.md).
+Do not run them under the exhausted H80 budget. A future authorized batch needs a
+spatially blocked, buffered, visible-only evaluator; a matched best baseline; and
+a complete versioned registry (surface AND final-dot checks). No automated live
+leaderboard feed or authenticated DrivenData receipt access is available.
+
+Core values in practice: maximize P(Win) by refusing unsupported promotion; own
+the outcome by repairing shared validation instead of manufacturing a new filename.

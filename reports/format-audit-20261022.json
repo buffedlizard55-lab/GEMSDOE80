@@ -1,0 +1,55 @@
+{
+  "format_valid": true,
+  "download_ready": true,
+  "organizer_confirmed": false,
+  "prediction": "docs/downloads/gemsdoe80-h80c-strain-accom-resid-20261021T233457Z-zeros.tif",
+  "template": "data/sample_submission.tif",
+  "checks": {
+    "driver": "GTiff",
+    "band_count": 1,
+    "template_band_count": 1,
+    "shape_matches": true,
+    "crs_matches": true,
+    "transform_matches": true,
+    "template_has_crs": true,
+    "prediction_dtype": [
+      "float32"
+    ],
+    "finite_values": true,
+    "no_nan_or_infinite_inside_footprint": true,
+    "footprint_overlaps_template": true
+  },
+  "errors": [],
+  "value_range": [
+    0.0,
+    1.0
+  ],
+  "nan_inside_footprint": 0,
+  "crs": "EPSG:32611",
+  "shape": [
+    3730,
+    3292
+  ],
+  "transform": [
+    100.0,
+    0.0,
+    243350.0,
+    0.0,
+    -100.0,
+    4508550.0
+  ],
+  "sha256": "d9c4ce410af5c413195aa3a463c2e4c6c223e26c6c8cf3a25a8a95c4b7a2bcc5",
+  "holdout": {
+    "available": false
+  },
+  "leakage_canary": {
+    "available": false
+  },
+  "lane_check": {
+    "available": false,
+    "note": "no registry raster provided with public competition data"
+  },
+  "values_in_0_1": true,
+  "missing_inside_footprint": 0,
+  "submit_format_ok": true
+}

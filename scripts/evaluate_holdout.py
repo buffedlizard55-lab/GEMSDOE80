@@ -5,7 +5,8 @@ Usage:
   python scripts/evaluate_holdout.py PREDICTION.tif \\
       --template data/sample_submission.tif --labels data/labels.tif
 
-Prints a JSON object labelled HOLDOUT-DTI (never a projection / organizer score).
+A static TIFF is only a diagnostic: it cannot prove visible-only feature derivation.
+For the reproducible H80-C hide-and-recover run use audit_h80c.py.
 """
 from __future__ import annotations
 
@@ -35,10 +36,17 @@ def main(argv=None) -> int:
     foot = tpl["foot"]
     labels = load_labels(args.labels, foot)
     with rasterio.open(args.prediction) as src:
+        if (src.shape != foot.shape or src.crs != tpl["meta"]["crs"]
+                or src.transform != tpl["meta"]["transform"] or src.count != 1):
+            raise ValueError("Prediction grid/band count does not match template")
         pred = src.read(1)
+    if not np.isfinite(pred[foot]).all() or not np.isin(pred[foot], [0, 1]).all():
+        raise ValueError("Binary evaluator requires finite {0,1} values inside footprint; no silent thresholding")
     pred_bool = np.isfinite(pred) & (pred > 0.5)
     split = withhold_segments(labels, foot)
-    report = score_holdout(pred_bool, split, foot)
+    report = score_holdout(pred_bool, split, foot, bootstrap=False)
+    report["label"] = "STATIC-ARTIFACT-DIAGNOSTIC (not HOLDOUT-DTI)"
+    report["note"] = "No refit provenance: cannot validate hide-and-recover from a submitted TIFF"
     print(json.dumps(report, indent=2))
     return 0
 

@@ -7,27 +7,78 @@
   "named_non_fault_mimic": "Lithologic/intrusive contacts (magnetic edges without slip) and geodetic interpolation seams can mimic strain-gradient lineaments.",
   "holdout_dti": {
     "label": "HOLDOUT-DTI",
-    "evaluator_version": "GEMSDOE80-evaluate_holdout.py-v1 (DTI alpha=0.2 beta=0.8 R=300m triangular kernel)",
+    "evaluator_version": "GEMSDOE80-evaluate_holdout.py-v2 (DTI alpha=0.2 beta=0.8 R=300m triangular kernel)",
     "withheld_positive_count": 18313,
     "n_components_total": 3199,
     "n_components_held": 957,
     "hold_frac_pixels": 0.30027218469207057,
     "score": 0.050672521801957734,
     "ci95": [
-      0.014221707066735548,
-      0.038298614142961866
+      0.042548282775246575,
+      0.05773589301179341
     ],
+    "ci95_method": "conditional 4x4 spatial-block percentile bootstrap; 1000 draws; fixed predictions/split; coverage unverified",
+    "split_method": "random whole connected components plus buffer; NOT spatially-blocked",
+    "promotion_eligible": false,
     "TP_w": 1043.2108694626206,
     "FP_w": 28641.334655129373,
     "FN_w": 17269.789130537378,
     "n_pred_after_visible_mask": 29041,
-    "ci95_method": "spatial-block range (min/max of 4 quadrants of the same hide-and-recover split); NOT a calibrated 95% CI of the pooled ratio. Pooled HOLDOUT-DTI is the score. A component-resample bootstrap was discarded as biased (with-replacement unique() collisions).",
-    "spatial_quadrant_dti": {
-      "NW": 0.02402319682449778,
-      "NE": 0.014221707066735548,
-      "SW": 0.038298614142961866,
-      "SE": 0.029446883496395074
-    }
+    "audit_kind": "fixed H80-C reproduction; no new experiment or submission file",
+    "leakage_canary": {
+      "available": true,
+      "per_feature": [
+        {
+          "feature": "dil",
+          "auc": 0.5678726622978467,
+          "leakage_flag": false
+        },
+        {
+          "feature": "inv",
+          "auc": 0.60746113227425,
+          "leakage_flag": false
+        },
+        {
+          "feature": "hg",
+          "auc": 0.5563061417804994,
+          "leakage_flag": false
+        },
+        {
+          "feature": "tc",
+          "auc": 0.4561215572886123,
+          "leakage_flag": false
+        },
+        {
+          "feature": "cond",
+          "auc": 0.46204200766190273,
+          "leakage_flag": false
+        },
+        {
+          "feature": "rtp",
+          "auc": 0.5020158730580824,
+          "leakage_flag": false
+        },
+        {
+          "feature": "along_fabric_derivative",
+          "auc": 0.519169387628579,
+          "leakage_flag": false
+        },
+        {
+          "feature": "catalogue_distance_visible_only",
+          "auc": 0.2570045591880811,
+          "leakage_flag": false
+        },
+        {
+          "feature": "combined_surface",
+          "auc": 0.5166867343067306,
+          "leakage_flag": false
+        }
+      ],
+      "max_auc": 0.60746113227425,
+      "leakage_flag": false,
+      "note": "AUC > 0.90 on a single feature means leakage until proven otherwise"
+    },
+    "reason": "Random segment split, not spatially-blocked; best matched baseline absent; registry not rechecked."
   },
   "holdout_random_control": {
     "label": "HOLDOUT-DTI",
@@ -72,7 +123,8 @@
     "thresholds": {
       "spearman": 0.9,
       "overlap_3px": 0.7
-    }
+    },
+    "provenance": "Historical three-raster subset only; not rerun in this audit, not all GEMSDOE sites. Final-dot rank correlation not separately recorded."
   },
   "leakage_canary": {
     "available": true,
@@ -175,7 +227,8 @@
     "download_zip": "./downloads/gemsdoe80-h80c-strain-accom-resid-20261021T233457Z-zeros.zip",
     "format_ok_to_upload": true,
     "organizer_confirmed": false,
-    "verdict_on_file": "FORMAT OK TO UPLOAD (grid matches sample_submission.tif; all 12,279,160 cells finite and in [0,1]; 0 NaN; 0 catalogue pixels). Not organizer-scored."
+    "verdict_on_file": "FORMAT PASS against integrity-pinned owner mirror; download for research. NOT approved for a weekly slot; organizer acceptance unconfirmed.",
+    "promotion_eligible": false
   },
   "all_experiments": [
     {
@@ -425,8 +478,8 @@
       }
     }
   ],
-  "verdict": "promote",
-  "verdict_reason": "Unique vs registry, leakage canary under 0.90, holdout DTI beats random, format valid. Promotion here means 'package as a candidate'; a weekly DrivenData slot is a separate selector.",
+  "verdict": "negative",
+  "verdict_reason": "No spatially-blocked holdout or matched current-best comparison; registry coverage incomplete; lane budget exhausted. No new unique TIFF generated in this audit.",
   "metric_self_check_worked_example_dti": 0.6026516673361586,
   "links": {
     "competition": "https://www.drivendata.org/competitions/306/competition-doe-gems/",
@@ -440,10 +493,15 @@
   },
   "generated_at_utc": "2026-10-21T23:37:38.128956+00:00",
   "irregularities": [
-    "Component-resample bootstrap 95% CI was biased low and did not cover the pooled HOLDOUT-DTI; replaced with spatial-block min/max of 4 quadrants.",
     "HOLDOUT-DTI uses a visible-only exclusion mask. The shipped TIF excludes the FULL catalogue (4 px), so it scores ~0 against withheld catalogue pixels by construction. That is expected: live test labels are off-catalogue.",
     "User-cited GEMSDOE32 score 0.2778 is not independently organizer-confirmed in this checkout (GEMSDOE32 itself labelled H33-2-B2 UNSCORED / projected 0.2747). Official public leaderboard #1 xiaofanhu 0.4413 was read 2026-10-21 from drivendata.org.",
     "sample_submission.tif mirror has 60,988 ones on catalogue traces (not 'total fault absence'); used only as CRS/shape/transform/footprint template.",
-    "No weekly DrivenData submission slot was spent."
-  ]
+    "No weekly DrivenData submission slot was spent.",
+    "Original bootstrap discarded multiplicity; corrected shared evaluator v2 uses additive spatial-block bootstrap; conditional coverage unverified.",
+    "Original split randomly withheld connected components, NOT spatially-blocked.",
+    "Original CI field held a quadrant range, not a 95% interval; superseded by fixed H80-C reproduction.",
+    "Leaderboard figures are historical claims, not current verified receipts; web hosts unavailable to shell."
+  ],
+  "audit_date_utc": "2026-10-22",
+  "new_unique_submission_generated_this_session": false
 }

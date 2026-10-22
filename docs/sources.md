@@ -1,3 +1,18 @@
+## 2026-10-22 audit supersedes current-tense claims below
+
+- Official organizer GitHub README freshly retrieved at commit
+  [`aebe92f7c8a990f0e3443451b7a825d9afd6336b`](https://github.com/drivendataorg/gems-prize-reference-solution/tree/aebe92f7c8a990f0e3443451b7a825d9afd6336b).
+  It supports both CPU and GPU environments; a GPU is not a hard training prerequisite.
+- Core rasters restored from integrity-pinned owner GitHub mirrors; all manifest hashes matched.
+  The older statement “does not download or use those copies” below is obsolete.
+- Band descriptions read from the restored TIFF; they are mirror metadata, not organizer verification.
+- Non-GitHub official pages and the full rules PDF were **not freshly verified** in this audit.
+  The register below is historical evidence from 2026-10-21, not a current feed.
+- There is no organizer receipt binding H33’s filename/hash to the user-reported 0.2778.
+  A causal explanation of its exact score or a promise to beat it would be unsupported.
+
+---
+
 # Source register — what was checked, how, and what it does NOT prove
 
 All checks: 2026-10-21 (UTC), from this sandbox. Egress is limited to github.com, codeload,
@@ -45,7 +60,7 @@ Several public GEMSDOE repositories state the same grid: EPSG:32611, 3730 × 329
 
 Consensus among owner-published repos is **not** organizer verification.  (The hashes quoted are as printed in those repos; they were not compared with any organizer file.) These repos also appear to
 redistribute competition-derived inputs; that is a licensing question for the user (see irregularities
-IR-01). This project does **not** download or use those copies.
+IR-01). This project **now uses integrity-pinned owner mirrors**; see 2026-10-22 correction above.
 
 The earlier placeholder in this repo used a different grid (3000 × 4000 at `(250000, 4450000)`) that
 is not supported by any source checked here, and it was removed.

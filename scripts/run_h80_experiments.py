@@ -23,8 +23,8 @@ Each experiment:
   4. Registry Spearman / 3 px overlap (stop that arm if duplicate).
   5. Random-dot control on the same emit-eligible mask.
 
-Promote the unique arm with the strongest SGMC-off-catalogue diagnostic that
-also beats the random control on holdout; never write a projection as a score.
+Legacy research packaging only: promotion is blocked without spatially-blocked
+validation against a matched current best. Never select by SGMC diagnostic.
 """
 from __future__ import annotations
 
@@ -194,8 +194,13 @@ def run_arm(kind, cfg, dil, inv, hg, tc, cond, rtp, valid, foot, labels, split, 
     near_full = binary_dilation(labels, iterations=cfg["buffer_px"])
     emit_s = foot & valid & ~near_full
     score_s = build_score(kind, dil, inv, hg, tc, cond, rtp, valid, dist_full, emit_s)
+    surface_check = check_registry(np.zeros_like(foot), score_s, foot, registry, RNG)
+    if surface_check["duplicate_lane"]:
+        raise RuntimeError("Duplicate surface: stop before placement")
     dots_s = nms_dots(score_s, emit_s, sep=cfg["sep"], max_k=cfg["max_k"])
     uniq = check_registry(dots_s, score_s, foot, registry, RNG)
+    if uniq["duplicate_lane"]:
+        raise RuntimeError("Duplicate final dots: stop lane")
     sg = sgmc_off_diagnostic(dots_s, labels, foot)
 
     print(f"  dots_holdout={int(dots_h.sum())} HOLDOUT-DTI={hold['score']:.4f} "
@@ -225,6 +230,13 @@ def run_arm(kind, cfg, dil, inv, hg, tc, cond, rtp, valid, foot, labels, split, 
 
 
 def main() -> int:
+    # The lane budget persists across sessions; do not reset it by rerunning.
+    card_path = RESEARCH / "run-card.json"
+    if card_path.exists():
+        card = json.loads(card_path.read_text())
+        if len(card.get("all_experiments", [])) >= 3:
+            print("STOP: H80 lane budget exhausted (3/3). No new raster generated.")
+            return 2
     we = worked_example_dti()
     print(f"metric self-check worked example DTI={we:.6f} (page ~0.60)")
 
@@ -267,6 +279,8 @@ def main() -> int:
         print(f"  AUC {r['feature']:22s} {r['auc']}")
 
     registry = load_registry()
+    if not registry:
+        raise RuntimeError("Missing registry: uniqueness cannot be established")
     print("registry rasters:", list(registry))
 
     arms_cfg = [
@@ -288,20 +302,17 @@ def main() -> int:
                 and (not canary["leakage_flag"])
                 and r["beats_random_holdout"]]
     if not eligible:
-        eligible = [r for r in results if not r["uniqueness"]["duplicate_lane"]]
-    if not eligible:
-        print("ALL ARMS DUPLICATE — stopping per parallel-run protocol.")
+        print("NO ELIGIBLE ARMS — stopping without a submission.")
         RESEARCH.mkdir(parents=True, exist_ok=True)
         (RESEARCH / "run-card.json").write_text(json.dumps({
             "verdict": "negative",
-            "reason": "every arm failed the registry uniqueness gate (spearman>0.90 or 3px overlap>0.70)",
+            "reason": "No arm cleared uniqueness, canary and random-control gates",
             "experiments": [{k: v for k, v in r.items() if k not in ("dots_submit", "dots_holdout", "score_submit")} for r in results],
         }, indent=2, default=_json_default) + "\n")
         return 2
 
     def key(r):
-        sg = r["sgmc_off_diagnostic"].get("DTI", 0.0) or 0.0
-        return (sg, r["holdout"]["score"], -r["n_dots_submit"])
+        return (r["holdout"]["score"], -r["n_dots_submit"])
 
     best = max(eligible, key=key)
     print(f"\nSELECTED {best['name']}  dots={best['n_dots_submit']}", flush=True)
@@ -330,7 +341,8 @@ def main() -> int:
         note = note[:140]
 
     promote = (
-        bundle["zeros"]["format_valid"]
+        best["holdout"].get("promotion_eligible", False)
+        and bundle["zeros"]["format_valid"]
         and not best["uniqueness"]["duplicate_lane"]
         and not canary["leakage_flag"]
         and best["beats_random_holdout"]

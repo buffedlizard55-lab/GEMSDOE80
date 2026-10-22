@@ -24,7 +24,7 @@ BETA = 0.8
 RADIUS_PX = 3.0
 RADIUS_M = 300.0
 EPS = 1e-12
-EVALUATOR_VERSION = "GEMSDOE80-evaluate_holdout.py-v1 (DTI alpha=0.2 beta=0.8 R=300m triangular kernel)"
+EVALUATOR_VERSION = "GEMSDOE80-evaluate_holdout.py-v2 (DTI alpha=0.2 beta=0.8 R=300m triangular kernel)"
 
 
 def kernel(d, radius: float = RADIUS_PX):

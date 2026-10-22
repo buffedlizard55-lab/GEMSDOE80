@@ -43,17 +43,21 @@ def dot_overlap_fraction(our_dots: np.ndarray, registry_dots: np.ndarray, radius
 
 def check_registry(our_dots: np.ndarray, our_score: np.ndarray, foot: np.ndarray, registry: dict[str, np.ndarray],
                    rng: np.random.Generator) -> dict:
+    if not registry:
+        raise ValueError("Registry empty: uniqueness cannot be established")
     rows = []
     dup = False
     for name, arr in registry.items():
         dots = np.isfinite(arr) & (arr > 0.5)
         corr = rank_corr(our_score, arr, foot, rng)
+        dot_corr = rank_corr(our_dots, dots, foot, rng)
         ov = dot_overlap_fraction(our_dots, dots)
-        hit = (corr is not None and abs(corr) > CORR_MAX) or (ov > OVERLAP_MAX)
+        hit = abs(corr) > CORR_MAX or abs(dot_corr) > CORR_MAX or ov > OVERLAP_MAX
         dup = dup or hit
         rows.append({
             "name": name,
             "spearman": corr,
+            "final_dot_spearman": dot_corr,
             "dot_fraction_within_3px": ov,
             "duplicate": bool(hit),
             "registry_positive_px": int(dots.sum()),

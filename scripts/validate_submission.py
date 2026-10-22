@@ -33,8 +33,6 @@ REPO = Path(__file__).resolve().parents[1]
 ALPHA, BETA = 0.2, 0.8
 KERNEL_R_M = 300.0
 RESOLUTION_M = 100.0
-BOOTSTRAP_SEED = 20261021
-N_BOOTSTRAP = 2000
 
 
 def sha256_file(path: Path) -> str:
@@ -112,32 +110,6 @@ def dti_weighted(pred, gt, resolution_m=RESOLUTION_M, alpha=ALPHA, beta=BETA):
 
     dti = tp_w / (tp_w + alpha * fp_w + beta * fn_w + 1e-12)
     return {"TP_w": tp_w, "FP_w": fp_w, "FN_w": fn_w, "DTI": float(dti)}
-
-
-def bootstrap_ci(scores, n_bootstrap=N_BOOTSTRAP, seed=BOOTSTRAP_SEED):
-    rng = np.random.default_rng(seed)
-    scores = np.asarray([s for s in scores if np.isfinite(s)], dtype=np.float64)
-    if scores.size == 0:
-        return (float("nan"), float("nan"))
-    boots = np.empty(n_bootstrap)
-    for i in range(n_bootstrap):
-        boots[i] = rng.choice(scores, size=scores.size, replace=True).mean()
-    return float(np.percentile(boots, 2.5)), float(np.percentile(boots, 97.5))
-
-
-def holdout_segment_mask(gt, holdout_frac=1.0 / 3.0):
-    """Whole fault segments withheld (connected components of the label raster)."""
-    try:
-        from scipy import ndimage
-
-        labeled, n = ndimage.label(gt > 0)
-    except Exception:
-        return (gt > 0).copy()
-    sizes = np.bincount(labeled.ravel())[1:]
-    order = np.argsort(-sizes)
-    n_hold = max(1, int(round(n * holdout_frac)))
-    hold_labels = set(int(v) for v in order[:n_hold])
-    return np.isin(labeled, list(hold_labels)) if hold_labels else np.zeros_like(gt, dtype=bool)
 
 
 def build_report(prediction: Path, template: Path):
@@ -274,20 +246,29 @@ def holdout_dti(report, prediction, template, labels_path, features_path):
     if gt.shape != values.shape:
         report["holdout"]["note"] = "labels grid does not match submission grid"
         return
-    holdout = holdout_segment_mask(gt)
-    gt_held = np.where(holdout, gt, 0.0)
+    import sys
+    sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
+    from gems80.holdout import withhold_segments
+    from gems80.io_grid import load_template
+    foot = load_template(template)["foot"]
+    split = withhold_segments(np.isfinite(gt) & (gt >= 1), foot)
+    holdout = foot & ~split["visible"]
+    values = np.where(holdout, values, 0.0)
+    gt_held = split["hidden"].astype(float)
     res = dti_weighted(values, gt_held)
-    lo, hi = bootstrap_ci(np.array([res["DTI"]]))
+
     report["holdout"] = {
         "available": True,
         "evaluator_version": "GEMS distance-weighted Tversky alpha=0.2 beta=0.8 R=300m",
         "withheld_positive_count": int((gt_held > 0).sum()),
         "score": res["DTI"],
-        "ci95": [lo, hi],
+        "ci95": None,
+        "label": "STATIC-ARTIFACT-DIAGNOSTIC (not HOLDOUT-DTI)",
+        "promotion_eligible": False,
         "TP_w": res["TP_w"],
         "FP_w": res["FP_w"],
         "FN_w": res["FN_w"],
-        "status": "COMPUTED (single-image scalar; CI approximate)",
+        "status": "Diagnostic only: predictions not refitted with hidden catalogue removed; no CI",
     }
 
     # Leakage canary: each feature band vs held-out labels.

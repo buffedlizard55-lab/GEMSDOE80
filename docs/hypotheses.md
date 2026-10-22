@@ -1,6 +1,13 @@
+> **2026-10-22 correction:** historical experiment record below. The split was random
+> whole components, NOT spatially-blocked. H80-C is now **negative**, not promoted.
+> HOLDOUT-DTI v2 reproduction: 0.05067; 18,313 withheld positives; conditional
+> bootstrap 95% interval [0.04255, 0.05774], coverage unverified.
+> All live scores below are historical, unrefreshed claims, not organizer receipts.
+> See [unrun proposals](next-hypotheses.md); no fourth experiment authorized.
+
 # Candidate geological hypotheses (GEMSDOE80)
 
-Status: H80-C was run on the spatially-blocked holdout (experiment 3 of 3).
+Status: H80-C was run on the random whole-component holdout (experiment 3 of 3).
 H80-A and H80-B were run and not selected. H80-D and H80-E were **not** run
 (budget = 3 experiments). None copies a previous GEMSDOE submission.
 

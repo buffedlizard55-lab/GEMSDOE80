@@ -25,7 +25,7 @@ def sha256_file(path: Path) -> str:
 def load_template(path: Path) -> dict:
     with rasterio.open(path) as src:
         arr = src.read(1)
-        foot = np.isfinite(arr)
+        foot = np.isfinite(arr) & (src.read_masks(1) > 0)
         meta = {
             "driver": "GTiff",
             "dtype": "float32",
@@ -55,7 +55,7 @@ def load_template(path: Path) -> dict:
 def load_labels(path: Path, foot: np.ndarray) -> np.ndarray:
     with rasterio.open(path) as src:
         a = src.read(1)
-    return (a >= 1) & foot
+    return np.isfinite(a) & (a >= 1) & foot
 
 
 def load_band(path: Path, band: int):
