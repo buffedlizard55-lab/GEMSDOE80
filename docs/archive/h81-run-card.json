@@ -1,0 +1,325 @@
+{
+  "experiment_budget": "3 of 3; hard stop; no weekly submission slot spent (selector is separate)",
+  "lane": "H81 tip-linkage relay-ramp (not H80 strain-residual, not H33 B=2 flank prune)",
+  "selected": "H81-A tip-linkage relay-ramp gap8-35 sigma10 dil>0 buf4 sep3 k=34000",
+  "hypothesis": "Unmapped geothermal faults occupy relay ramps / step-overs between overlapping normal fault tips \u2014 the most common setting (32% step-overs, 25% terminations; Faulds 2021). A geometric linkage line between nearby visible tips predicts the breaching fault that hosts permeability, by construction off the catalogue and in dilational quadrants.",
+  "mechanism": "Endpoint detection (one 8-neighbor) on visible fault skeleton; cKDTree linkage of endpoint pairs gap 8-35 px (0.8-3.5 km, Giddens mean 2.8 km); Bresenham linkage lines; distance-to-linkage exp(-d/10.0) \u00d7 (dil>0 else 0.15); 4 px catalogue collar; NMS sep=3 px cap 34000.",
+  "named_non_fault_mimic": "Fluvial braid terminations, dune alignments, and cadastral grids can mimic tip-like terminations; geodetic interpolation seams can mimic dilatation.",
+  "holdout_dti": {
+    "label": "HOLDOUT-DTI",
+    "evaluator_version": "GEMSDOE80-evaluate_holdout.py-v1 (DTI alpha=0.2 beta=0.8 R=300m triangular kernel)",
+    "withheld_positive_count": 18313,
+    "n_components_total": 3199,
+    "n_components_held": 957,
+    "hold_frac_pixels": 0.30027218469207057,
+    "score": 0.060698498155798294,
+    "ci95": [
+      0.05408383126368705,
+      0.0635890995852424
+    ],
+    "TP_w": 968.1204361174226,
+    "FP_w": 5528.181872161493,
+    "FN_w": 17344.879563882576,
+    "n_pred_after_visible_mask": 5903
+  },
+  "holdout_random_control": {
+    "label": "HOLDOUT-DTI",
+    "evaluator_version": "GEMSDOE80-evaluate_holdout.py-v1 (DTI alpha=0.2 beta=0.8 R=300m triangular kernel)",
+    "withheld_positive_count": 18313,
+    "n_components_total": 3199,
+    "n_components_held": 957,
+    "hold_frac_pixels": 0.30027218469207057,
+    "score": 0.01231382730278339,
+    "ci95": null,
+    "TP_w": 195.24131209224066,
+    "FP_w": 5830.024517398759,
+    "FN_w": 18117.75868790776,
+    "n_pred_after_visible_mask": 5903
+  },
+  "beats_random_holdout": true,
+  "correlation_overlap_vs_registry": {
+    "duplicate_lane": false,
+    "vs": [],
+    "thresholds": {
+      "spearman": 0.9,
+      "overlap_3px": 0.7
+    }
+  },
+  "leakage_canary": {
+    "available": true,
+    "per_feature": [
+      {
+        "feature": "dilatation",
+        "auc": 0.5678726622978467,
+        "leakage_flag": false
+      },
+      {
+        "feature": "shear",
+        "auc": 0.5997138661584802,
+        "leakage_flag": false
+      },
+      {
+        "feature": "earthquake_intensity",
+        "auc": 0.6008114546903652,
+        "leakage_flag": false
+      },
+      {
+        "feature": "distance_to_eq",
+        "auc": 0.5802031562267207,
+        "leakage_flag": false
+      },
+      {
+        "feature": "conductivity",
+        "auc": 0.46204200766190273,
+        "leakage_flag": false
+      },
+      {
+        "feature": "det_slope",
+        "auc": 0.5888085318777807,
+        "leakage_flag": false
+      },
+      {
+        "feature": "iso_hg",
+        "auc": 0.5142088843609696,
+        "leakage_flag": false
+      },
+      {
+        "feature": "tmi_hg",
+        "auc": 0.5563061417804994,
+        "leakage_flag": false
+      },
+      {
+        "feature": "linkage_score",
+        "auc": 0.736484985555482,
+        "leakage_flag": false
+      }
+    ],
+    "max_auc": 0.736484985555482,
+    "leakage_flag": false,
+    "note": "AUC > 0.90 on a single feature means leakage until proven otherwise"
+  },
+  "sgmc_off_diagnostic": {
+    "available": false,
+    "note": "SGMC raster not present"
+  },
+  "raster_sha256": "701ed7fed8611861f2fe2ec6437c850aede0a6a792b5fc3dbbca10191953bbbd",
+  "raster_zip_sha256": "5fae213ad545cc41c2ec2c1199496ad9f54f0151a963b48989976c1fbf1c4420",
+  "validator_output": {
+    "no_nan_inside_footprint": true,
+    "values_in_0_1": true,
+    "crs_shape_transform_match": true,
+    "crs": "EPSG:32611",
+    "shape": [
+      3730,
+      3292
+    ],
+    "transform": [
+      100.0,
+      0.0,
+      243350.0,
+      0.0,
+      -100.0,
+      4508550.0
+    ],
+    "format_valid": true,
+    "on_catalogue_px": 0,
+    "positive_px": 7415,
+    "nodata": null
+  },
+  "submission": {
+    "name": "gemsdoe80-h81a-relay-20261022T010259Z-zeros",
+    "note": "H81A relay tip-link d8-35 NMS 7415; off-cat buf4; HOLDOUT-DTI only; unique vs H33/H80",
+    "note_length_chars": 85,
+    "download_zeros": "./downloads/gemsdoe80-h81a-relay-20261022T010259Z-zeros.tif",
+    "download_nan": "./downloads/gemsdoe80-h81a-relay-20261022T010259Z-nan.tif",
+    "download_zip": "./downloads/gemsdoe80-h81a-relay-20261022T010259Z-zeros.zip",
+    "format_ok_to_upload": true,
+    "organizer_confirmed": false,
+    "verdict_on_file": "FORMAT OK TO UPLOAD (grid matches sample_submission.tif; all 12,279,160 cells finite and in [0,1]; 0 NaN; 0 catalogue pixels). Not organizer-scored."
+  },
+  "all_experiments": [
+    {
+      "name": "H81-A tip-linkage relay-ramp gap8-35 sigma10 dil>0 buf4 sep3 k=34000",
+      "kind": "A",
+      "cfg": {
+        "buffer_px": 4,
+        "sep": 3,
+        "max_k": 34000,
+        "seed_off": 11
+      },
+      "n_dots_holdout": 5903,
+      "n_dots_submit": 7415,
+      "holdout": {
+        "label": "HOLDOUT-DTI",
+        "evaluator_version": "GEMSDOE80-evaluate_holdout.py-v1 (DTI alpha=0.2 beta=0.8 R=300m triangular kernel)",
+        "withheld_positive_count": 18313,
+        "n_components_total": 3199,
+        "n_components_held": 957,
+        "hold_frac_pixels": 0.30027218469207057,
+        "score": 0.060698498155798294,
+        "ci95": [
+          0.05408383126368705,
+          0.0635890995852424
+        ],
+        "TP_w": 968.1204361174226,
+        "FP_w": 5528.181872161493,
+        "FN_w": 17344.879563882576,
+        "n_pred_after_visible_mask": 5903
+      },
+      "holdout_random": {
+        "label": "HOLDOUT-DTI",
+        "evaluator_version": "GEMSDOE80-evaluate_holdout.py-v1 (DTI alpha=0.2 beta=0.8 R=300m triangular kernel)",
+        "withheld_positive_count": 18313,
+        "n_components_total": 3199,
+        "n_components_held": 957,
+        "hold_frac_pixels": 0.30027218469207057,
+        "score": 0.01231382730278339,
+        "ci95": null,
+        "TP_w": 195.24131209224066,
+        "FP_w": 5830.024517398759,
+        "FN_w": 18117.75868790776,
+        "n_pred_after_visible_mask": 5903
+      },
+      "beats_random_holdout": true,
+      "uniqueness": {
+        "duplicate_lane": false,
+        "vs": [],
+        "thresholds": {
+          "spearman": 0.9,
+          "overlap_3px": 0.7
+        }
+      },
+      "sgmc_off_diagnostic": {
+        "available": false,
+        "note": "SGMC raster not present"
+      }
+    },
+    {
+      "name": "H81-B seismic residual ieq\u00d7invdeq\u00d7shear dil>0 buf4 sep3 k=34000",
+      "kind": "B",
+      "cfg": {
+        "buffer_px": 4,
+        "sep": 3,
+        "max_k": 34000,
+        "seed_off": 12
+      },
+      "n_dots_holdout": 11396,
+      "n_dots_submit": 11540,
+      "holdout": {
+        "label": "HOLDOUT-DTI",
+        "evaluator_version": "GEMSDOE80-evaluate_holdout.py-v1 (DTI alpha=0.2 beta=0.8 R=300m triangular kernel)",
+        "withheld_positive_count": 18313,
+        "n_components_total": 3199,
+        "n_components_held": 957,
+        "hold_frac_pixels": 0.30027218469207057,
+        "score": 0.02332671802660826,
+        "ci95": null,
+        "TP_w": 396.0654916841123,
+        "FP_w": 11247.180215905217,
+        "FN_w": 17916.934508315888,
+        "n_pred_after_visible_mask": 11396
+      },
+      "holdout_random": {
+        "label": "HOLDOUT-DTI",
+        "evaluator_version": "GEMSDOE80-evaluate_holdout.py-v1 (DTI alpha=0.2 beta=0.8 R=300m triangular kernel)",
+        "withheld_positive_count": 18313,
+        "n_components_total": 3199,
+        "n_components_held": 957,
+        "hold_frac_pixels": 0.30027218469207057,
+        "score": 0.021960956564109117,
+        "ci95": null,
+        "TP_w": 372.83234604402753,
+        "FP_w": 11260.437782250132,
+        "FN_w": 17940.167653955974,
+        "n_pred_after_visible_mask": 11396
+      },
+      "beats_random_holdout": true,
+      "uniqueness": {
+        "duplicate_lane": false,
+        "vs": [],
+        "thresholds": {
+          "spearman": 0.9,
+          "overlap_3px": 0.7
+        }
+      },
+      "sgmc_off_diagnostic": {
+        "available": false,
+        "note": "SGMC raster not present"
+      }
+    },
+    {
+      "name": "H81-C clay-cap Laplacian cond\u00d7slope\u00d7hG buf4 sep3 k=34000",
+      "kind": "C",
+      "cfg": {
+        "buffer_px": 4,
+        "sep": 3,
+        "max_k": 34000,
+        "seed_off": 13
+      },
+      "n_dots_holdout": 27275,
+      "n_dots_submit": 26823,
+      "holdout": {
+        "label": "HOLDOUT-DTI",
+        "evaluator_version": "GEMSDOE80-evaluate_holdout.py-v1 (DTI alpha=0.2 beta=0.8 R=300m triangular kernel)",
+        "withheld_positive_count": 18313,
+        "n_components_total": 3199,
+        "n_components_held": 957,
+        "hold_frac_pixels": 0.30027218469207057,
+        "score": 0.0563381269705546,
+        "ci95": null,
+        "TP_w": 1140.7221243051977,
+        "FP_w": 26846.188862334602,
+        "FN_w": 17172.277875694803,
+        "n_pred_after_visible_mask": 27275
+      },
+      "holdout_random": {
+        "label": "HOLDOUT-DTI",
+        "evaluator_version": "GEMSDOE80-evaluate_holdout.py-v1 (DTI alpha=0.2 beta=0.8 R=300m triangular kernel)",
+        "withheld_positive_count": 18313,
+        "n_components_total": 3199,
+        "n_components_held": 957,
+        "hold_frac_pixels": 0.30027218469207057,
+        "score": 0.0418510962187885,
+        "ci95": null,
+        "TP_w": 845.7576894214999,
+        "FP_w": 26945.914500198243,
+        "FN_w": 17467.2423105785,
+        "n_pred_after_visible_mask": 27275
+      },
+      "beats_random_holdout": true,
+      "uniqueness": {
+        "duplicate_lane": false,
+        "vs": [],
+        "thresholds": {
+          "spearman": 0.9,
+          "overlap_3px": 0.7
+        }
+      },
+      "sgmc_off_diagnostic": {
+        "available": false,
+        "note": "SGMC raster not present"
+      }
+    }
+  ],
+  "verdict": "promote",
+  "verdict_reason": "Unique vs registry, leakage canary under 0.90, holdout DTI beats random, format valid. Promotion = package as candidate; weekly slot is separate selector.",
+  "metric_self_check_worked_example_dti": 0.6026516673361586,
+  "links": {
+    "competition": "https://www.drivendata.org/competitions/306/competition-doe-gems/",
+    "problem_description": "https://www.drivendata.org/competitions/306/competition-doe-gems/page/967/",
+    "leaderboard": "https://www.drivendata.org/competitions/306/competition-doe-gems/leaderboard/",
+    "reference_solution": "https://github.com/drivendataorg/gems-prize-reference-solution",
+    "geodawn": "https://www.usgs.gov/data/geodawn-airborne-magnetic-and-radiometric-surveys-northwestern-great-basin-nevada-and",
+    "ingenious": "https://gbcge.org/current-projects/ingenious/",
+    "epsg_32611": "https://epsg.io/32611",
+    "tversky": "https://en.wikipedia.org/wiki/Tversky_index"
+  },
+  "generated_at_utc": "2026-10-22T01:06:27.857669+00:00",
+  "irregularities": [
+    "Component-resample bootstrap CI biased low (unique() collisions) \u2014 replaced with spatial-block min/max of 4 quadrants for HOLDOUT-CI; pooled score is the metric.",
+    "HOLDOUT-DTI uses visible-only mask; shipped TIF excludes full catalogue 4 px collar -> scores ~0 against withheld catalogue by construction (expected: live labels off-catalogue per problem page).",
+    "GEMSDOE32 0.2778 not organizer-confirmed (GEMSDOE32 labels UNSCORED / projected 0.2747); official leaderboard #1 0.4413 (2026-10-21).",
+    "sample_submission.tif mirror has 60,988 ones on catalogue (not total absence); used only as grid template.",
+    "No weekly slot spent."
+  ]
+}

@@ -1,0 +1,41 @@
+{
+  "evidence_class": "VALIDATOR-RECEIPT",
+  "file_name": "gems80-adpt-kkt-lagrangian-36500d-20261022T012049Z-5bd11c85-zeros.tif",
+  "file_path": "/home/user/GEMSDOE80/docs/downloads/gems80-adpt-kkt-lagrangian-36500d-20261022T012049Z-5bd11c85-zeros.tif",
+  "file_size_bytes": 141719,
+  "file_size_mib": 0.135,
+  "sha256": "f538f414fb11169342bb613a9c9c1eb9e075278c511e694d55c96ba0760851f9",
+  "shape": [
+    3730,
+    3292
+  ],
+  "band_count": 1,
+  "dtype": "float32",
+  "crs": "EPSG:32611",
+  "min_value": 0.0,
+  "max_value": 1.0,
+  "nan_count_inside_footprint": 0,
+  "nan_count_total": 0,
+  "positive_pixels": 36500,
+  "binary_unit_pixels": 36500,
+  "catalogue_overlap_pixels": 0,
+  "checks": {
+    "single_band": true,
+    "dtype_float32": true,
+    "shape_match": true,
+    "crs_epsg_32611": true,
+    "transform_exact": true,
+    "no_nan_inside_footprint": true,
+    "all_pixels_finite": true,
+    "range_0_1_inside_footprint": true,
+    "range_0_1_entire_raster": true,
+    "outside_footprint_zero": true,
+    "zero_catalogue_dots": true,
+    "non_degenerate_emission": true
+  },
+  "notes": [],
+  "passed": true,
+  "submission_ui_name": "GEMSDOE80 ADPT-80 KKT-Lagrangian (36500 dots, 5bd11c85)",
+  "submission_ui_note": "GEMSDOE80 ADPT-80 176f KKT-Lagrangian 36500d: 0.1804/0.2025 HOLDOUT-DTI, 0/1001 disc ov<=0.70, float32 [0,1] EPSG:32611",
+  "download_relative_path": "downloads/gems80-adpt-kkt-lagrangian-36500d-20261022T012049Z-5bd11c85-zeros.tif"
+}

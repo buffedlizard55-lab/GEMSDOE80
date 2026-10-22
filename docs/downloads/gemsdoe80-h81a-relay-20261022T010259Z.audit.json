@@ -1,0 +1,79 @@
+{
+  "stem": "gemsdoe80-h81a-relay-20261022T010259Z",
+  "zeros": {
+    "path": "/home/user/GEMSDOE80/docs/downloads/gemsdoe80-h81a-relay-20261022T010259Z-zeros.tif",
+    "sha256": "701ed7fed8611861f2fe2ec6437c850aede0a6a792b5fc3dbbca10191953bbbd",
+    "bytes": 79232,
+    "mode": "zeros",
+    "crs": "EPSG:32611",
+    "shape": [
+      3730,
+      3292
+    ],
+    "transform": [
+      100.0,
+      0.0,
+      243350.0,
+      0.0,
+      -100.0,
+      4508550.0
+    ],
+    "dtype": "float32",
+    "count": 1,
+    "nodata": null,
+    "positive_px": 7415,
+    "on_catalogue_px": 0,
+    "nan_inside_footprint": 0,
+    "values_in_0_1_inside": true,
+    "outside_compliant": true,
+    "full_grid_in_0_1": true,
+    "format_valid": true
+  },
+  "nan": {
+    "path": "/home/user/GEMSDOE80/docs/downloads/gemsdoe80-h81a-relay-20261022T010259Z-nan.tif",
+    "sha256": "2eaf644564a1db30935f72add58e5ebdcd62f4f885260507b503555731aa410b",
+    "bytes": 122106,
+    "mode": "nan",
+    "crs": "EPSG:32611",
+    "shape": [
+      3730,
+      3292
+    ],
+    "transform": [
+      100.0,
+      0.0,
+      243350.0,
+      0.0,
+      -100.0,
+      4508550.0
+    ],
+    "dtype": "float32",
+    "count": 1,
+    "nodata": null,
+    "positive_px": 7415,
+    "on_catalogue_px": 0,
+    "nan_inside_footprint": 0,
+    "values_in_0_1_inside": true,
+    "outside_compliant": true,
+    "full_grid_in_0_1": true,
+    "format_valid": true
+  },
+  "zip_sha256": "5fae213ad545cc41c2ec2c1199496ad9f54f0151a963b48989976c1fbf1c4420",
+  "zip_path": "/home/user/GEMSDOE80/docs/downloads/gemsdoe80-h81a-relay-20261022T010259Z-zeros.zip",
+  "template_report": {
+    "height": 3730,
+    "width": 3292,
+    "crs": "EPSG:32611",
+    "transform": [
+      100.0,
+      0.0,
+      243350.0,
+      0.0,
+      -100.0,
+      4508550.0
+    ],
+    "nodata": NaN,
+    "footprint_px": 5167373,
+    "dtype": "float32"
+  }
+}

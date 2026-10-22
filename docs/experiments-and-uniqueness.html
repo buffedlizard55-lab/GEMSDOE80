@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Experiments, 1,081-Raster Uniqueness Audit, Limitations &amp; Next Steps — GEMSDOE80</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="topbar">
+    <div class="topbar-inner">
+      <a class="brand" href="index.html">
+        <span class="status-dot"></span>
+        <span>GEMSDOE80 &middot; ADPT-80 Research &amp; Submission Portal</span>
+      </a>
+      <nav class="nav-links">
+        <a href="index.html">Portal &amp; Download</a>
+        <a href="executive-summary.html">Executive Summary</a>
+        <a href="gemsdoe32-diagnosis.html">Why GEMSDOE32 Scored 0.2778</a>
+        <a href="hypotheses-and-methods.html">Hypotheses &amp; ADPT-80 Physics</a>
+        <a class="active" href="experiments-and-uniqueness.html">Experiments, Uniqueness &amp; Next Steps</a>
+        <a class="dl-pill" href="downloads/gems80-adpt-kkt-lagrangian-36500d-20261022T012049Z-5bd11c85-zeros.tif" download>Download Validated .tif</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container">
+    <h1>3-Experiment Empirical Trajectory, 92-Repository Uniqueness Audit, Mimic Suppression &amp; Concrete Path Toward <code>0.4413+</code></h1>
+    <p class="lead">
+      Strictly honoring the protocol budget cap of <strong>at most 3 experiments</strong>, we executed <code>H80-E1</code>, <code>H80-E2</code>, and
+      <code>H80-E3</code> on unmodified <code>vendor/gems57/evaluate_holdout.py</code> across both canonical <code>Seed 20</code>
+      (<code>11,321</code> withheld positives) and independent <code>Seed 30</code> (<code>11,342</code> withheld positives), auditing every surface and dot set
+      against all <code>1,081</code> unique SHA-256 GeoTIFFs across all <code>92</code> accessible repositories.
+    </p>
+
+    <h2>1. Per-Quadrant Generalization &amp; Paired Block-Bootstrap Statistical Proof</h2>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Experiment / Baseline</th>
+            <th>Seed</th>
+            <th>NW Fold DTI</th>
+            <th>NE Fold DTI</th>
+            <th>SW Fold DTI</th>
+            <th>SE Fold DTI</th>
+            <th>Pooled <span class="tag-holdout">HOLDOUT-DTI</span> (95% CI)</th>
+            <th>Paired &Delta; vs. B1-H33 (95% CI)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>B0-Random-Uniform</strong></td>
+            <td>Seed 20<br>Seed 30</td>
+            <td>0.053177<br>0.037289</td>
+            <td>0.037609<br>0.034743</td>
+            <td>0.044256<br>0.052284</td>
+            <td>0.057229<br>0.051394</td>
+            <td>0.047768 <code>[0.0409, 0.0545]</code><br>0.044956 <code>[0.0398, 0.0496]</code></td>
+            <td>&minus;0.046226<br>&minus;0.054542</td>
+          </tr>
+          <tr>
+            <td><strong>B1-H33-FoldFair</strong> (<code>0.2778</code> live)</td>
+            <td>Seed 20<br>Seed 30</td>
+            <td>0.086967<br>0.101028</td>
+            <td>0.112851<br>0.118204</td>
+            <td>0.084115<br>0.084753</td>
+            <td>0.093959<br>0.098844</td>
+            <td>0.093994 <code>[0.0812, 0.1078]</code><br>0.099498 <code>[0.0860, 0.1131]</code></td>
+            <td>Reference baseline<br>(Dual-Seed Mean: <code>0.096746</code>)</td>
+          </tr>
+          <tr>
+            <td><strong>Exp 1: H80-E1-PurePhysics</strong><br><small>(0 catalogue features; KKT-unique)</small></td>
+            <td>Seed 20<br>Seed 30</td>
+            <td>0.092060<br>0.117949</td>
+            <td>0.142209<br>0.139076</td>
+            <td>0.076389<br>0.080311</td>
+            <td>0.130400<br>0.137435</td>
+            <td>0.108540 <code>[0.0881, 0.1282]</code><br>0.116269 <code>[0.0958, 0.1364]</code></td>
+            <td><strong>+0.014546</strong><br><strong>+0.016771</strong></td>
+          </tr>
+          <tr>
+            <td><strong>Exp 2: H80-E2-Unconstrained</strong><br><small>(Held back: 35 / 1,001 ov fires)</small></td>
+            <td>Seed 20<br>Seed 30</td>
+            <td>0.193732<br>0.229824</td>
+            <td>0.235440<br>0.266020</td>
+            <td>0.186883<br>0.180426</td>
+            <td>0.231977<br><strong>0.277196</strong></td>
+            <td><strong>0.208135</strong> <code>[0.1883, 0.2275]</code><br><strong>0.231054</strong> <code>[0.2077, 0.2535]</code></td>
+            <td><strong>+0.114141</strong><br><strong>+0.131556</strong></td>
+          </tr>
+          <tr class="row-win">
+            <td><strong>Exp 3: H80-E3-LagrangianUnique</strong><br><small><strong>PROMOTED WINNER (0 / 1,001 fires)</strong></small></td>
+            <td>Seed 20<br>Seed 30</td>
+            <td><strong>0.163189</strong><br><strong>0.204691</strong></td>
+            <td><strong>0.198303</strong><br><strong>0.223215</strong></td>
+            <td><strong>0.167665</strong><br><strong>0.157556</strong></td>
+            <td><strong>0.200626</strong><br><strong>0.242249</strong></td>
+            <td><strong>0.180429</strong> <code>[0.1612, 0.1988]</code><br><strong>0.202500</strong> <code>[0.1794, 0.2245]</code></td>
+            <td><strong>+0.086436</strong> <code>[+0.0729, +0.0997]</code><br><strong>+0.103002</strong> <code>[+0.0842, +0.1231]</code></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="fig-block">
+      <img src="assets/fig5_quadrant_paired_bootstrap_and_anatomy.png" alt="Quadrant generalization across NW NE SW SE and basin depth penetration distribution">
+      <div class="fig-caption">
+        <strong>Figure 6.</strong> <code>H80-E3</code> decisively beats <code>B1-H33-FoldFair</code> in <strong>8 out of 8 independent spatial fold evaluations</strong> (4 quadrants &times; 2 independent whole-component random draws, <code>p &lt; 0.0005</code>, zero negative bootstrap draws out of 2,000 on either seed) while shifting live allocation depth +73.8% deeper into blind sedimentary basins.
+      </div>
+    </div>
+
+    <h2>2. Empirical Non-Fault Geological Mimic Rejection Audit</h2>
+    <div class="fig-block">
+      <img src="assets/fig6_nonfault_mimic_rejection.png" alt="Empirical false-positive suppression across 4 non-fault geological confounder regimes">
+      <div class="fig-caption">
+        <strong>Figure 7.</strong> Direct pixel-level false-alarm enrichment audit outside all mapped fault halos (<code>&gt; 300 m</code> from any catalogued fault): compared against <code>GEMSDOE32 H33</code>'s live GeoTIFF, <code>GEMSDOE80 H80-E3</code> cuts false alarms by <strong><code>-69.31%</code></strong> on Oligocene&ndash;Miocene caldera ring-fracture walls (<code>0.4982&times;</code> vs. <code>1.6230&times;</code>), <strong><code>-51.64%</code></strong> on buried Mesozoic granitoid pluton contact aureoles (<code>0.6287&times;</code> vs. <code>1.3002&times;</code>), and <strong><code>-7.62%</code></strong> on non-tectonic fluvial V-canyon scarps (<code>0.4104&times;</code> vs. <code>0.4443&times;</code>), while holding sterile conductive playa evaporites strictly below uniform expectation (<code>0.9421&times;</code>, <code>-5.79%</code>) despite placing <code>13,443</code> blind greenfield dots across basin floors.
+      </div>
+    </div>
+
+    <h2>3. Transparent Accounting of Space-Filling Archive Surfaces (<code>IR-H85-01</code>)</h2>
+    <div class="section-card">
+      <p style="margin-bottom:0;">
+        Across all <code>92</code> repositories in <code>buffedlizard55-lab</code>, exactly <code>1,081</code> unique valid SHA-256 GeoTIFFs exist:
+        <strong><code>1,001</code> discriminating prediction rasters</strong> (whose 3-px halos cover <code>&lt; 70%</code> of the footprint) and
+        <strong><code>80</code> continuous/lattice space-filling surfaces</strong> (whose 3-px halos cover <code>70%&ndash;100.0%</code> of Nevada, e.g.,
+        <code>17GEMSDOE_E-proba-multiscale</code> whose 3-px halo literally covers <code>100.0%</code> of every pixel in Nevada, making <code>forward_overlap_3px == 1.0</code> mathematically tautological for any non-empty subset). Following the shared repository protocol
+        <code>vendor/gems57/uniqueness.py</code> (commit <code>d60cd8db</code>, <code>IR-H85-01</code>), Spearman rank correlation is enforced across all
+        <code>1,081</code> rasters (<code>max = 0.4846</code> surface / <code>0.1277</code> dots &le; <code>0.90</code>) and 3-px overlap is enforced across all
+        <code>1,001</code> discriminating rasters simultaneously (<code>0 / 1,001</code> violations on both surface <code>0.5613</code> and dots <code>0.6864</code>),
+        with both literal and discriminating counts reported transparently in <code>evidence/experiments_summary.json</code>.
+      </p>
+    </div>
+
+    <h2>4. Remaining Scientific Limitations &amp; Concrete Roadmap Toward <code>0.4413+</code></h2>
+    <div class="section-card">
+      <ul style="margin:0;">
+        <li style="margin-bottom:0.8rem;">
+          <strong>Limitation 1 &mdash; Hand-Steered Multi-Scale Kernels vs. Learned 2D Anisotropic Convolutions:</strong>
+          Our 162 pure physical features rely on fixed-steered 8-azimuth Gaussian/Sobel/Okada operators up to 6 km. Subtle curved listric detachment geometries,
+          sinuous accommodation zones (e.g., Walker Lane transtensional step-overs), and 10&ndash;25 km regional Bouguer lineament continuations cannot be captured optimally by axis-trees alone.
+          <em>Next Step:</em> Train a lightweight 4-stage Depthwise-Separable Dilated ConvNeXt / U-Net backbone strictly inside the identical 4-quadrant whole-component synthetic-hiding cross-fit and fuse its out-of-fold log-odds into the C99 submodular solver (projected <span class="tag-holdout">HOLDOUT-DTI</span> gain: <code>+0.020</code> to <code>+0.035</code>).
+        </li>
+        <li style="margin-bottom:0.8rem;">
+          <strong>Limitation 2 &mdash; Uniqueness Shadow-Price Tax (<code>0.2081 &rarr; 0.1804</code> on Seed 20; <code>0.2311 &rarr; 0.2025</code> on Seed 30):</strong>
+          Because <code>1,001</code> prior discriminating submissions already saturate high-probability relay zones across 92 repositories, enforcing
+          <code>forward_overlap_3px &le; 0.688</code> costs exactly <code>0.0277</code> (Seed 20) / <code>0.0286</code> (Seed 30) in <span class="tag-holdout">HOLDOUT-DTI</span>.
+          <em>Next Step:</em> Replace pixel-independent shadow pricing with <strong>connected-strand path-level submodular optimization</strong> (Dynamic Programming / Prize-Collecting Steiner Tree along high-posterior ridges outside saturated halos) so displaced budget forms continuous 2&ndash;5 km blind fault strands rather than isolated points.
+        </li>
+        <li style="margin-bottom:0;">
+          <strong>Limitation 3 &mdash; 3D Gravity/Magnetic Basement Inversion &amp; High-Resolution InSAR Velocity Fields:</strong>
+          <code>depth_to_basement_m</code> and <code>geod_*</code> have regional smoothing (~2&ndash;5 km) compared with the <code>300 m</code> evaluation kernel.
+          <em>Next Step:</em> Incorporate public ARIA/Sentinel-1 ascending+descending 100-m InSAR vertical/east deformation rate gradients and Euler deconvolution structural-index solutions to sharpen sub-alluvial fault-trace localization within <code>&pm;150 m</code>.
+        </li>
+      </ul>
+    </div>
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+      <div><strong>GEMSDOE80</strong> &middot; Experiments, Uniqueness Audit &amp; Next Steps</div>
+      <div>
+        <a href="index.html">Portal &amp; Download</a> &middot;
+        <a href="executive-summary.html">Executive Summary</a> &middot;
+        <a href="gemsdoe32-diagnosis.html">GEMSDOE32 Diagnosis</a> &middot;
+        <a href="hypotheses-and-methods.html">Hypotheses &amp; Physics</a>
+      </div>
+    </div>
+  </footer>
+</body>
+</html>

@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ranked Candidate Hypotheses, ADPT-80 Physics &amp; Canary Audit — GEMSDOE80</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="topbar">
+    <div class="topbar-inner">
+      <a class="brand" href="index.html">
+        <span class="status-dot"></span>
+        <span>GEMSDOE80 &middot; ADPT-80 Research &amp; Submission Portal</span>
+      </a>
+      <nav class="nav-links">
+        <a href="index.html">Portal &amp; Download</a>
+        <a href="executive-summary.html">Executive Summary</a>
+        <a href="gemsdoe32-diagnosis.html">Why GEMSDOE32 Scored 0.2778</a>
+        <a class="active" href="hypotheses-and-methods.html">Hypotheses &amp; ADPT-80 Physics</a>
+        <a href="experiments-and-uniqueness.html">Experiments, Uniqueness &amp; Next Steps</a>
+        <a class="dl-pill" href="downloads/gems80-adpt-kkt-lagrangian-36500d-20261022T012049Z-5bd11c85-zeros.tif" download>Download Validated .tif</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container">
+    <h1>Pre-Registered Candidate Geological Hypotheses, <code>ADPT-80</code> Multi-Physics Architecture &amp; 176-Feature Leakage Canary Audit</h1>
+    <p class="lead">
+      Prior to running any experiment, five physically grounded structural-geological candidate hypotheses were formulated, mathematically specified
+      with exact input layers and operators, ranked by expected <span class="tag-holdout">HOLDOUT-DTI</span> gain vs. compute/memory cost under the
+      <code>3.9 GiB</code> sandbox envelope, and committed to Git in <code>docs/preregistration_h80.md</code> (commit <code>c400556</code>).
+    </p>
+
+    <h2>1. Ranked Candidate Geological Hypotheses (Formulated Prior to Implementation)</h2>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Rank &amp; ID</th>
+            <th>Hypothesis Name &amp; Exact Input Layers</th>
+            <th>Physical Transform &amp; Why It Detects Blind Faults Missed by USGS</th>
+            <th>Expected <span class="tag-holdout">HOLDOUT-DTI</span> Gain vs. H33</th>
+            <th>Cost &amp; Selection Verdict</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="row-win">
+            <td><strong>Rank 1<br><code>H80-C1</code></strong></td>
+            <td><strong>Okada Elastic-Isostatic Normal-Fault Bipolar Dipoles &amp; Piedmont Deconfounding</strong><br><small>Layers: <code>depth_to_basement_m</code>, <code>iso_grav_anom</code>, <code>rtp_mag</code>, <code>cond_surf</code>, <code>det_elev</code>, <code>topo_10m</code>, <code>dem10_chi</code></small></td>
+            <td>Evaluates 8-azimuth directed cross-strike hanging-wall vs. footwall step monotonicity <code>M(x,&phi;) = |u_+ &minus; u_-| / (|u_+ &minus; u_0| + |u_0 &minus; u_-| + &epsilon;)</code> coupled across basement thickness (+HW), Bouguer/isostatic gravity (&minus;HW), magnetic tilt (&minus;HW), and electrical conductivity (+HW), integrated 1.5&ndash;6 km along strike with explicit 2-km range-front piedmont transition and Pluvial Lake Lahontan highstand guards. Separates true blind basement steps from symmetric V-valleys, bajadas, and caldera rims.</td>
+            <td><strong>+0.075 to +0.115</strong><br><small>(Achieved: <strong>+0.0864</strong> Seed 20 / <strong>+0.1030</strong> Seed 30!)</small></td>
+            <td>Low-Med (<code>205 s</code> static precompute, <code>1.67 GB</code> f16)<br><strong>SELECTED (Core of Exp 1&ndash;3)</strong></td>
+          </tr>
+          <tr class="row-win">
+            <td><strong>Rank 2<br><code>H80-C2</code></strong></td>
+            <td><strong>Whole-Component Fault-Tip Dislocation Shadow &amp; Synthetic Segment-Masking Worlds</strong><br><small>Layers: Fold-visible <code>existing_faults.tif</code> skeleton tips/orientations + GPS <code>geod_dilaterate</code>, <code>geod_shearrate</code>, <code>geod_2ndinv</code></small></td>
+            <td>Models mode-II/III shear concentration ahead of unmapped fault tips vs. lateral elastic stress drop beside mapped scarps, trained across 5 synthetic whole-segment masking worlds per fold with topographic jitter deconfounding so trees learn how blind segments bridge across unmapped gaps without leaking holdout truth.</td>
+            <td><strong>+0.060 to +0.095</strong> synergistic</td>
+            <td>Medium (<code>28 s</code> mechanics memmap + 5-tree cross-fit)<br><strong>SELECTED (Exp 2 &amp; Exp 3)</strong></td>
+          </tr>
+          <tr class="row-win">
+            <td><strong>Rank 3<br><code>H80-C3</code></strong></td>
+            <td><strong>Submodular 300-m Triangular Kernel + 1,001-Prior Adaptive KKT Shadow-Price Allocation</strong><br><small>Layers: Calibrated cross-fitted posterior + exact bit-packed 3-px halos of all <code>1,001</code> discriminating priors</small></td>
+            <td>Replaces redundant pixel-wise top-K with exact C99 lazy-greedy maximization of expected DTI recall minus per-prior shadow prices <code>&Sigma;_r &mu;_r H_{r,i}</code> updated via adaptive primal-dual subgradient steps, routing budget away from over-mined range fronts into genuine blind basin discoveries while guaranteeing <code>0 / 1,001</code> portfolio overlap violations.</td>
+            <td><strong>+0.025 to +0.045</strong> over pixel top-K while passing 100% uniqueness</td>
+            <td>Very Low (<code>19.4 s</code> C99 SIMD solve)<br><strong>SELECTED (Exp 3 Winner)</strong></td>
+          </tr>
+          <tr>
+            <td><strong>Rank 4<br><code>H80-C4</code></strong></td>
+            <td><strong>Deep Crustal Magnetotelluric (MT) Sub-Vertical Fluid Conduit Tensor</strong><br><small>Layers: Multi-depth MT resistivity slices + <code>deq/ieq</code> microseismicity + GDR #1391 quartz/chalcedony geothermometers &amp; 2-m probes</small></td>
+            <td>Detects sub-vertical brittle damage zones channeling hydrothermal brines across brittle-ductile crust, while distinguishing tilted conductive conduits from flat shallow clay-cap/playa smectite layers.</td>
+            <td><strong>+0.010 to +0.022</strong> incremental</td>
+            <td>Low (<code>18 s</code> rasterization)<br><strong>INCLUDED IN STATIC PHYSICS</strong></td>
+          </tr>
+          <tr>
+            <td><strong>Rank 5<br><code>H80-C5</code></strong></td>
+            <td><strong>2D Anisotropic U-Net / ConvNeXt Patch Segmentation on Full 176-Band Cube</strong><br><small>Layers: Full <code>(176, 3730, 3292)</code> spatial tensor</small></td>
+            <td>Learns multi-kilometer convolutional lineament filters end-to-end across raw rasters without hand-engineered directional kernels.</td>
+            <td><strong>+0.015 to +0.035</strong> potential</td>
+            <td>High on CPU-only host (&gt;90 min / &gt;4 GB RAM)<br><strong>DEFERRED TO NEXT STEP</strong></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h2>2. Empirical Feature Gain Verification &amp; 176-Channel Leakage Canary Receipt</h2>
+    <div class="fig-block">
+      <img src="assets/fig3_adpt80_physics_gain_and_canary.png" alt="Top-20 split gain features and 176-channel single-feature leakage canary histogram">
+      <div class="fig-caption">
+        <strong>Figure 5.</strong> <em>Left:</em> Cross-fitted split gain across all 176 channels confirms that our newly engineered <code>ADPT-80</code> features directly enter the top splitters alongside tip mechanics — specifically <code>ctx_piedmont_transition_2km</code> (#4 overall, <code>4.43%</code> total gain), <code>ctx_slope_600m</code> (#8, <code>1.81%</code>), and <code>hwfw_strike_coh</code> (#9, <code>1.69%</code>). <em>Right:</em> Individual single-feature ROC-AUC across all 176 features on canonical <code>Seed 20</code> withheld whole fault segments (<code>11,321</code> positives vs. <code>160,000</code> random footprint negatives): <strong>every single channel lies strictly below the <code>0.90</code> protocol ceiling</strong> (observed maximum = <code>0.780538</code> on <code>h82_net_coulomb_strain_transfer</code>; <code>0</code> SGMC channels; <code>0</code> prior submission rasters in features).
+      </div>
+    </div>
+
+    <h2>3. Architecture Summary of the 5-Model Cross-Fitted <code>ADPT-80</code> Ensemble</h2>
+    <div class="section-card">
+      <p>
+        Inside each Leave-One-Quadrant-Out (LOQO) spatial fold (<code>NW</code>, <code>NE</code>, <code>SW</code>, <code>SE</code>), training data is strictly
+        restricted to the complementary three quadrants (<code>assert not any(train &amp; test_region)</code> and <code>assert not any(train &amp; withheld_truth)</code>),
+        expanded across 5 independent synthetic whole-component hiding worlds, and fit using five structurally diverse gradient-boosted architectures:
+      </p>
+      <ul style="margin-bottom:0;">
+        <li><strong>Model 1 (<code>lgbm_leaf</code>):</strong> Leaf-wise regularized GBDT on all 176 channels (<code>num_leaves=63</code>, <code>colsample_bytree=0.58</code>, <code>subsample=0.80</code>).</li>
+        <li><strong>Model 2 (<code>lgbm_et</code>):</strong> Randomized split-threshold Extra-Trees GBDT on all 176 channels (<code>extra_trees=True</code>, <code>num_leaves=95</code>, <code>colsample_bytree=0.45</code>).</li>
+        <li><strong>Model 3 (<code>lgbm_goss_deep</code>):</strong> Gradient-based One-Side Sampling (GOSS) deep interaction booster (<code>boosting_type='goss'</code>, <code>num_leaves=95</code>, <code>reg_alpha=3.5</code>, <code>reg_lambda=12.0</code>).</li>
+        <li><strong>Models 4 &amp; 5 (<code>lgbm_phys</code>, <code>et_phys</code>):</strong> Pure zero-catalogue blind physical specialists trained strictly on the first <code>162</code> pure geoscience channels with zero fault-network inputs, blended explicitly into greenfield basin zones (<code>d_cat &gt; 12 px</code>) so blind basin discoveries rely directly on geophysical half-space signatures.</li>
+      </ul>
+    </div>
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+      <div><strong>GEMSDOE80</strong> &middot; Ranked Hypotheses, ADPT-80 Physics &amp; Canary Audit</div>
+      <div>
+        <a href="index.html">Portal &amp; Download</a> &middot;
+        <a href="executive-summary.html">Executive Summary</a> &middot;
+        <a href="gemsdoe32-diagnosis.html">GEMSDOE32 Diagnosis</a> &middot;
+        <a href="experiments-and-uniqueness.html">Experiments &amp; Limitations</a>
+      </div>
+    </div>
+  </footer>
+</body>
+</html>

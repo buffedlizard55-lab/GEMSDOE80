@@ -1,0 +1,58 @@
+{
+  "evidence_class": "MIMIC-REJECTION-AUDIT",
+  "primary_named_mimic": "Coalescing Basin-and-Range Piedmont Alluvial-Fan Bajadas, Pluvial Lake Lahontan/Bonneville Paleoshoreline Scarps, and Oligocene-Miocene Caldera Ring-Fracture Margins",
+  "strata": [
+    {
+      "mimic_regime": "Caldera Ring-Fracture & Silicic Tuff Margins",
+      "stratum_pixels": 50551,
+      "random_uniform_enrichment": 1.0,
+      "h33_live_leader_enrichment": 1.623,
+      "h80_e1_pure_physics_enrichment": 0.274,
+      "gems80_h80_e3_enrichment": 0.4982,
+      "h80_e3_dots_in_stratum": 180,
+      "h33_dots_in_stratum": 605,
+      "h80_e1_dots_in_stratum": 99,
+      "relative_false_alarm_reduction_vs_reference_pct": 69.31,
+      "reference_comparator": "GEMSDOE32 H33 Live"
+    },
+    {
+      "mimic_regime": "Fluvial V-Canyon & Bedrock Erosion Scarps",
+      "stratum_pixels": 195657,
+      "random_uniform_enrichment": 1.0,
+      "h33_live_leader_enrichment": 0.4443,
+      "h80_e1_pure_physics_enrichment": 0.296,
+      "gems80_h80_e3_enrichment": 0.4104,
+      "h80_e3_dots_in_stratum": 574,
+      "h33_dots_in_stratum": 641,
+      "h80_e1_dots_in_stratum": 414,
+      "relative_false_alarm_reduction_vs_reference_pct": 7.62,
+      "reference_comparator": "GEMSDOE32 H33 Live"
+    },
+    {
+      "mimic_regime": "Buried Mesozoic Granitoid Pluton Contact Aureoles",
+      "stratum_pixels": 13351,
+      "random_uniform_enrichment": 1.0,
+      "h33_live_leader_enrichment": 1.3002,
+      "h80_e1_pure_physics_enrichment": 0.2829,
+      "gems80_h80_e3_enrichment": 0.6287,
+      "h80_e3_dots_in_stratum": 60,
+      "h33_dots_in_stratum": 128,
+      "h80_e1_dots_in_stratum": 27,
+      "relative_false_alarm_reduction_vs_reference_pct": 51.64,
+      "reference_comparator": "GEMSDOE32 H33 Live"
+    },
+    {
+      "mimic_regime": "Sterile Conductive Playa Evaporites (vs Uniform)",
+      "stratum_pixels": 77223,
+      "random_uniform_enrichment": 1.0,
+      "h33_live_leader_enrichment": 0.0246,
+      "h80_e1_pure_physics_enrichment": 0.1649,
+      "gems80_h80_e3_enrichment": 0.9421,
+      "h80_e3_dots_in_stratum": 520,
+      "h33_dots_in_stratum": 14,
+      "h80_e1_dots_in_stratum": 91,
+      "relative_false_alarm_reduction_vs_reference_pct": 5.79,
+      "reference_comparator": "Uniform Footprint Baseline"
+    }
+  ]
+}
