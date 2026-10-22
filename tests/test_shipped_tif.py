@@ -1,4 +1,7 @@
-"""The packaged zeros TIF must exist, hash-match, and sit on the official grid."""
+"""The historical candidate TIF must exist, hash-match, and retain its recorded metadata.
+
+The recorded grid is not organizer-authenticated unless compared with the official template.
+"""
 from __future__ import annotations
 
 import hashlib

@@ -1,20 +1,25 @@
-# GEMSDOE80 — unique GEMS Prize GeoTIFF
+# GEMSDOE80 — GEMS Prize research and candidate GeoTIFF
 
 **Re-read this README and `docs/SESSION_PROMPT.md` at the start of every session.**
 
-> **OK TO DOWNLOAD AND SUBMIT (format).**
-> Primary file: [`docs/downloads/gemsdoe80-h80c-strain-accom-resid-20261021T233457Z-zeros.tif`](docs/downloads/gemsdoe80-h80c-strain-accom-resid-20261021T233457Z-zeros.tif)
+> **DOWNLOAD: YES. SUBMISSION READINESS: NOT CERTIFIED.**
+> Historical candidate file: [`docs/downloads/gemsdoe80-h80c-strain-accom-resid-20261021T233457Z-zeros.tif`](docs/downloads/gemsdoe80-h80c-strain-accom-resid-20261021T233457Z-zeros.tif)
 >
-> Single-band float32, EPSG:32611, 3730×3292, transform (100, 0, 243350, 0, −100, 4508550),
-> **all 12,279,160 cells finite and in [0, 1]**, no nodata tag, 0 NaN, 28,807 off-catalogue unit dots.
-> This encoding avoids DrivenData’s `Predicted values must be in range [0, 1]`.
+> This checkout independently verified the TIFF bytes: single-band float32, EPSG:32611,
+> 3730×3292, transform (100, 0, 243350, 0, −100, 4508550), all 12,279,160 cells finite
+> and in [0, 1], no nodata tag, and 28,807 positive pixels. The historical audit says its
+> grid matched an **owner-mirrored** sample template; the official DrivenData template is
+> absent here, so CRS/shape/transform compatibility is **not re-certified against organizer data**.
+> A valid value range does not guarantee acceptance or a score.
 >
-> **Not organizer-scored.** HOLDOUT-DTI = **0.0507** (evaluator `GEMSDOE80-evaluate_holdout.py-v1`,
-> 18,313 withheld positives; spatial-block range [0.0142, 0.0383]). Verdict **promote** as a
-> packaged candidate. No weekly slot spent.
+> **Not organizer-scored; do not promote to a weekly slot.** Historical HOLDOUT-DTI = 0.0507
+> (evaluator `GEMSDOE80-evaluate_holdout.py-v1`, 18,313 withheld positives). The [0.0142, 0.0383]
+> four-quadrant spatial-block range is descriptive, **not a 95% CI**. Calibrated 95% CI unavailable.
+> No organizer receipt exists. The H80 experiment budget was already 3/3; this review ran no new experiment.
 
 GitHub Pages: executive summary and the download button are at the top of
 [`docs/index.html`](docs/index.html) · how-to-submit: [`docs/executive-summary.html`](docs/executive-summary.html)
+Three-pass review and evidence limits: [`reports/review-20261022.md`](reports/review-20261022.md)
 
 **Unique name:** `gemsdoe80-h80c-strain-accom-resid-20261021T233457Z-zeros`
 
@@ -31,18 +36,19 @@ triangular kernel R=300 m
 ([problem description](https://www.drivendata.org/competitions/306/competition-doe-gems/page/967/)).
 Test labels are faults **not** in the public USGS / INGENIOUS catalogue.
 
-## 1. Why H33-2-B2 was cited at 0.2778, and whether we can beat it
+## 1. Why H33-2-B2 was cited at 0.2778, and whether we can beat it (unconfirmed report)
 
 H33-2-B2 (GEMSDOE32) is a **metric-geometry** file: take a 0.2708 dotted ridge,
 delete every dot within 2 px of the catalogue, keep 37,654 unit pixels, write
-all-finite zeros on the official 3730×3292 grid. DTI is a covering budget —
-sparse off-catalogue mass beats a thick surface. The 0.2778 figure is
-**not ORGANIZER-CONFIRMED in this checkout** (GEMSDOE32 labelled that file
-UNSCORED / projected 0.2747). Official public leaderboard 2026-10-21:
-**#1 xiaofanhu 0.4413**. Higher scores exist. Beating 0.2778 on the live set
-requires a *different* detector that still hits hidden faults. Copying H33 is
-forbidden (lane protocol). H80-C is unique vs that family (Spearman ≈ 0,
-3 px overlap 0.153). Live DTI of H80-C is unknown until a receipt exists.
+all-finite zeros on the 3730×3292 grid reported in owner-maintained mirrors; that geometry is
+not organizer-verified in this checkout. DTI is a covering metric: sparse off-catalogue mass
+can reduce false-positive cost while maintaining proximity credit, but that mechanism alone
+does not prove why any particular raster scored well. The 0.2778 figure is user-reported and
+**not ORGANIZER-CONFIRMED** here (GEMSDOE32 labelled the file UNSCORED / projected 0.2747).
+A public leaderboard entry read on 2026-10-21 showed 0.4413 at the top; this is a public
+leaderboard observation, not a submission-page receipt. Higher public entries existed at that
+read time. H80-C's historical comparisons were against three named local reference rasters only;
+that is not proof of uniqueness across all user-listed GEMSDOE sites. Live DTI remains unknown.
 
 ## 2. Lane H80-C (experiment 3 of 3)
 
@@ -68,16 +74,22 @@ Full card: [`research/run-card.json`](research/run-card.json) · hypotheses: [`d
 
 ```bash
 python3 -m venv .venv && .venv/bin/pip install -r requirements.txt
-# competition rasters in data/ (gitignored): sample_submission.tif, labels.tif, training_features.tif
+# Required competition rasters in data/ (gitignored): sample_submission.tif, labels.tif, training_features.tif
 python scripts/prepare_data.py
-python scripts/run_h80_experiments.py          # 3-experiment budget
-python scripts/validate_submission.py docs/downloads/<zeros>.tif --template data/sample_submission.tif
-python scripts/evaluate_holdout.py docs/downloads/<zeros>.tif
+# Holdout rebuilds H80-C from visible faults; it does not score a static full-catalogue TIF.
+python scripts/evaluate_holdout.py --template data/sample_submission.tif \\
+  --labels data/labels.tif --features data/training_features.tif
+python scripts/validate_submission.py CANDIDATE.tif --template data/sample_submission.tif
 ```
+
+The three H80 experiments are exhausted for this lane (3/3). Do **not** rerun
+`run_h80_experiments.py` as part of this review. Any future experiment needs a
+newly authorized budget and must beat a current HOLDOUT-DTI best with a valid
+CI before a separate selector considers a weekly submission slot.
 
 Holdout = hide-and-recover: withhold whole fault segments + buffer, derive
 catalogue-based features from visible faults only, mask visible pixels, score
-pooled DTI.
+pooled DTI. The validator only checks file format; it does not make a score.
 
 ## 4. Repository layout
 

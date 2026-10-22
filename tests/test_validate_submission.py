@@ -77,6 +77,27 @@ class SubmissionValidatorTests(unittest.TestCase):
         self.assertFalse(report["checks"]["transform_matches"])
         report = self.validate("shape", np.full((2, 2), 0.4, dtype="float32"))
         self.assertFalse(report["checks"]["shape_matches"])
+        self.assertFalse(report["format_valid"])
+        self.assertFalse(report["download_ready"])
+        self.assertNotIn("Failed to read rasters", report["errors"])
+
+    def test_non_float32_prediction_is_rejected(self) -> None:
+        report = self.validate("float64", np.full((2, 3), 0.4, dtype="float64"))
+        self.assertFalse(report["format_valid"])
+        self.assertIn("float32", " ".join(report["errors"]))
+
+    def test_prediction_nodata_mask_must_cover_template_footprint(self) -> None:
+        prediction = self.root / "masked-footprint.tif"
+        values = np.full((2, 3), 0.4, dtype="float32")
+        values[0, 0] = 0.0
+        self.write(prediction, values, nodata=0.0)
+        import importlib.util
+        spec = importlib.util.spec_from_file_location("validator", self.script)
+        module = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(module)
+        report = module.build_report(prediction, self.template)
+        self.assertFalse(report["format_valid"])
+        self.assertFalse(report["checks"]["template_footprint_covered"])
 
 class FootprintRegressionTests(SubmissionValidatorTests):
     def test_nan_nodata_hole_cannot_hide_inside_template(self):

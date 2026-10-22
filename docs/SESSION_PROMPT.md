@@ -43,12 +43,14 @@ summarised here so every session builds the same thing.
 - https://en.wikipedia.org/wiki/Tversky_index
 - https://docs.nlr.gov/docs/fy26osti/96647.pdf
 
-## Format that avoids `Predicted values must be in range [0, 1]`
+## Historical candidate's local format checks (not a submission guarantee)
 
-Single-band float32, EPSG:32611, 3730×3292, transform
-(100, 0, 243350, 0, −100, 4508550), all cells finite, values in [0, 1],
-**no nodata tag** (zeros outside the footprint). NaN-outside is the
-competition’s written format but has tripped the same portal error.
+The checked-in candidate is single-band float32, EPSG:32611, 3730×3292,
+transform (100, 0, 243350, 0, −100, 4508550), all cells finite and in [0, 1],
+with no nodata tag (zeros outside). These are file-byte checks. The official
+sample template is absent from the current checkout; a prior grid comparison
+used an owner-mirrored file, so current compatibility and portal acceptance are
+**not certified**. Do not state that a format will not be rejected.
 
 ## Core values
 

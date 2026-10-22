@@ -49,5 +49,9 @@
     "available": false,
     "note": "no registry raster provided with public competition data"
   },
-  "values_in_0_1": true
+  "values_in_0_1": true,
+  "submit_format_ok": false,
+  "readiness_scope": "Historical byte/range check; template was an owner mirror and was not organizer-authenticated. Official template is absent in the current checkout, so do not treat this as current submission certification.",
+  "template_provenance": "owner-mirrored; not organizer-authenticated",
+  "revalidated_against_official_template_this_checkout": false
 }

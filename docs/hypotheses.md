@@ -15,7 +15,7 @@ Competition (official):
 H33-2-B2 is a **metric-geometry** result, not a new detector. The GEMSDOE32
 audit describes it as the 0.2708 dotted base with every dot at
 d(catalogue) ≤ 2 px deleted (37,654 unit dots, 0 on the catalogue, all-finite
-zeros encoding, official 3730×3292 grid).
+zeros encoding, 3730×3292 grid as reported in owner mirrors; not organizer-authenticated in this checkout).
 
 Under DTI, TP_w is a covering: each truth pixel takes the **max** kernel-weighted
 prediction within 3 px. Extra mass that does not raise that max is FP at cost
@@ -51,7 +51,9 @@ flagged as IR-32-PROXY-01).
 1. Whole-segment holdout (~30% of catalogue components, 3 px buffer); catalogue-based distance computed from **visible** faults only; visible pixels masked in the prediction; pooled DTI α=0.2 β=0.8 R=300 m.
 2. Leakage canary: per-feature AUC vs withheld labels. Max AUC observed **0.607** (strain 2nd invariant) — under the 0.90 leakage bar.
 3. Lane check vs GEMSDOE32 H33-2-B2, H19-5 d2.8, and the 0.2600 anchor: Spearman |r| ≤ 0.01, 3 px overlap ≤ 0.166. Thresholds 0.90 / 0.70. **Not a duplicate.**
-4. No weekly submission slot spent.
+4. Archived comparisons cover only three named local rasters, not every GEMSDOE site in the prompt; global uniqueness is not established.
+5. The archived four-quadrant spread is not a calibrated 95% CI, and the old component-resample interval is invalid. The run card sets `ci95: null`. No candidate can be promoted until a calibrated conditional spatial-block interval and a current comparable HOLDOUT-DTI best are available.
+6. No weekly submission slot was spent. The 2026-10-22 review ran no new experiment because the three-experiment budget was already exhausted and required competition rasters are absent.
 
 Official links:
 - https://www.drivendata.org/competitions/306/competition-doe-gems/page/967/

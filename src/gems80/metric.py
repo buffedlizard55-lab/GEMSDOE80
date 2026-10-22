@@ -24,7 +24,7 @@ BETA = 0.8
 RADIUS_PX = 3.0
 RADIUS_M = 300.0
 EPS = 1e-12
-EVALUATOR_VERSION = "GEMSDOE80-evaluate_holdout.py-v1 (DTI alpha=0.2 beta=0.8 R=300m triangular kernel)"
+EVALUATOR_VERSION = "GEMSDOE80-evaluate_holdout.py-v2 (DTI alpha=0.2 beta=0.8 R=300m triangular kernel; conditional spatial-block bootstrap CI)"
 
 
 def kernel(d, radius: float = RADIUS_PX):
@@ -35,31 +35,58 @@ def dti_from_components(tp: float, fp: float, fn: float, alpha: float = ALPHA, b
     return float(tp / (tp + alpha * fp + beta * fn + EPS))
 
 
+def dti_contribution_maps(pred_bool: np.ndarray, truth_bool: np.ndarray,
+                          valid: np.ndarray | None = None) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
+    """Return per-pixel TP, FP and FN contributions for binary predictions.
+
+    Each truth pixel receives nearest-prediction triangular credit; each predicted
+    pixel pays false-positive cost according to distance to the nearest truth.
+    These maps also support spatial-block uncertainty estimates.
+    """
+    p = np.asarray(pred_bool, dtype=bool)
+    g = np.asarray(truth_bool, dtype=bool)
+    if p.shape != g.shape:
+        raise ValueError("prediction and truth arrays must have the same shape")
+    if valid is not None:
+        valid = np.asarray(valid, dtype=bool)
+        if valid.shape != p.shape:
+            raise ValueError("valid mask must have the same shape as prediction")
+        p = p & valid
+        g = g & valid
+    n = int(g.sum())
+    n_pred = int(p.sum())
+    if n == 0:
+        return (np.zeros(p.shape, dtype=np.float64),
+                p.astype(np.float64), np.zeros(p.shape, dtype=np.float64))
+    if n_pred == 0:
+        return (np.zeros(p.shape, dtype=np.float64),
+                np.zeros(p.shape, dtype=np.float64), g.astype(np.float64))
+    dp = distance_transform_edt(~p)
+    dg = distance_transform_edt(~g)
+    tp_map = g * kernel(dp)
+    fn_map = g.astype(np.float64) - tp_map
+    fp_map = p * (1.0 - kernel(dg))
+    return tp_map, fp_map, fn_map
+
+
 def dti_binary(pred_bool: np.ndarray, truth_bool: np.ndarray, valid: np.ndarray | None = None) -> dict:
     """Exact DTI for binary {0,1} predictions via Euclidean distance transforms."""
     p = np.asarray(pred_bool, dtype=bool)
     g = np.asarray(truth_bool, dtype=bool)
     if valid is not None:
         valid = np.asarray(valid, dtype=bool)
+        if valid.shape != p.shape:
+            raise ValueError("valid mask must have the same shape as prediction")
         p = p & valid
         g = g & valid
-    n = int(g.sum())
-    n_pred = int(p.sum())
-    if n == 0:
-        return {"TP_w": 0.0, "FP_w": float(n_pred), "FN_w": 0.0, "n_truth": 0, "n_pred": n_pred, "DTI": 0.0}
-    if n_pred == 0:
-        return {"TP_w": 0.0, "FP_w": 0.0, "FN_w": float(n), "n_truth": n, "n_pred": 0, "DTI": 0.0}
-    dp = distance_transform_edt(~p)
-    tp = float(kernel(dp[g]).sum())
-    fn = float(n) - tp
-    dg = distance_transform_edt(~g)
-    fp = float((1.0 - kernel(dg[p])).sum())
+    tp_map, fp_map, fn_map = dti_contribution_maps(p, g)
+    tp, fp, fn = float(tp_map.sum()), float(fp_map.sum()), float(fn_map.sum())
     return {
         "TP_w": tp,
         "FP_w": fp,
         "FN_w": fn,
-        "n_truth": n,
-        "n_pred": n_pred,
+        "n_truth": int(g.sum()),
+        "n_pred": int(p.sum()),
         "DTI": dti_from_components(tp, fp, fn),
     }
 

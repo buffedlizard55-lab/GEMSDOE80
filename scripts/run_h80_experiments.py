@@ -28,6 +28,7 @@ also beats the random control on holdout; never write a projection as a score.
 """
 from __future__ import annotations
 
+import argparse
 import json
 import sys
 from datetime import datetime, timezone
@@ -62,8 +63,8 @@ TEMPLATE = DATA / "sample_submission.tif"
 LABELS = DATA / "labels.tif"
 SGMC = DATA / "external" / "derived_sgmc_faults_100m_u8.tif"
 REGISTRY_DIR = DATA / "registry"
-OUT_DL = ROOT / "docs" / "downloads"
-OUT_SUB = ROOT / "docs" / "submissions"
+# Experiment outputs are private candidate artifacts. Promotion to Pages / a weekly slot is separate.
+OUT_DL = ROOT / "artifacts" / "candidates"
 REPORTS = ROOT / "reports"
 RESEARCH = ROOT / "research"
 
@@ -225,6 +226,28 @@ def run_arm(kind, cfg, dil, inv, hg, tc, cond, rtp, valid, foot, labels, split, 
 
 
 def main() -> int:
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument(
+        "--current-best-report", type=Path, default=None,
+        help="JSON from evaluate_holdout.py for the current comparable best; without it, no candidate can be promoted.",
+    )
+    args = parser.parse_args()
+    current_best = None
+    if args.current_best_report is not None:
+        if not args.current_best_report.is_file():
+            parser.error(f"current-best report not found: {args.current_best_report}")
+        current_card = json.loads(args.current_best_report.read_text())
+        current_result = current_card.get("holdout_dti", current_card)
+        if current_card.get("label", current_result.get("label")) != "HOLDOUT-DTI":
+            parser.error("current-best report is not labelled HOLDOUT-DTI")
+        if current_result.get("evaluator_version") != EVALUATOR_VERSION:
+            parser.error("current-best report uses a different evaluator version")
+        if current_result.get("ci95") is None:
+            parser.error("current-best report has no valid 95% spatial-block CI")
+        current_best = float(current_result["score"])
+        if not 0.0 <= current_best <= 1.0:
+            parser.error("current-best HOLDOUT-DTI must be in [0, 1]")
+
     we = worked_example_dti()
     print(f"metric self-check worked example DTI={we:.6f} (page ~0.60)")
 
@@ -305,22 +328,16 @@ def main() -> int:
 
     best = max(eligible, key=key)
     print(f"\nSELECTED {best['name']}  dots={best['n_dots_submit']}", flush=True)
-    print("computing bootstrap 95% CI on selected arm...", flush=True)
+    print("computing conditional 5-km spatial-block 95% CI on selected research arm...", flush=True)
     best["holdout"] = score_holdout(best["dots_holdout"], split, foot, bootstrap=True)
     print(f"  HOLDOUT-DTI={best['holdout']['score']:.4f} CI={best['holdout']['ci95']}", flush=True)
 
     stem = f"gemsdoe80-h80{best['kind'].lower()}-strain-accom-resid-{STAMP}"
     OUT_DL.mkdir(parents=True, exist_ok=True)
-    OUT_SUB.mkdir(parents=True, exist_ok=True)
     bundle = write_pair(best["dots_submit"], TEMPLATE, LABELS, OUT_DL, stem)
-    # copy zeros into submissions/ for the Pages download table
-    import shutil
+    # Candidate artifacts stay out of the public Pages tree; selector/promotion is separate.
     src_z = Path(bundle["zeros"]["path"])
-    shutil.copy2(src_z, OUT_SUB / src_z.name)
-    shutil.copy2(src_z.with_suffix(".zip"), OUT_SUB / (src_z.stem + ".zip")) if False else None
     zpath = Path(bundle["zip_path"])
-    shutil.copy2(zpath, OUT_SUB / zpath.name)
-    shutil.copy2(Path(bundle["nan"]["path"]), OUT_SUB / Path(bundle["nan"]["path"]).name)
 
     note = (
         f"H80{best['kind']} cat-residual strain-accom NMS dots {best['n_dots_submit']}; "
@@ -329,16 +346,24 @@ def main() -> int:
     if len(note) > 140:
         note = note[:140]
 
+    has_valid_ci = best["holdout"].get("ci95") is not None
+    beats_current_best = current_best is not None and best["holdout"]["score"] > current_best
     promote = (
         bundle["zeros"]["format_valid"]
         and not best["uniqueness"]["duplicate_lane"]
         and not canary["leakage_flag"]
         and best["beats_random_holdout"]
+        and has_valid_ci
+        and beats_current_best
     )
     verdict = "promote" if promote else "negative"
 
     run_card = {
         "experiment_budget": "3 of 3; hard stop; no weekly submission slot spent (selector is separate)",
+        "current_holdout_best_dti": current_best,
+        "current_holdout_best_report": str(args.current_best_report) if args.current_best_report else None,
+        "beats_current_holdout_best": beats_current_best,
+        "has_calibrated_spatial_block_ci": has_valid_ci,
         "lane": "H80 catalogue-residual strain-accommodation (not H19-5 ridge, not H33 B=2 flank prune)",
         "selected": best["name"],
         "hypothesis": (
@@ -381,16 +406,16 @@ def main() -> int:
             "name": stem + "-zeros",
             "note": note,
             "note_length_chars": len(note),
-            "download_zeros": f"./downloads/{src_z.name}",
-            "download_nan": f"./downloads/{Path(bundle['nan']['path']).name}",
-            "download_zip": f"./downloads/{zpath.name}",
-            "format_ok_to_upload": bundle["zeros"]["format_valid"],
+            "candidate_tif": str(src_z.relative_to(ROOT)),
+            "candidate_nan_tif": str(Path(bundle["nan"]["path"]).relative_to(ROOT)),
+            "candidate_zip": str(zpath.relative_to(ROOT)),
+            "format_check_passed_against_supplied_template": bundle["zeros"]["format_valid"],
+            "format_ok_to_upload": False,
             "organizer_confirmed": False,
             "verdict_on_file": (
-                "FORMAT OK TO UPLOAD (grid matches sample_submission.tif; all 12,279,160 cells "
-                "finite and in [0,1]; 0 NaN; 0 catalogue pixels). Not organizer-scored."
+                "Local format checks passed against the supplied template. Template provenance and organizer acceptance are not certified; candidate remains in artifacts/candidates and is not published."
                 if bundle["zeros"]["format_valid"]
-                else "NOT OK TO SUBMIT — format checks failed."
+                else "NOT FORMAT-VALID — format checks failed."
             ),
         },
         "all_experiments": [
@@ -399,10 +424,11 @@ def main() -> int:
         ],
         "verdict": verdict,
         "verdict_reason": (
-            "Unique vs registry, leakage canary under 0.90, holdout DTI beats random, format valid. "
-            "Promotion here means 'package as a candidate'; a weekly DrivenData slot is a separate selector."
+            "Unique vs registry, leakage canary under 0.90, conditional spatial-block CI available, "
+            "HOLDOUT-DTI beats both the random control and supplied current best, and format checks passed "
+            "against the supplied template. This packages only a private candidate; weekly-slot selection is separate."
             if promote else
-            "Did not clear uniqueness + leakage + beat-random + format jointly."
+            "Not promoted: at least one gate is missing (including a comparable --current-best-report, valid conditional spatial-block CI, uniqueness, leakage, random-control improvement, or format check). Candidate remains private in artifacts/candidates."
         ),
         "metric_self_check_worked_example_dti": we,
         "links": {

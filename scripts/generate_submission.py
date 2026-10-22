@@ -6,7 +6,7 @@ directional derivative of dilatation, corroborated by magnetic tilt/curvature,
 4 px catalogue collar, 3 px NMS.
 
 Requires data/sample_submission.tif, data/labels.tif, data/training_features.tif.
-Writes zeros + nan twins under docs/downloads/.
+Writes zeros + nan twins under artifacts/candidates/ (git-ignored); it does not publish or promote them.
 """
 from __future__ import annotations
 
@@ -50,7 +50,7 @@ def main() -> int:
     ap.add_argument("--template", default=str(ROOT / "data" / "sample_submission.tif"))
     ap.add_argument("--features", default=str(ROOT / "data" / "training_features.tif"))
     ap.add_argument("--labels", default=str(ROOT / "data" / "labels.tif"))
-    ap.add_argument("--out-dir", default=str(ROOT / "docs" / "downloads"))
+    ap.add_argument("--out-dir", default=str(ROOT / "artifacts" / "candidates"))
     ap.add_argument("--out", default=None, help="Ignored compatibility flag (H80-C writes a zeros/nan pair).")
     args = ap.parse_args()
 

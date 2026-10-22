@@ -1,7 +1,7 @@
 {
   "experiment_budget": "3 of 3; hard stop; no weekly submission slot spent (selector is separate)",
   "lane": "H80 catalogue-residual strain-accommodation (not H19-5 ridge, not H33 B=2 flank prune)",
-  "selected": "H80-C residual along-fabric |t\u00b7\u2207dil| \u00d7 tc, dil>0, buf=4, sep=3, k=34033",
+  "selected": "H80-C residual along-fabric |t·∇dil| × tc, dil>0, buf=4, sep=3, k=34033",
   "hypothesis": "Unmapped geothermal-indicative faults occupy strain-transfer/accommodation zones (spatial gradient of dilatation / 2nd strain invariant) that are not explained by distance to the visible USGS/INGENIOUS catalogue, corroborated by magnetic fabric.",
   "mechanism": "Sobel magnitude (or along-fabric directional derivative) of geodetic dilatation or 2nd invariant; subtract binned median vs distance-to-visible-catalogue; multiply by percentile-normalized magnetic HG or tilt; gate on positive dilatation; exclude a 4 px catalogue collar; NMS local maxima, sep=3 px, cap 34033.",
   "named_non_fault_mimic": "Lithologic/intrusive contacts (magnetic edges without slip) and geodetic interpolation seams can mimic strain-gradient lineaments.",
@@ -13,21 +13,22 @@
     "n_components_held": 957,
     "hold_frac_pixels": 0.30027218469207057,
     "score": 0.050672521801957734,
-    "ci95": [
-      0.014221707066735548,
-      0.038298614142961866
-    ],
     "TP_w": 1043.2108694626206,
     "FP_w": 28641.334655129373,
     "FN_w": 17269.789130537378,
     "n_pred_after_visible_mask": 29041,
-    "ci95_method": "spatial-block range (min/max of 4 quadrants of the same hide-and-recover split); NOT a calibrated 95% CI of the pooled ratio. Pooled HOLDOUT-DTI is the score. A component-resample bootstrap was discarded as biased (with-replacement unique() collisions).",
+    "ci95_method": "Unavailable: the four-quadrant min/max is a descriptive range, not a calibrated 95% confidence interval; do not present it as CI.",
     "spatial_quadrant_dti": {
       "NW": 0.02402319682449778,
       "NE": 0.014221707066735548,
       "SW": 0.038298614142961866,
       "SE": 0.029446883496395074
-    }
+    },
+    "ci95": null,
+    "spatial_block_range": [
+      0.014221707066735548,
+      0.038298614142961866
+    ]
   },
   "holdout_random_control": {
     "label": "HOLDOUT-DTI",
@@ -164,7 +165,9 @@
     "format_valid": true,
     "on_catalogue_px": 0,
     "positive_px": 28807,
-    "nodata": null
+    "nodata": null,
+    "template_match_scope": "Historical owner-mirrored template only; official sample_submission.tif absent in current checkout.",
+    "organizer_template_revalidated_this_checkout": false
   },
   "submission": {
     "name": "gemsdoe80-h80c-strain-accom-resid-20261021T233457Z-zeros",
@@ -173,13 +176,15 @@
     "download_zeros": "./downloads/gemsdoe80-h80c-strain-accom-resid-20261021T233457Z-zeros.tif",
     "download_nan": "./downloads/gemsdoe80-h80c-strain-accom-resid-20261021T233457Z-nan.tif",
     "download_zip": "./downloads/gemsdoe80-h80c-strain-accom-resid-20261021T233457Z-zeros.zip",
-    "format_ok_to_upload": true,
+    "format_ok_to_upload": false,
     "organizer_confirmed": false,
-    "verdict_on_file": "FORMAT OK TO UPLOAD (grid matches sample_submission.tif; all 12,279,160 cells finite and in [0,1]; 0 NaN; 0 catalogue pixels). Not organizer-scored."
+    "verdict_on_file": "NOT CURRENTLY CERTIFIED FOR SUBMISSION: local bytes/range are valid; historical grid match was against an owner mirror, not an organizer-authenticated template. No organizer score.",
+    "readiness_status": "NOT CURRENTLY CERTIFIED: historical format audit used an owner-mirrored template; official template provenance and organizer acceptance are unverified in this checkout.",
+    "template_match_historical": true
   },
   "all_experiments": [
     {
-      "name": "H80-A residual-|\u2207dil| \u00d7 tmi_hg, dil>0, buf=3, sep=3, k=35129",
+      "name": "H80-A residual-|∇dil| × tmi_hg, dil>0, buf=3, sep=3, k=35129",
       "kind": "A",
       "cfg": {
         "buffer_px": 3,
@@ -260,7 +265,7 @@
       }
     },
     {
-      "name": "H80-B residual-|\u22072ndinv| \u00d7 (tmi_hg, cond), dil>p55, buf=3, sep=3, k=33113",
+      "name": "H80-B residual-|∇2ndinv| × (tmi_hg, cond), dil>p55, buf=3, sep=3, k=33113",
       "kind": "B",
       "cfg": {
         "buffer_px": 3,
@@ -341,7 +346,7 @@
       }
     },
     {
-      "name": "H80-C residual along-fabric |t\u00b7\u2207dil| \u00d7 tc, dil>0, buf=4, sep=3, k=34033",
+      "name": "H80-C residual along-fabric |t·∇dil| × tc, dil>0, buf=4, sep=3, k=34033",
       "kind": "C",
       "cfg": {
         "buffer_px": 4,
@@ -359,14 +364,12 @@
         "n_components_held": 957,
         "hold_frac_pixels": 0.30027218469207057,
         "score": 0.050672521801957734,
-        "ci95": [
-          0.041420523852271005,
-          0.04587145101005782
-        ],
+        "ci95": null,
         "TP_w": 1043.2108694626206,
         "FP_w": 28641.334655129373,
         "FN_w": 17269.789130537378,
-        "n_pred_after_visible_mask": 29041
+        "n_pred_after_visible_mask": 29041,
+        "ci95_status": "Unavailable: the archived component-resampling interval had a deduplication defect and is not reported as a 95% CI."
       },
       "holdout_random": {
         "label": "HOLDOUT-DTI",
@@ -425,8 +428,8 @@
       }
     }
   ],
-  "verdict": "promote",
-  "verdict_reason": "Unique vs registry, leakage canary under 0.90, holdout DTI beats random, format valid. Promotion here means 'package as a candidate'; a weekly DrivenData slot is a separate selector.",
+  "verdict": "negative",
+  "verdict_reason": "Negative for competition-slot promotion: no calibrated 95% holdout CI, no current official template/data checkout, registry coverage is limited, and no organizer receipt. The historical candidate and its format audit are retained as research artifacts only; do not infer a live score.",
   "metric_self_check_worked_example_dti": 0.6026516673361586,
   "links": {
     "competition": "https://www.drivendata.org/competitions/306/competition-doe-gems/",
@@ -444,6 +447,7 @@
     "HOLDOUT-DTI uses a visible-only exclusion mask. The shipped TIF excludes the FULL catalogue (4 px), so it scores ~0 against withheld catalogue pixels by construction. That is expected: live test labels are off-catalogue.",
     "User-cited GEMSDOE32 score 0.2778 is not independently organizer-confirmed in this checkout (GEMSDOE32 itself labelled H33-2-B2 UNSCORED / projected 0.2747). Official public leaderboard #1 xiaofanhu 0.4413 was read 2026-10-21 from drivendata.org.",
     "sample_submission.tif mirror has 60,988 ones on catalogue traces (not 'total fault absence'); used only as CRS/shape/transform/footprint template.",
-    "No weekly DrivenData submission slot was spent."
+    "No weekly DrivenData submission slot was spent.",
+    "2026-10-22 review: CI fields were corrected to null because archived quadrant ranges and deduplicated component bootstrap values are not calibrated 95% confidence intervals. Current official template/features/labels are absent; historical mirrored-template checks do not certify organizer acceptance."
   ]
 }

@@ -117,7 +117,7 @@ def main(argv=None) -> int:
     ap.add_argument("--mask-tif", type=Path, required=True, help="Any single-band raster; >0.5 treated as emit")
     ap.add_argument("--template", type=Path, default=ROOT / "data" / "sample_submission.tif")
     ap.add_argument("--labels", type=Path, default=ROOT / "data" / "labels.tif")
-    ap.add_argument("--out-dir", type=Path, default=ROOT / "docs" / "downloads")
+    ap.add_argument("--out-dir", type=Path, default=ROOT / "artifacts" / "candidates")
     ap.add_argument("--stem", required=True)
     args = ap.parse_args(argv)
     with rasterio.open(args.mask_tif) as src:

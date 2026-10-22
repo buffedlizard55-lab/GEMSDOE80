@@ -75,5 +75,9 @@
     "nodata": NaN,
     "footprint_px": 5167373,
     "dtype": "float32"
-  }
+  },
+  "readiness_status": "NOT CERTIFIED for competition submission in current checkout; official sample template absent; historical template match relied on an owner mirror.",
+  "organizer_confirmed": false,
+  "template_provenance": "owner-mirrored, not organizer-authenticated",
+  "format_check_scope": "Historical format check only; all values and stored metadata are described in nested audits, but official-template alignment is not re-certified."
 }
