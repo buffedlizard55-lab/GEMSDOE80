@@ -1,0 +1,176 @@
+{
+  "file": "gems80-h81-puremeta-transfer-37654-20261022-zeros.tif",
+  "sha256": "1f08541f6e804755e887e42073fac8aff4770dd0b3b2a65d0084ecd95558bd5a",
+  "bytes": 128893,
+  "submission_name": "gems80-h81-puremeta-transfer-37654-zeros",
+  "note": "H81-2 pure self-masked meta transfer, skeleton-submod 300m, collar2.4, 37654 dots, no vent dilution [0,1]",
+  "note_chars": 105,
+  "validator": {
+    "file": "/home/user/GEMSDOE80/submissions/gems80-h81-puremeta-transfer-37654-20261022-zeros.tif",
+    "bytes": 128893,
+    "sha256": "1f08541f6e804755e887e42073fac8aff4770dd0b3b2a65d0084ecd95558bd5a",
+    "meta": {
+      "crs": "EPSG:32611",
+      "shape": [
+        3730,
+        3292
+      ],
+      "dtype": "float32",
+      "count": 1,
+      "nodata": null,
+      "transform": [
+        100.0,
+        0.0,
+        243350.0,
+        0.0,
+        -100.0,
+        4508550.0
+      ],
+      "profile_compress": "deflate"
+    },
+    "band_description": [
+      null
+    ],
+    "n_finite": 12279160,
+    "n_nan": 0,
+    "n_infinite": 0,
+    "min": 0.0,
+    "max": 1.0,
+    "mean": 0.0030664964579045773,
+    "emitted_positive_pixels": 37654,
+    "checks": {
+      "single_band": true,
+      "dtype_float32": true,
+      "dimensions_3730x3292": true,
+      "crs_epsg_32611": true,
+      "transform_matches_sample_submission": true,
+      "no_nan_anywhere": true,
+      "no_inf_anywhere": true,
+      "no_sentinel_values": true,
+      "range_0_1_guaranteed": true,
+      "min_ge_0": true,
+      "max_le_1": true,
+      "in_footprint_all_finite": true,
+      "in_footprint_range_0_1": true,
+      "outside_footprint_zero": true,
+      "zero_dots_on_mapped_catalogue": true
+    },
+    "all_checks_passed": true,
+    "validation_class": "local format/range preflight; not organizer acceptance or uniqueness clearance",
+    "on_catalogue_positive_pixels": 0,
+    "in_footprint_positive_pixels": 37654,
+    "footprint_fraction": 0.007286874781441169
+  },
+  "template_report": {
+    "path": "/home/user/GEMSDOE80/submissions/gems80-h81-puremeta-transfer-37654-20261022-zeros.tif",
+    "bytes": 128893,
+    "sha256": "1f08541f6e804755e887e42073fac8aff4770dd0b3b2a65d0084ecd95558bd5a",
+    "bands": 1,
+    "dtype": "float32",
+    "crs": "EPSG:32611",
+    "width": 3292,
+    "height": 3730,
+    "bounds": [
+      243350.0,
+      4135550.0,
+      572550.0,
+      4508550.0
+    ],
+    "ref_bounds": [
+      243350.0,
+      4135550.0,
+      572550.0,
+      4508550.0
+    ],
+    "transform": [
+      100.0,
+      0.0,
+      243350.0,
+      0.0,
+      -100.0,
+      4508550.0
+    ],
+    "nodata": null,
+    "blocksize": [
+      256,
+      256
+    ],
+    "fixture_grid": false,
+    "has_validity_mask": false,
+    "nan_pixels": 0,
+    "infinity_pixels": 0,
+    "n_nan": 0,
+    "min": 0.0,
+    "max": 1.0,
+    "mean": 0.0030664964579045773,
+    "n_nonzero": 37654,
+    "mass": 37654.0,
+    "mass_outside_footprint": 0,
+    "problems": [],
+    "ok": true,
+    "validation_class": "local on-disk template/range check; not organizer upload acceptance"
+  },
+  "zip_file": "gems80-h81-puremeta-transfer-37654-20261022-zeros.zip",
+  "zip_sha256": "f7d7518fee0e3a0d2b42dbea9d4f2429da787533a45ce8cc0e062d4118617292",
+  "approved_for_weekly_slot": false,
+  "promoted": false,
+  "submission_slots_used": 0,
+  "status": "locally validated within separately recorded inventory scope; not organizer acceptance or slot approval",
+  "metadata": {
+    "lane": "H81-2 pure self-masked meta transfer (no hybrid dilution)",
+    "holdout_dti_pooled": {
+      "CTRL_E80_2_puremeta_37654": {
+        "evidence_class": "HOLDOUT-DTI",
+        "evaluator_version": "gems57-pooled-hide-v2",
+        "dti": 0.18896792683141156,
+        "ci95": [
+          0.17185330773824506,
+          0.20430964315777314
+        ],
+        "withheld_positive_pixels": 22663,
+        "tpw": 6267.1216203183385,
+        "fpw": 68905.88703074165,
+        "fnw": 16395.87837968166
+      },
+      "H81_1_conduit_gated_37654": {
+        "evidence_class": "HOLDOUT-DTI",
+        "evaluator_version": "gems57-pooled-hide-v2",
+        "dti": 0.18403225176435226,
+        "ci95": [
+          0.16713627688871127,
+          0.19968268986043347
+        ],
+        "withheld_positive_pixels": 22663,
+        "tpw": 6105.907685448536,
+        "fpw": 69134.41898311186,
+        "fnw": 16557.092314551464
+      },
+      "CTRL_E80_3_hero_hybrid_41600": {
+        "evidence_class": "HOLDOUT-DTI",
+        "evaluator_version": "gems57-pooled-hide-v2",
+        "dti": 0.1612846711988098,
+        "ci95": [
+          0.14564110209693676,
+          0.17668820288572934
+        ],
+        "withheld_positive_pixels": 22663,
+        "tpw": 5635.972704906453,
+        "fpw": 78433.30313038954,
+        "fnw": 17027.02729509355
+      },
+      "GEMSDOE32_H33_fold_fair": {
+        "evidence_class": "HOLDOUT-DTI",
+        "evaluator_version": "gems57-pooled-hide-v2",
+        "dti": 0.0974930517949667,
+        "ci95": [
+          0.08424586882791113,
+          0.10943612673992578
+        ],
+        "withheld_positive_pixels": 22663,
+        "tpw": 3226.9367090079836,
+        "fpw": 71616.79091445438,
+        "fnw": 19436.063290992013
+      }
+    }
+  }
+}

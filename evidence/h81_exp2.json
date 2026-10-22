@@ -1,0 +1,477 @@
+{
+  "schema": "gems80.h81-exp2.v1",
+  "evidence_class": "HOLDOUT-DTI",
+  "evaluator_version": "gems57-pooled-hide-v2",
+  "shares_new": [
+    0.78,
+    0.07,
+    0.15
+  ],
+  "seed_20": {
+    "evidence_class": "HOLDOUT-DTI",
+    "evaluator_version": "gems57-pooled-hide-v2",
+    "alpha": 0.2,
+    "beta": 0.8,
+    "triangular_radius_m": 300.0,
+    "pooled": true,
+    "scores": {
+      "CTRL_hero_41600": {
+        "evidence_class": "HOLDOUT-DTI",
+        "evaluator_version": "gems57-pooled-hide-v2",
+        "dti": 0.159222952086797,
+        "ci95": [
+          0.1401804367008452,
+          0.17706205499775868
+        ],
+        "withheld_positive_pixels": 11321,
+        "tpw": 2776.70805727731,
+        "fpw": 39134.88845960072,
+        "fnw": 8544.291942722684
+      },
+      "EXP2_core78_41600": {
+        "evidence_class": "HOLDOUT-DTI",
+        "evaluator_version": "gems57-pooled-hide-v2",
+        "dti": 0.16758159333184894,
+        "ci95": [
+          0.14878828020094875,
+          0.1858881186404832
+        ],
+        "withheld_positive_pixels": 11321,
+        "tpw": 2907.744895366591,
+        "fpw": 38564.34918259718,
+        "fnw": 8413.25510463341
+      }
+    },
+    "best_comparable_control": "CTRL_hero_41600",
+    "paired_differences": {
+      "CTRL_hero_41600": {
+        "evidence_class": "HOLDOUT-DTI",
+        "evaluator_version": "gems57-pooled-hide-v2",
+        "delta": 0.008358641245051951,
+        "ci95": [
+          0.005672220391370343,
+          0.011356577240595883
+        ],
+        "withheld_positive_pixels": 11321
+      }
+    },
+    "bootstrap": {
+      "method": "paired physical spatial-cluster percentile",
+      "clusters": 157,
+      "draws": 1000,
+      "seed": 520830,
+      "confidence": 0.95,
+      "caveat": "Conditional on fitted folds, catalogue labels and fixed budgets; not a leaderboard interval."
+    },
+    "implementation_sha256": {
+      "evaluate_holdout.py": "ad86640b46f3c5fc6b1aceec4c4bfc82d03e35008b37ab2a8ad6076e6810ff3a",
+      "holdout.py": "7a0a84176986190b527aa9c6a84216c2dab4b599f25b1143db5f420e85020ab1",
+      "metric.py": "4afe10cbaa229948520c75194b1ebc32676e72544f05582f0725092b097b4d7f",
+      "spatial.py": "fad7b09db9efc512247b9a176a7e7ce8631e287592b4e07902d0b9c38bed00f8"
+    }
+  },
+  "seed_30": {
+    "evidence_class": "HOLDOUT-DTI",
+    "evaluator_version": "gems57-pooled-hide-v2",
+    "alpha": 0.2,
+    "beta": 0.8,
+    "triangular_radius_m": 300.0,
+    "pooled": true,
+    "scores": {
+      "CTRL_hero_41600": {
+        "evidence_class": "HOLDOUT-DTI",
+        "evaluator_version": "gems57-pooled-hide-v2",
+        "dti": 0.1633282258419324,
+        "ci95": [
+          0.143817461066773,
+          0.18104696642291787
+        ],
+        "withheld_positive_pixels": 11342,
+        "tpw": 2859.010003621641,
+        "fpw": 39296.44128239691,
+        "fnw": 8482.989996378357
+      },
+      "EXP2_core78_41600": {
+        "evidence_class": "HOLDOUT-DTI",
+        "evaluator_version": "gems57-pooled-hide-v2",
+        "dti": 0.1733322243128606,
+        "ci95": [
+          0.15397209312508767,
+          0.1917320647227828
+        ],
+        "withheld_positive_pixels": 11342,
+        "tpw": 3017.7861323523803,
+        "fpw": 38666.29389246018,
+        "fnw": 8324.213867647619
+      }
+    },
+    "best_comparable_control": "CTRL_hero_41600",
+    "paired_differences": {
+      "CTRL_hero_41600": {
+        "evidence_class": "HOLDOUT-DTI",
+        "evaluator_version": "gems57-pooled-hide-v2",
+        "delta": 0.0100039984709282,
+        "ci95": [
+          0.007080537969258819,
+          0.01266927779913115
+        ],
+        "withheld_positive_pixels": 11342
+      }
+    },
+    "bootstrap": {
+      "method": "paired physical spatial-cluster percentile",
+      "clusters": 157,
+      "draws": 1000,
+      "seed": 520840,
+      "confidence": 0.95,
+      "caveat": "Conditional on fitted folds, catalogue labels and fixed budgets; not a leaderboard interval."
+    },
+    "implementation_sha256": {
+      "evaluate_holdout.py": "ad86640b46f3c5fc6b1aceec4c4bfc82d03e35008b37ab2a8ad6076e6810ff3a",
+      "holdout.py": "7a0a84176986190b527aa9c6a84216c2dab4b599f25b1143db5f420e85020ab1",
+      "metric.py": "4afe10cbaa229948520c75194b1ebc32676e72544f05582f0725092b097b4d7f",
+      "spatial.py": "fad7b09db9efc512247b9a176a7e7ce8631e287592b4e07902d0b9c38bed00f8"
+    }
+  },
+  "pooled": {
+    "evidence_class": "HOLDOUT-DTI",
+    "evaluator_version": "gems57-pooled-hide-v2",
+    "alpha": 0.2,
+    "beta": 0.8,
+    "triangular_radius_m": 300.0,
+    "pooled": true,
+    "scores": {
+      "CTRL_hero_41600": {
+        "evidence_class": "HOLDOUT-DTI",
+        "evaluator_version": "gems57-pooled-hide-v2",
+        "dti": 0.1612794406725677,
+        "ci95": [
+          0.14552395757952227,
+          0.17665269279382564
+        ],
+        "withheld_positive_pixels": 22663,
+        "tpw": 5635.718060898955,
+        "fpw": 78431.32974199759,
+        "fnw": 17027.28193910105
+      },
+      "EXP2_core78_41600": {
+        "evidence_class": "HOLDOUT-DTI",
+        "evaluator_version": "gems57-pooled-hide-v2",
+        "dti": 0.17046180532956653,
+        "ci95": [
+          0.15479826407290292,
+          0.18609265808175804
+        ],
+        "withheld_positive_pixels": 22663,
+        "tpw": 5925.531027718973,
+        "fpw": 77230.64307505732,
+        "fnw": 16737.468972281033
+      }
+    },
+    "best_comparable_control": "CTRL_hero_41600",
+    "paired_differences": {
+      "CTRL_hero_41600": {
+        "evidence_class": "HOLDOUT-DTI",
+        "evaluator_version": "gems57-pooled-hide-v2",
+        "delta": 0.009182364656998843,
+        "ci95": [
+          0.006843161334006454,
+          0.011586886430378385
+        ],
+        "withheld_positive_pixels": 22663
+      }
+    },
+    "bootstrap": {
+      "method": "paired physical spatial-cluster percentile",
+      "clusters": 158,
+      "draws": 1000,
+      "seed": 520899,
+      "confidence": 0.95,
+      "caveat": "Conditional on fitted folds, catalogue labels and fixed budgets; not a leaderboard interval."
+    },
+    "implementation_sha256": {
+      "evaluate_holdout.py": "ad86640b46f3c5fc6b1aceec4c4bfc82d03e35008b37ab2a8ad6076e6810ff3a",
+      "holdout.py": "7a0a84176986190b527aa9c6a84216c2dab4b599f25b1143db5f420e85020ab1",
+      "metric.py": "4afe10cbaa229948520c75194b1ebc32676e72544f05582f0725092b097b4d7f",
+      "spatial.py": "fad7b09db9efc512247b9a176a7e7ce8631e287592b4e07902d0b9c38bed00f8"
+    }
+  },
+  "uniqueness": {
+    "evidence_class": "REGISTRY-UNIQUENESS-MEASUREMENT",
+    "candidate_name": "gems80-h81-core78-hybrid-41600-20261022-zeros",
+    "candidate_dots": 41600,
+    "rasters_compared": 20,
+    "discriminating_priors_count": 18,
+    "space_filling_priors_count": 2,
+    "pre_placement_surface_gate": {
+      "max_abs_spearman_rho": 0.48561,
+      "worst_file": "17GEMSDOE__17GEMSDOE_E-proba-multiscale_20260930T044527Z.tif",
+      "threshold": 0.9,
+      "passed": true
+    },
+    "post_placement_binding_like_for_like_gate": {
+      "evidence_class": "REGISTRY-MEASUREMENT",
+      "binding_rule": "like-for-like",
+      "discriminating_priors": 18,
+      "space_filling_priors": 2,
+      "space_filling_files": [
+        "13gems_20261001_r13-lattice-s5_v2_nan-outside.tif",
+        "17GEMSDOE__17GEMSDOE_E-proba-multiscale_20260930T044527Z.tif"
+      ],
+      "worst_forward_overlap": 0.7626,
+      "worst_forward_overlap_file": "GEMSDOE76__gems76_h76_3_geotherm_tilt_axial_submod_20261021_zeros.tif",
+      "worst_abs_spearman": 0.17063,
+      "worst_abs_spearman_file": "GEMSDOE76__gems76_h76_3_geotherm_tilt_axial_submod_20261021_zeros.tif",
+      "overlap_limit": 0.7,
+      "rho_limit": 0.9,
+      "duplicate": true,
+      "note": "A space-filling prior's halo covers >= 70% of the allowed domain, so even a uniformly random dot set reports >= 0.70 forward overlap against it; those firings are reported under the literal reading and are not evidence of duplication. Thresholds are unchanged."
+    },
+    "literal_reading_with_space_filling_priors": {
+      "worst_forward_overlap": 1.0,
+      "space_filling_firings_count": 2,
+      "discriminating_firings_count": 3,
+      "note": "Space-filling priors (e.g. 17GEMSDOE E-proba-multiscale with 5,167,373 positive pixels and 13GEMSDOE 5px lattice) have 3-px halo coverage >= 98% of the allowed domain, so even a uniform random dot set has ~1.0 forward overlap against them. Under the binding like-for-like rule (IR-H85-01), dot overlap is evaluated across all 126 discriminating priors (halo coverage < 0.70) while Spearman rank correlation is evaluated across all 133 priors."
+    },
+    "key_benchmark_comparisons": {
+      "vs_GEMSDOE32_H33_02778": {
+        "file": "GEMSDOE32__gemsdoe32-h33-h33-2-b2-20261004T220000Z-e5eb6e7e-zeros.tif",
+        "sha256": "c55bafc470054e8271dcb89347a17e07fefe50de6af6e6ba6c4b169ef7ab6fa9",
+        "their_dots": 37654,
+        "forward_overlap": 0.43531,
+        "reverse_overlap": 0.20479,
+        "jaccard": 0.01758,
+        "spearman_preplacement_surface": 0.05884,
+        "spearman_full_footprint": 0.05884,
+        "representation": "discriminating",
+        "halo_coverage": 0.15188,
+        "support_fraction": 0.00737
+      },
+      "vs_GEMSDOE76_H76_3": {
+        "file": "GEMSDOE76__gems76_h76_3_geotherm_tilt_axial_submod_20261021_zeros.tif",
+        "sha256": "d706807d42d1b21f6417483cd7aeb04a410d62accd5a66c6b2a6ab0dc16662af",
+        "their_dots": 37654,
+        "forward_overlap": 0.7626,
+        "reverse_overlap": 0.4902,
+        "jaccard": 0.09835,
+        "spearman_preplacement_surface": 0.0969,
+        "spearman_full_footprint": 0.17063,
+        "representation": "discriminating",
+        "halo_coverage": 0.11571,
+        "support_fraction": 0.00737
+      },
+      "vs_GEMSDOE77_H85_EDTI": {
+        "file": "GEMSDOE77__gems85-h85-edti-collar35-skel-r33-20261021-d97b248e-zeros.tif",
+        "sha256": "47caaca53d2906f797459abf1194fb81ee1181e05cf5c9a6e74e6f57b0999b98",
+        "their_dots": 201260,
+        "forward_overlap": 0.75642,
+        "reverse_overlap": 0.10311,
+        "jaccard": 0.01152,
+        "spearman_preplacement_surface": 0.0908,
+        "spearman_full_footprint": 0.0908,
+        "representation": "discriminating",
+        "halo_coverage": 0.56029,
+        "support_fraction": 0.03941
+      }
+    },
+    "all_126_discriminating_overlap_le_070": false,
+    "top_15_discriminating_by_overlap": [
+      {
+        "file": "GEMSDOE76__gems76_h76_3_geotherm_tilt_axial_submod_20261021_zeros.tif",
+        "sha256": "d706807d42d1b21f6417483cd7aeb04a410d62accd5a66c6b2a6ab0dc16662af",
+        "their_dots": 37654,
+        "forward_overlap": 0.7626,
+        "reverse_overlap": 0.4902,
+        "jaccard": 0.09835,
+        "spearman_preplacement_surface": 0.0969,
+        "spearman_full_footprint": 0.17063,
+        "representation": "discriminating",
+        "halo_coverage": 0.11571,
+        "support_fraction": 0.00737
+      },
+      {
+        "file": "GEMSDOE77__gems85-h85-edti-collar35-skel-r33-20261021-d97b248e-zeros.tif",
+        "sha256": "47caaca53d2906f797459abf1194fb81ee1181e05cf5c9a6e74e6f57b0999b98",
+        "their_dots": 201260,
+        "forward_overlap": 0.75642,
+        "reverse_overlap": 0.10311,
+        "jaccard": 0.01152,
+        "spearman_preplacement_surface": 0.0908,
+        "spearman_full_footprint": 0.0908,
+        "representation": "discriminating",
+        "halo_coverage": 0.56029,
+        "support_fraction": 0.03941
+      },
+      {
+        "file": "gems10-h25-ctx-ridge-20260927T232947704150Z-6452ae1d00.tif",
+        "sha256": "1381e784fb8b8340beffd0e735ac9eea89ad35d1a807f8a9bab5506e3fc8275e",
+        "their_dots": 174232,
+        "forward_overlap": 0.73829,
+        "reverse_overlap": 0.24067,
+        "jaccard": 0.02843,
+        "spearman_preplacement_surface": 0.1112,
+        "spearman_full_footprint": 0.1112,
+        "representation": "discriminating",
+        "halo_coverage": 0.25582,
+        "support_fraction": 0.03412
+      },
+      {
+        "file": "gems10-h28-dotted-ridge-20260928T020256236880Z-6452ae1d00.tif",
+        "sha256": "7637b72d4c6c3e10226bf46bd72a20272d62ccbe29743062632d10b158b49c58",
+        "their_dots": 69281,
+        "forward_overlap": 0.69654,
+        "reverse_overlap": 0.20693,
+        "jaccard": 0.01862,
+        "spearman_preplacement_surface": 0.07006,
+        "spearman_full_footprint": 0.07006,
+        "representation": "discriminating",
+        "halo_coverage": 0.26517,
+        "support_fraction": 0.01357
+      },
+      {
+        "file": "8GEMSDOE_Hedge-v2_submission.tif",
+        "sha256": "052688eafbc7a55d90caab72252a50304fe5caa8ecf973f8e791b4ae910f0792",
+        "their_dots": 227507,
+        "forward_overlap": 0.54519,
+        "reverse_overlap": 0.14242,
+        "jaccard": 0.01496,
+        "spearman_preplacement_surface": -0.01666,
+        "spearman_full_footprint": 0.02019,
+        "representation": "discriminating",
+        "halo_coverage": 0.27501,
+        "support_fraction": 0.04455
+      },
+      {
+        "file": "gemsdoe-ens12-adopted-7f00890a.tif",
+        "sha256": "7f00890a62878d612fb5eef67a9a364a2df819433dde74b6762ce4fc0fc4fe15",
+        "their_dots": 172974,
+        "forward_overlap": 0.5426,
+        "reverse_overlap": 0.18528,
+        "jaccard": 0.01883,
+        "spearman_preplacement_surface": 0.08121,
+        "spearman_full_footprint": 0.08121,
+        "representation": "discriminating",
+        "halo_coverage": 0.23892,
+        "support_fraction": 0.03387
+      },
+      {
+        "file": "GEMSDOE74__gemsdoe74-triregime-radon-piedmont-37654-20261021T051000Z-zeros.tif",
+        "sha256": "31bf5aef0539dc3c401662f0bc3b657287943049ad8d031d10026ba45d669c4b",
+        "their_dots": 37654,
+        "forward_overlap": 0.53462,
+        "reverse_overlap": 0.21472,
+        "jaccard": 0.01699,
+        "spearman_preplacement_surface": 0.055,
+        "spearman_full_footprint": 0.055,
+        "representation": "discriminating",
+        "halo_coverage": 0.19337,
+        "support_fraction": 0.00737
+      },
+      {
+        "file": "gems16-h16-1-topo-geophys-baseline-ridges-20260930-df20f65e-nan.tif",
+        "sha256": "055309694ed499ca3d87e76b3f5e81c292aef6e39c418d33ff5a817aa1309bea",
+        "their_dots": 123939,
+        "forward_overlap": 0.51627,
+        "reverse_overlap": 0.21929,
+        "jaccard": 0.02486,
+        "spearman_preplacement_surface": 0.10076,
+        "spearman_full_footprint": 0.10076,
+        "representation": "discriminating",
+        "halo_coverage": 0.20583,
+        "support_fraction": 0.02427
+      },
+      {
+        "file": "gems27-topo-gap-closure-t-v2-on-d1-5-20261002-5512495c6bd1-nan.tif",
+        "sha256": "33003374335d84bf885f2d8f5e9dd4c57044c8ec58fa6a0d7fa581e8bc41c11d",
+        "their_dots": 61328,
+        "forward_overlap": 0.5149,
+        "reverse_overlap": 0.21863,
+        "jaccard": 0.01957,
+        "spearman_preplacement_surface": 0.07237,
+        "spearman_full_footprint": 0.07237,
+        "representation": "discriminating",
+        "halo_coverage": 0.18245,
+        "support_fraction": 0.01201
+      },
+      {
+        "file": "gems19-h19-4-multiline-corroborated-openness-thermal-pop-20260930-691e4dfa-nan.tif",
+        "sha256": "89109a3bd2cd3b12e7a0f388113c519843acfc9c4f46825affefc3e63dd99b22",
+        "their_dots": 123779,
+        "forward_overlap": 0.50986,
+        "reverse_overlap": 0.21937,
+        "jaccard": 0.02516,
+        "spearman_preplacement_surface": 0.10015,
+        "spearman_full_footprint": 0.10015,
+        "representation": "discriminating",
+        "halo_coverage": 0.20071,
+        "support_fraction": 0.02424
+      },
+      {
+        "file": "GEMSDOE75__gems75-trlt-radon-loco-ridge-20261021-zeros.tif",
+        "sha256": "e04df46e8a0770b470bf8846ed2aff966fd192e7ff71fbc4d82724b28c0b1b71",
+        "their_dots": 36800,
+        "forward_overlap": 0.50764,
+        "reverse_overlap": 0.2334,
+        "jaccard": 0.02175,
+        "spearman_preplacement_surface": 0.06987,
+        "spearman_full_footprint": 0.06987,
+        "representation": "discriminating",
+        "halo_coverage": 0.15704,
+        "support_fraction": 0.00721
+      },
+      {
+        "file": "gems19-h19-5-powerlaw-budget-multiline-corroborated-20260930-e27054cf-nan.tif",
+        "sha256": "ec1f9b56b83ce33cad781ceb9f104b18fb4f2ff785263a4e89616af4aabdee8d",
+        "their_dots": 121131,
+        "forward_overlap": 0.50252,
+        "reverse_overlap": 0.22188,
+        "jaccard": 0.02586,
+        "spearman_preplacement_surface": 0.10114,
+        "spearman_full_footprint": 0.10114,
+        "representation": "discriminating",
+        "halo_coverage": 0.19321,
+        "support_fraction": 0.02372
+      },
+      {
+        "file": "gems24-h25-1-dotted-h19-5-d1-5-20261002-989f59505db1-nan.tif",
+        "sha256": "68d0e2e4fcc594f9a23f56c44b885fee733d026d39be55e18ad2a07289525310",
+        "their_dots": 60069,
+        "forward_overlap": 0.47712,
+        "reverse_overlap": 0.21154,
+        "jaccard": 0.01873,
+        "spearman_preplacement_surface": 0.07046,
+        "spearman_full_footprint": 0.07046,
+        "representation": "discriminating",
+        "halo_coverage": 0.17804,
+        "support_fraction": 0.01176
+      },
+      {
+        "file": "gems24-h25-1-dotted-h19-5-d2-8-20261002-e56ea318af89-nan.tif",
+        "sha256": "91eae1ca42ec845eaa8c2ba32da49806e24751743459b8a10017c479bbe639b8",
+        "their_dots": 44090,
+        "forward_overlap": 0.46154,
+        "reverse_overlap": 0.20737,
+        "jaccard": 0.01624,
+        "spearman_preplacement_surface": 0.0565,
+        "spearman_full_footprint": 0.0565,
+        "representation": "discriminating",
+        "halo_coverage": 0.16926,
+        "support_fraction": 0.00863
+      },
+      {
+        "file": "GEMSDOE32__gemsdoe32-h33-h33-2-b2-20261004T220000Z-e5eb6e7e-zeros.tif",
+        "sha256": "c55bafc470054e8271dcb89347a17e07fefe50de6af6e6ba6c4b169ef7ab6fa9",
+        "their_dots": 37654,
+        "forward_overlap": 0.43531,
+        "reverse_overlap": 0.20479,
+        "jaccard": 0.01758,
+        "spearman_preplacement_surface": 0.05884,
+        "spearman_full_footprint": 0.05884,
+        "representation": "discriminating",
+        "halo_coverage": 0.15188,
+        "support_fraction": 0.00737
+      }
+    ]
+  },
+  "verdict": "negative-duplicate"
+}

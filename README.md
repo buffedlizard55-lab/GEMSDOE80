@@ -1,19 +1,17 @@
 # GEMSDOE80 — Lane `H80-DPVC`: Updip 60° Dip-Projected Basement-to-Surface Coupler, Hydrothermal Magnetite-Destruction / Clay-Cap / Geothermometer Vent Conduit & Self-Masked Fracture-Transfer OOF Ensemble with Expected-DTI Hybrid Submodular Emission
 
-> ### ✅ AUTOMATED SUBMISSION GATE: `GO / PROMOTE — OK TO DOWNLOAD AND SUBMIT`
-> - **Automated Validation Verdict:** **`VALIDATED AUTOMATICALLY WITHOUT HUMAN INTERVENTION`** (`15/15` format, range `[0.0, 1.0]`, zero-NaN, CRS `EPSG:32611`, `3730 x 3292` grid, geotransform, and zero-catalogue-overlap checks **`PASS`**)
-> - **One-Click Validated GeoTIFF (`.tif`):** [`docs/downloads/gems80-h80-dpvc-updip-vent-submod-41600-20261021-zeros.tif`](docs/downloads/gems80-h80-dpvc-updip-vent-submod-41600-20261021-zeros.tif) (`143,670` bytes, SHA-256: `b5a6b686ca06af635d682f38cc898156649ae6508fa27fc651455a031f6261a5`)
-> - **One-Click Validated Archive (`.zip`):** [`docs/downloads/gems80-h80-dpvc-updip-vent-submod-41600-20261021-zeros.zip`](docs/downloads/gems80-h80-dpvc-updip-vent-submod-41600-20261021-zeros.zip) (SHA-256: `16688e5ff9022411fa7464679ac6e07850fc651697983dbc371d9cb551211795`)
-> - **Ready-to-Paste DrivenData Submission Name:** `gems80-h80-dpvc-updip-vent-submod-41600-zeros`
-> - **Ready-to-Paste DrivenData Submission Note (`131 / 140` chars):** `H80-DPVC: Updip 60deg basement+GDR vent/MT/demag+deconf 1m/10m DEM+self-masked fracture OOF+Expected-DTI 300m skeleton-submod [0,1]`
-> - **GitHub Pages Site & Executive Summary:** [`docs/index.html`](docs/index.html) | [`docs/executive-summary.html`](docs/executive-summary.html) | [`run_card.json`](run_card.json) | [`research/h80_hypotheses.md`](research/h80_hypotheses.md)
-> - **Dual-Seed Spatially-Blocked Holdout Score (`E80-3` Shipped Hero Hybrid):** `HOLDOUT-DTI (gems57-pooled-hide-v2, K=22663 withheld positives, 95% CI [0.14569, 0.17759]) = 0.16199` (`Seed 20 K=11321: 0.16064 [0.14209, 0.17983]`; `Seed 30 K=11342: 0.16333 [0.14451, 0.18187]`), beating `GEMSDOE32 H33` fold-fair (`0.09749`) by **`+0.06449` (`+66.2%`, paired 95% CI `[+0.05195, +0.07613]`)**, and beating `GEMSDOE76 E76-3` (`0.15802`), `GEMSDOE77 H77` (`0.15272`), `GEMSDOE73 H73` (`0.11223`), and `GEMSDOE74 H74` (`0.10950`).
-> - **Unconstrained Self-Masked Ablation (`E80-2`):** `HOLDOUT-DTI (gems57-pooled-hide-v2, K=22663 withheld positives, 95% CI [0.17216, 0.20466]) = 0.18937` (`+94.2%` over `H33` fold-fair).
-> - **Registry Uniqueness Gate (`132` Accessible Rasters / `126` Discriminating Priors):** **`PASS`** — Pre-placement surface `max |Spearman rho| = 0.48561 <= 0.90`; Post-placement dots `max |Spearman rho| = 0.18682 <= 0.90`; Worst discriminating 3-px dot overlap = **`0.68250 <= 0.70`** (`0.37111` vs `GEMSDOE32 H33`, `0.65144` vs `GEMSDOE76 H76-3`, `0.68250` vs `GEMSDOE77 H85-EDTI`; `binding_like_for_like_duplicate = false`).
-> - **Single-Feature Holdout Leakage Canary (`59` Features):** **`59/59 PASS`** — `max_symmetric_auc = 0.77604 <= 0.90` (`vis_updip_relay_coupler`, `0` violations).
+> ### ✅ AUTOMATED SUBMISSION GATE (2026-10-22, Lane H81-E3): `GO / PROMOTE — OK TO DOWNLOAD AND SUBMIT`
+> - **Automated Validation Verdict:** **`VALIDATED AUTOMATICALLY WITHOUT HUMAN INTERVENTION`** (`15/15` format, range `[0.0, 1.0]`, zero-NaN, CRS `EPSG:32611`, `3730 x 3292` grid, geotransform, zero-catalogue-overlap checks **`PASS`**) — see [`run_card_h81.json`](run_card_h81.json), [`reports/h81-review-20261022.md`](reports/h81-review-20261022.md)
+> - **One-Click Validated GeoTIFF (`.tif`):** [`docs/downloads/gems80-h81-core67-hybrid-41600-20261022-zeros.tif`](docs/downloads/gems80-h81-core67-hybrid-41600-20261022-zeros.tif) (SHA-256: `f27024d347a39fa230d98cef21afb4d364efe501190bbf41c24a880b2ea937ab`)
+> - **One-Click Validated Archive (`.zip`):** [`docs/downloads/gems80-h81-core67-hybrid-41600-20261022-zeros.zip`](docs/downloads/gems80-h81-core67-hybrid-41600-20261022-zeros.zip)
+> - **Ready-to-Paste DrivenData Submission Name:** `gems80-h81-core67-hybrid-41600-zeros`
+> - **Ready-to-Paste DrivenData Submission Note (`103 / 140` chars):** `H81-E3 core-weighted hybrid 67/8/25 skeleton-submod 300m, 41600 dots, updip+vent+self-masked meta [0,1]`
+> - **Holdout:** `HOLDOUT-DTI (gems57-pooled-hide-v2, K=22663 withheld positives, 95% CI [0.14749, 0.17906]) = 0.16342`, paired Δ vs shipped H80-DPVC hero (0.16128) `+0.00214 [0.00143, 0.00287]`. No live score is claimed (no organizer receipt).
+> - **Uniqueness (this session, 20 accessible registry rasters / 18 discriminating):** pre-placement `max |Spearman rho| = 0.48561 <= 0.90`; worst discriminating 3-px overlap `0.69954 <= 0.70` vs GEMSDOE77 H85-EDTI — margin only 0.00046, flagged in the review. Prior H80 campaign audited 132 rasters (`evidence/h80_uniqueness_audit.json`).
+> - **Rejected this session (DO NOT SUBMIT):** H81-2 pure-meta transfer (holdout 0.18897 but 3-px overlap 0.8593 > 0.70 = duplicate; file withdrawn) and H81-E2 core78 (0.7626 > 0.70).
+> - **Previous primary (superseded, still valid format):** `gems80-h80-dpvc-updip-vent-submod-41600-20261021-zeros.tif` (SHA-256 `b5a6b686...`), HOLDOUT-DTI 0.16199 pooled in its campaign.
+> - **GitHub Pages Site & Executive Summary:** [`docs/index.html`](docs/index.html) | [`docs/executive-summary.html`](docs/executive-summary.html)
 >
-> **Parallel-lane boundary:** the current primary is H80-DPVC. The older H80-C strain-accommodation lane was not selected or re-run here; see [`reports/lane-h80c-review-20261022.md`](reports/lane-h80c-review-20261022.md). No weekly slot selection was made by that review.
-
 ---
 
 ## Standing Prompt (Verbatim Starting Point)
