@@ -7,9 +7,9 @@
 
 Autonomous PhD-level structural-geological research, multi-physics forward modeling, and verified submission artifact for the **[DOE Geothermal Exploration using Machine Learning and Data Science (GEMS): Finding Faults](https://www.drivendata.org/competitions/306/competition-doe-gems/page/967/)** competition on DrivenData (official reference implementation verified via GitHub API: [`drivendataorg/gems-prize-reference-solution`](https://github.com/drivendataorg/gems-prize-reference-solution), HEAD `aebe92f7c8a990f0e3443451b7a825d9afd6336b`).
 
-- **GitHub Pages Portal & One-Click Download:** `https://buffedlizard55-lab.github.io/GEMSDOE80/` (`docs/index.html`)
-- **Executive Summary & Upload Checklist:** `https://buffedlizard55-lab.github.io/GEMSDOE80/executive-summary.html` (`docs/executive-summary.html`)
-- **Direct Validated GeoTIFF Download URL:** `https://buffedlizard55-lab.github.io/GEMSDOE80/downloads/gems80-adpt-kkt-lagrangian-36500d-20261022T012049Z-5bd11c85-zeros.tif`
+- **GitHub Pages Portal & One-Click Download:** `https://buffedlizard55-lab.github.io/GEMSDOE80/` and `https://buffedlizard55-lab.github.io/GEMSDOE80/docs/index.html`
+- **Executive Summary & Upload Checklist:** `https://buffedlizard55-lab.github.io/GEMSDOE80/docs/executive-summary.html`
+- **Direct Validated GeoTIFF Download URL:** `https://buffedlizard55-lab.github.io/GEMSDOE80/docs/downloads/gems80-adpt-kkt-lagrangian-36500d-20261022T012049Z-5bd11c85-zeros.tif`
 
 ---
 
