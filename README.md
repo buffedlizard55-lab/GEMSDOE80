@@ -1,5 +1,7 @@
 # GEMSDOE80 — unique GEMS Prize GeoTIFF
 
+> **Integration status:** [PR #10](https://github.com/buffedlizard55-lab/GEMSDOE80/pull/10) is open/conflicting after parallel main rewrites. This audit concerns the original H80-C pipeline only; these Pages changes are not deployed.
+
 **Re-read this README and `docs/SESSION_PROMPT.md` at the start of every session.**
 
 > **DOWNLOAD AVAILABLE · FORMAT PASS · NOT APPROVED FOR A WEEKLY SLOT.**

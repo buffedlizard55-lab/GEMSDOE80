@@ -503,5 +503,12 @@
     "Leaderboard figures are historical claims, not current verified receipts; web hosts unavailable to shell."
   ],
   "audit_date_utc": "2026-10-22",
-  "new_unique_submission_generated_this_session": false
+  "new_unique_submission_generated_this_session": false,
+  "integration": {
+    "pull_request": "https://github.com/buffedlizard55-lab/GEMSDOE80/pull/10",
+    "state": "open; conflicting",
+    "merged": false,
+    "reason": "Concurrent main pipeline replacement at 573d7be; merge aborted to preserve newer work",
+    "scope": "Original H80-C branch only; replacement H80-DPVC not evaluated"
+  }
 }
