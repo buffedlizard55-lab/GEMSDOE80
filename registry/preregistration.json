@@ -1,0 +1,148 @@
+{
+  "schema": "gems80.preregistration.v1",
+  "preregistered_utc": "2026-10-21T21:45:00Z",
+  "repository": "buffedlizard55-lab/GEMSDOE80",
+  "branch": "arena/b2371d68-gemsdoe80",
+  "lane": "H80-DPVC: Updip Dip-Projected Basement-to-Surface Coupler, Hydrothermal Magnetite-Destruction / Clay-Cap / Geothermometer Vent Conduit & Self-Masked Fracture-Transfer OOF Ensemble with Expected-DTI Hybrid Submodular Emission",
+  "protocol_rules": {
+    "rule_1_lane_uniqueness": {
+      "max_abs_spearman_rho_surface": 0.90,
+      "max_forward_3px_dot_overlap": 0.70,
+      "check_stages": [
+        "pre_placement_surface",
+        "post_placement_final_dots"
+      ],
+      "binding_rule": "like-for-like (IR-H85-01: discriminating priors with 3px halo coverage < 0.70 for dot overlap; all priors for Spearman rank correlation; literal reading against space-filling priors also reported)"
+    },
+    "rule_2_reuse_shared_tools": {
+      "evaluator": "vendor/gems57/evaluate_holdout.py (gems57-pooled-hide-v2)",
+      "holdout_splitter": "vendor/gems57/holdout.py (buffered_component_draw, buffer_px=3, boundary_px=12, hide_frac=0.20)",
+      "submission_writer": "vendor/gems57/submission_writer.py (write_submission)",
+      "uniqueness_gate": "vendor/gems57/uniqueness.py"
+    },
+    "rule_3_score_labeling": "Every number is explicitly labeled as HOLDOUT-DTI (with evaluator version, withheld positive pixel count, and 95% spatial-block bootstrap CI) or ORGANIZER-CONFIRMED (cited from submission receipt/leaderboard). Zero projections are ever written as scores.",
+    "rule_4_leakage_canary": {
+      "max_single_feature_symmetric_auc": 0.90,
+      "tested_before_modeling": true
+    },
+    "rule_5_run_card": "Canonical JSON run card emitted to run_card.json and evidence/h80_run_card.json.",
+    "rule_6_budget": {
+      "max_experiments": 3,
+      "max_hours": 2.0,
+      "weekly_slots_used_in_sandbox": 0
+    }
+  },
+  "candidate_hypotheses_ranked": [
+    {
+      "rank": 1,
+      "id": "H80-A (H80-DPVC)",
+      "title": "Updip 60-Deg Dip-Projected Basement-to-Surface Coupler + Hydrothermal Magnetite-Destruction / Smectite Clay-Cap / Geothermometer Vent Conduit + Self-Masked Fracture-Transfer OOF Ensemble with Expected-DTI Skeleton-Submodular Hybrid Emission",
+      "layers_involved": [
+        "training_features.tif Bands 1-19 (specifically Band 2 rtp, Band 3 tmi_hg, Band 4 geod_2ndinv, Band 5 iso_grav_anom_slope, Band 6 tc, Band 7 geod_shearrate, Band 8 geod_dilaterate, Band 9 tmi_vg, Band 11 iso_grav_anom_vg, Band 12 det_elev, Band 13 iso_grav_anom, Band 14 tmi, Band 15 depth_to_base_surf, Band 16 ieq_n100a15, Band 17 cond_surf, Band 18 iso_grav_anom_hg, Band 19 det_elev_slope)",
+        "external/lidar_scarp_features_u8.tif (Bands 1-12: 1m 3DEP LiDAR step_max, lapneg_max, lappos_max, downface_max, upface_max, cross_max, relief, coh100, strike, valid)",
+        "external/topo_10m_derived_100m_u8.tif & external/dem10_chi_100m_u8.tif & external/dem10_chi_100m_i16.tif (10m 3DEP slope, curvature, relief, aspect coherence, knickpoints, ksn, mean elevation)",
+        "external/geodawn_rad_u8.tif (K, Th, U, TC) & external/geodawn_extensions_u8.tif (ThK, UK, UTh, TMI_up150)",
+        "external/gdr_wellspring_in_footprint.csv (temp_c, geothermquartz_c, geothermchalc_c, geothermcat_c; strictly excluding dist_known_fault_px), external/2m_temperature_probe_INGENIOUS_regional_data.zip (F2mDAB), external/paleo_geothermal_regional.zip, external/gdr_volcanic_vents_in_footprint.csv",
+        "external/tiger_road_distance_m.tif & external/blm_closed_claim_distance_m.tif"
+      ],
+      "physical_signature_targeted": "Updip advection of deep basement/gravity/tilt steps by Delta_u = clip(0.5 * depth_to_base * cot(60 deg), 100m, 1500m) along -grad(depth_to_base) to align mid-scarp subsurface potential-field edges with surface rupture traces; shallow hydrothermal magnetite-destruction residual (z(TMI_up150) - z(TMI)) coupled with MT smectite clay-cap lateral edges |grad(cond_surf)|, K/Th adularia-illite and U/Th redox alteration halos, and strike-anisotropic GDR-1391 geothermometer/2m-probe plumes; deconfounded 1m/10m scarp dipoles; and fold-proper self-masked fracture-transfer rays/splays/relay bridges.",
+      "why_catches_unmapped_faults": "Mapped USGS/INGENIOUS faults follow exposed bedrock range fronts (depth_to_base ~ 0). Unmapped piedmont master strands, intrabasin synthetic step-faults, and blind geothermal conduits lie over 400-2500 m of Cenozoic valley fill where gravity/magnetic gradients are displaced down-dip by 300-1400 m and where surface scarps are diffused or sealed by hydrothermal clay/sinter.",
+      "named_non_fault_mimics": [
+        "Plio-Pleistocene Lake Lahontan wave-cut paleoshoreline benches at 1212 m, 1298 m, and 1334 m elevation contours (suppressed via contour-band indicator lahontan_shoreline_idx and subsurface tilt corroboration)",
+        "US Census TIGER highway/railroad embankment cuts and BLM mining disturbances (suppressed via tiger_road_distance_m and blm_closed_claim_distance_m attenuation gates)",
+        "Steep pre-Tertiary mountain-interior erosional canyon walls and V-shaped fluvial gullies (suppressed via sqrt(relief+9) normalization, cross_max fluvial division, and terrain-stratum prevalence calibration)"
+      ],
+      "novelty_vs_prior_lanes": "First lane in GEMSDOE to integrate explicit updip 60-degree basement-depth advection of Verduzco gravity/magnetic tilt and basement steps with shallow magnetite-destruction differentials (TMI_up150 - TMI), GDR-1391 chemical geothermometers, TIGER/BLM/Lahontan deconfounding, fold-proper self-masked fracture-transfer OOF stacking, and Expected-DTI 1-px ridge-skeleton + 300m submodular hybrid emission evaluated across both Seed 20 and Seed 30 holdout draws.",
+      "expected_dti_improvement": "+0.04 to +0.09 HOLDOUT-DTI over retained benchmarks (H33 fold-fair 0.0961, GEMSDOE76 0.1580, GEMSDOE77 H85-EDTI 0.1828)",
+      "implementation_cost": "Medium (~2.5 minutes CPU runtime, < 1.1 GB RAM, 100% SHA-256-pinned data already present)",
+      "selected_for_validation": true
+    },
+    {
+      "rank": 2,
+      "id": "H80-B (H80-TSPD)",
+      "title": "Anisotropic Crustal Transtensional Strain-Rate Tensor x Spectral Poisson Pseudogravity Deficit",
+      "layers_involved": [
+        "training_features.tif Bands 2 (rtp), 4 (geod_2ndinv), 7 (geod_shearrate), 8 (geod_dilaterate), 13 (iso_grav_anom), 16 (ieq_n100a15), 18 (iso_grav_anom_hg)"
+      ],
+      "physical_signature_targeted": "Transtensional obliquity ratio (geod_shearrate * max(geod_dilaterate, 0) / geod_2ndinv) coupled with spectral Poisson pseudogravity anomaly residual.",
+      "why_catches_unmapped_faults": "Walker Lane - Basin and Range transition faults accommodate oblique transtensional strain without mature vertical range-front topographic scarps.",
+      "named_non_fault_mimics": [
+        "Mafic/felsic pluton margins with strong remanent magnetization and GPS interpolation smoothing lobes"
+      ],
+      "novelty_vs_prior_lanes": "Explicit strain-rate tensor obliquity invariants multiplied by Poisson pseudogravity residuals.",
+      "expected_dti_improvement": "+0.015 to +0.025 HOLDOUT-DTI",
+      "implementation_cost": "Low (~45s CPU), lower spatial resolution (~2-5 km geodetic footprint); key transtensional strain terms incorporated into H80-A.",
+      "selected_for_validation": false
+    },
+    {
+      "rank": 3,
+      "id": "H80-C (H80-PCQF)",
+      "title": "Multi-Azimuth Log-Gabor Phase-Congruency Quadrature Filter Bank on Potential-Field Analytic Signals",
+      "layers_involved": [
+        "training_features.tif Bands 3 (tmi_hg), 6 (tc), 9 (tmi_vg), 11 (iso_grav_anom_vg), 18 (iso_grav_anom_hg)"
+      ],
+      "physical_signature_targeted": "Dimensionless multi-scale Kovesi phase congruency across Hilbert-pair quadrature filters at 300 m, 900 m, and 2100 m wavelengths.",
+      "why_catches_unmapped_faults": "Amplitude-invariant phase alignment detects deeply buried intrabasin basement steps attenuated by 1/z^2 sedimentary cover.",
+      "named_non_fault_mimics": [
+        "Aeromagnetic flight-line leveling striping and pre-Cenozoic metamorphic foliation"
+      ],
+      "novelty_vs_prior_lanes": "Pure frequency-domain phase congruency on joint gravity/magnetic analytic signals.",
+      "expected_dti_improvement": "+0.010 to +0.020 HOLDOUT-DTI",
+      "implementation_cost": "Medium-High (2D FFT quadrature bank across 8 orientations).",
+      "selected_for_validation": false
+    },
+    {
+      "rank": 4,
+      "id": "H80-D (H80-RASH)",
+      "title": "Radiometric Potassium-Adularia / Thorium-Immobilization Alteration Halo & Epithermal Sinter Leaching Detector",
+      "layers_involved": [
+        "external/geodawn_rad_u8.tif (K, Th, U, TC)",
+        "external/geodawn_extensions_u8.tif (ThK, UK, UTh)",
+        "training_features.tif Band 17 (cond_surf)"
+      ],
+      "physical_signature_targeted": "Cross-strike dipole of high K/Th (potassic adularia boiling-zone alteration) flanked by low TC / elevated U/Th (opal-A sinter silica flooding and redox uranium fronts).",
+      "why_catches_unmapped_faults": "Hydrothermal sinter terraces and argillic alteration cement and flatten fault traces, masking topographic scarps while leaving a gamma-ray spectrometric signature.",
+      "named_non_fault_mimics": [
+        "Rhyolitic ash-flow tuff outcrops and potassium-enriched evaporitic playa brines"
+      ],
+      "novelty_vs_prior_lanes": "Dedicated gamma-ray spectrometric alteration dipole; key channels integrated into H80-A Domain B.",
+      "expected_dti_improvement": "+0.005 standalone HOLDOUT-DTI (+0.018 when fused in H80-A)",
+      "implementation_cost": "Low (~30s CPU).",
+      "selected_for_validation": false
+    },
+    {
+      "rank": 5,
+      "id": "H80-E (H80-INSAR)",
+      "title": "Sentinel-1 InSAR Persistent Scatterer / SBAS Interseismic & Hydrothermal Pore-Pressure Phase Gradient",
+      "layers_involved": [
+        "External NASA ASF / JPL ARIA Sentinel-1 geocoded unwrapped interferograms & COMET LiCSAR LOS velocity grids (https://asf.alaska.edu/, https://aria-share.jpl.nasa.gov/)"
+      ],
+      "physical_signature_targeted": "Across-strike line-of-sight velocity and seasonal thermo-poroelastic deformation gradient |grad(v_LOS)| across creeping or breathing blind geothermal faults.",
+      "why_catches_unmapped_faults": "Directly senses active sub-centimeter surface deformation across flat Holocene playas where wind/water erosion erases topographic scarps.",
+      "named_non_fault_mimics": [
+        "Agricultural groundwater pumping subsidence cones, playa soil-moisture dielectric phase delays, and topographic tropospheric phase screens"
+      ],
+      "novelty_vs_prior_lanes": "Direct satellite radar interferometric deformation gradient.",
+      "expected_dti_improvement": "+0.020 to +0.035 HOLDOUT-DTI if full-footprint ARIA/LiCSAR stack is pre-staged",
+      "implementation_cost": "Blocked in current sandbox by outbound host allowlist (asf.alaska.edu / aria-share.jpl.nasa.gov not in sandbox outbound allowlist); documented with official free data URLs for unrestricted staging.",
+      "selected_for_validation": false
+    }
+  ],
+  "preregistered_experiments": [
+    {
+      "id": "E80-1",
+      "name": "Pure Label-Free Multi-Physics + Updip 60-Deg Basement Advection + Hydrothermal Vent Conduit HGB (Zero Catalogue Geometry)",
+      "description": "Evaluates the 54-channel label-free static stack (including updip 60-deg normal-fault basement/gravity/tilt advection, shallow magnetite-destruction differential, MT clay-cap edges, GDR-1391 geothermometer plumes, and TIGER/BLM/Lahontan deconfounded 1m/10m scarp dipoles) with zero catalogue-derived geometry features on both Seed 20 and Seed 30 holdout draws."
+    },
+    {
+      "id": "E80-2",
+      "name": "H80-DPVC Multi-Physics + Fold-Proper Self-Masked Fracture-Transfer OOF Stack at Fixed H33 Budget (37,654 Dots, Submodular 300m)",
+      "description": "Adds the 9 fold-proper visible-only fracture-transfer channels (collinear tip rays, wing-crack splays, en-echelon relay bridges, strike corridors, completeness deficit, and stress tendency) trained via 3-subfold self-masking strictly inside fold['visible'], emitted at the exact H33 budget of 37,654 dots via 300 m kernel submodular max-cover."
+    },
+    {
+      "id": "E80-3",
+      "name": "H80-DPVC Hero Deliverable: Multi-Physics + Updip-Advected + Self-Masked OOF Meta-Surface with Expected-DTI Collar-Aware 1-px Ridge-Skeleton + 300m Submodular Hybrid Allocation",
+      "description": "Combines the fold-proper H80-DPVC meta-surface and label-free updip-geothermal physics surface with a collar-aware (d_cat > 2.6 px) 1-px local-maximum ridge-skeleton + 300m submodular hybrid emitter that eliminates redundant adjacent pixel FP waste and maximizes pooled HOLDOUT-DTI across both Seed 20 and Seed 30 while strictly satisfying the 133-raster uniqueness gate (|Spearman rho| <= 0.90 and discriminating 3-px overlap <= 0.70)."
+    }
+  ]
+}
