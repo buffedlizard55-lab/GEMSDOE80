@@ -1,6 +1,25 @@
 # GEMSDOE80 — Lane `H80-DPVC`: Updip 60° Dip-Projected Basement-to-Surface Coupler, Hydrothermal Magnetite-Destruction / Clay-Cap / Geothermometer Vent Conduit & Self-Masked Fracture-Transfer OOF Ensemble with Expected-DTI Hybrid Submodular Emission
 
-> ### ✅ AUTOMATED SUBMISSION GATE: `GO / PROMOTE — OK TO DOWNLOAD AND SUBMIT`
+## Current release decision — 2026-10-22 (supersedes historical promotion claims)
+
+**OK TO DOWNLOAD FOR RESEARCH. DO NOT SUBMIT. Verdict: NEGATIVE.**
+The TIFF is finite and in [0,1], but format validity is not scientific promotion.
+The recorded all-registry 3-pixel overlap is **1.0**, exceeding the required 0.70.
+Dense/space-filling rasters cannot be exempted under the user's protocol. This is
+logged as a protocol duplicate, not a claim that the raster bytes were copied.
+No new model was run: the recorded experiment budget is already exhausted.
+No weekly slot was used; promotion is a separate selector step.
+Grid matches an owner-mirror pin, not an authenticated organizer template.
+Historical HOLDOUT-DTI values below are inherited evidence, not re-run results.
+Neither 0.2778 nor any quoted leaderboard maximum is ORGANIZER-CONFIRMED here;
+no submission-page receipt exists. Conflicting 0.3195/0.4413 claims are unresolved.
+
+[Download research TIFF](docs/downloads/gems80-h80-dpvc-updip-vent-submod-41600-20261021-zeros.tif) ·
+[Machine audit](reports/release-audit-20261022.json) ·
+[Review and next steps](reports/strict-review-20261022.md)
+
+
+> ### HISTORICAL FORMAT CHECKS — NOT SUBMISSION APPROVAL
 > - **Automated Validation Verdict:** **`VALIDATED AUTOMATICALLY WITHOUT HUMAN INTERVENTION`** (`15/15` format, range `[0.0, 1.0]`, zero-NaN, CRS `EPSG:32611`, `3730 x 3292` grid, geotransform, and zero-catalogue-overlap checks **`PASS`**)
 > - **One-Click Validated GeoTIFF (`.tif`):** [`docs/downloads/gems80-h80-dpvc-updip-vent-submod-41600-20261021-zeros.tif`](docs/downloads/gems80-h80-dpvc-updip-vent-submod-41600-20261021-zeros.tif) (`143,670` bytes, SHA-256: `b5a6b686ca06af635d682f38cc898156649ae6508fa27fc651455a031f6261a5`)
 > - **One-Click Validated Archive (`.zip`):** [`docs/downloads/gems80-h80-dpvc-updip-vent-submod-41600-20261021-zeros.zip`](docs/downloads/gems80-h80-dpvc-updip-vent-submod-41600-20261021-zeros.zip) (SHA-256: `16688e5ff9022411fa7464679ac6e07850fc651697983dbc371d9cb551211795`)

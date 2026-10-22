@@ -70,8 +70,8 @@ def test_uniqueness_audit_and_run_card_protocol():
     assert uniq["post_placement_binding_like_for_like_gate"]["duplicate"] is False
 
     rc = json.loads((ROOT / "run_card.json").read_text())
-    assert rc["verdict"] == "promote"
-    assert rc["ok_to_download_and_submit"] is True
+    assert rc["verdict"] == "negative"
+    assert rc["ok_to_download_and_submit"] is False
     assert rc["automated_inspection_status"] == "VALIDATED_AUTOMATICALLY_WITHOUT_HUMAN_INTERVENTION"
     assert rc["submission_note_chars"] <= 140
     assert len(rc["submission_note"]) <= 140
@@ -90,10 +90,10 @@ def test_documentation_and_github_pages_links():
 
     for page_rel in ("docs/index.html", "docs/executive-summary.html"):
         page = (ROOT / page_rel).read_text()
-        assert "GO / PROMOTE" in page
+        assert "DO NOT SUBMIT" in page
         assert "gems80-h80-dpvc-updip-vent-submod-41600-20261021-zeros.tif" in page
         assert "gems80-h80-dpvc-updip-vent-submod-41600-20261021-zeros.zip" in page
-        assert "VALIDATED AUTOMATICALLY WITHOUT HUMAN INTERVENTION" in page
+        assert "research download only" in page
 
     for fig_idx in (
         "fig1_h33_forensic_autopsy.png",
