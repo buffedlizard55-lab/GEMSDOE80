@@ -391,3 +391,21 @@ pytest -q
   "weekly_slots_used": 0
 }
 ```
+
+---
+
+## Appendix H — Parallel Lane H81-A (tip-linkage relay-ramp, HOLDOUT 0.0607)
+
+This lane was evaluated in parallel on `arena/9b333a76-gemsdoe80` (commit 8847ec3) and is not the primary
+(H80-DPVC HOLDOUT 0.1619 remains primary). It is documented here as a second
+unique lane that also beats H33 on HOLDOUT and is available as a fallback.
+
+- **Primary of this lane:** `docs/downloads/gemsdoe80-h81a-relay-20261022T010259Z-zeros.tif` (7415 dots, SHA `701ed7fed8611861…`)
+- **Holdout:** 0.0607 (CI [0.0541,0.0636], 18,313 withheld, 5903 dots holdout, beats random 0.0123, beats H80-C 0.0507)
+- **Mechanism:** endpoint (1-neighbor) → cKDTree gap 8–35 px (0.8–3.5 km, Giddens mean 2.8 km) → midpoint dilate 2 px → `exp(-d/10)` × (dil>0 else 0.15) → 4 px catalogue collar → NMS sep3
+- **Leakage:** max AUC 0.736 (linkage_score) <0.90
+- **Uniqueness:** vs H80-DPVC Spearman 0.02 / overlap 0.22 <0.90/0.70
+- **Why it matters:** Targets the most common geothermal setting (Faulds 32% step-overs) — breaching faults between overlapping tips are off-catalogue by construction.
+
+Full card archived at `docs/archive/h81-run-card.json` and hypotheses at `docs/archive/h81-hypotheses.md`.
+Download remains in `docs/downloads/` and `docs/submissions/` for reproducibility.
