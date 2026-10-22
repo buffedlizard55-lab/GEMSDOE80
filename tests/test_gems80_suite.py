@@ -1,105 +1,175 @@
-"""Comprehensive end-to-end verification suite for GEMSDOE80 (Lane H80-DPVC)."""
+"""Comprehensive automated verification suite for GEMSDOE80 (Passes 1, 2, and 3)."""
+from __future__ import annotations
+
+import hashlib
 import json
+import re
+import sys
 from pathlib import Path
 
+import numpy as np
+import rasterio
+
 ROOT = Path(__file__).resolve().parents[1]
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
+if str(ROOT / "src") not in sys.path:
+    sys.path.insert(0, str(ROOT / "src"))
+if str(ROOT / "vendor") not in sys.path:
+    sys.path.insert(0, str(ROOT / "vendor"))
+
+from gems57 import evaluate_holdout as eh
+from gems57.grid import load_grid
+from scripts.restore_data import DATA_DIR
+from scripts.validate_submission import validate_geotiff
+
+EXPECTED_EVAL_SHA = "ad86640b46f3c5fc6b1aceec4c4bfc82d03e35008b37ab2a8ad6076e6810ff3a"
+EXPECTED_TIF_NAME = "gems80-adpt-kkt-lagrangian-36500d-20261022T012049Z-5bd11c85-zeros.tif"
 
 
-def test_leakage_canary_and_manifest_audit():
-    canary_path = ROOT / "evidence" / "h80_leakage_canary.json"
-    assert canary_path.exists()
-    canary = json.loads(canary_path.read_text())
-    assert canary["n_features_tested"] == 59
-    assert canary["n_violations"] == 0
-    assert canary["all_passed"] is True
-    assert canary["max_symmetric_auc"] <= 0.90
-    assert len(canary["features_ranked"]) == 59
-
-    # Ensure banned column dist_known_fault_px is never used in feature computation
-    feat_code = (ROOT / "src" / "gems80" / "features.py").read_text()
-    assert 'df_ws["dist_known_fault_px"]' not in feat_code
-    assert "df_ws['dist_known_fault_px']" not in feat_code
+def _sha256(path: Path) -> str:
+    h = hashlib.sha256()
+    with path.open("rb") as f:
+        for chunk in iter(lambda: f.read(1 << 20), b""):
+            h.update(chunk)
+    return h.hexdigest()
 
 
-def test_h33_forensic_autopsy_and_collinearity():
-    autopsy_path = ROOT / "evidence" / "h33_forensic_autopsy.json"
-    assert autopsy_path.exists()
-    aut = json.loads(autopsy_path.read_text())
-    assert aut["h33_positive_dots"] == 37654
-    assert aut["d28_positive_dots"] == 44090
-    assert aut["dots_removed_by_2px_collar"] == 6436
-    assert aut["exact_bitwise_subset_verified"] is True
-    assert aut["xor_pixels_between_h33_and_d28_gt_2px"] == 0
-    assert aut["reciprocal_dti_vs_dot_count_pearson_r"] > 0.999
+# ==============================================================================
+# PASS 1: Shared Evaluator Integrity & Complete 12-Check GeoTIFF Validation
+# ==============================================================================
+def test_pass1_shared_evaluator_unmodified() -> None:
+    hashes = eh.implementation_hashes()
+    assert eh.VERSION == "gems57-pooled-hide-v2"
+    assert hashes["evaluate_holdout.py"] == EXPECTED_EVAL_SHA
 
 
-def test_dual_seed_holdout_evaluation():
-    ev_path = ROOT / "evidence" / "h80_holdout_evaluation.json"
-    assert ev_path.exists()
-    ev = json.loads(ev_path.read_text())
-    assert ev["evaluator_version"] == "gems57-pooled-hide-v2"
-    assert ev["alpha"] == 0.2
-    assert ev["beta"] == 0.8
-    assert ev["triangular_kernel_radius_m"] == 300.0
+def test_pass1_geotiff_strict_range_no_nan_and_grid_match() -> None:
+    sub_tif = ROOT / "submissions" / EXPECTED_TIF_NAME
+    dl_tif = ROOT / "docs" / "downloads" / EXPECTED_TIF_NAME
+    assert sub_tif.is_file(), f"Missing submission GeoTIFF: {sub_tif}"
+    assert dl_tif.is_file(), f"Missing downloadable GitHub Pages GeoTIFF: {dl_tif}"
+    assert _sha256(sub_tif) == _sha256(dl_tif), "Submissions and docs/downloads GeoTIFFs must be byte-identical"
 
-    pooled = ev["dual_seed_pooled"]
-    scores = pooled["scores"]
-    e3 = scores["E80_3_hero_hybrid_updip_vent_44800"]["dti"]
-    e2 = scores["E80_2_selfmask_updip_submod_37654"]["dti"]
-    e1 = scores["E80_1_pure_updip_vent_physics_37654"]["dti"]
-    h33 = scores["GEMSDOE32_H33_fold_fair"]["dti"]
-
-    assert scores["E80_3_hero_hybrid_updip_vent_44800"]["withheld_positive_pixels"] == 22663
-    assert e3 > 0.160
-    assert e2 > 0.185
-    assert e1 > h33
-    assert e3 > h33 + 0.060
-
-    delta_vs_h33 = pooled["paired_differences"]["GEMSDOE32_H33_fold_fair"]
-    assert delta_vs_h33["delta"] > 0.060
-    assert delta_vs_h33["ci95"][0] > 0.050
+    report = validate_geotiff(dl_tif)
+    assert report["passed"] is True, f"Validator failed: {report}"
+    assert all(report["checks"].values()), f"Failed checks: {report['checks']}"
+    assert report["band_count"] == 1
+    assert report["dtype"] == "float32"
+    assert report["shape"] == [3730, 3292]
+    assert report["crs"] == "EPSG:32611"
+    assert report["min_value"] == 0.0
+    assert report["max_value"] == 1.0
+    assert report["nan_count_inside_footprint"] == 0
+    assert report["nan_count_total"] == 0
+    assert report["positive_pixels"] == 36500
+    assert report["catalogue_overlap_pixels"] == 0
 
 
-def test_uniqueness_audit_and_run_card_protocol():
-    uniq = json.loads((ROOT / "evidence" / "h80_uniqueness_audit.json").read_text())
-    assert uniq["rasters_compared"] >= 132
-    assert uniq["discriminating_priors_count"] >= 126
-    assert uniq["pre_placement_surface_gate"]["max_abs_spearman_rho"] <= 0.90
-    assert uniq["post_placement_binding_like_for_like_gate"]["worst_abs_spearman"] <= 0.90
-    assert uniq["post_placement_binding_like_for_like_gate"]["worst_forward_overlap"] <= 0.70
-    assert uniq["post_placement_binding_like_for_like_gate"]["duplicate"] is False
-
-    rc = json.loads((ROOT / "run_card.json").read_text())
-    assert rc["verdict"] == "negative"
-    assert rc["ok_to_download_and_submit"] is False
-    assert rc["automated_inspection_status"] == "VALIDATED_AUTOMATICALLY_WITHOUT_HUMAN_INTERVENTION"
-    assert rc["submission_note_chars"] <= 140
-    assert len(rc["submission_note"]) <= 140
-    assert rc["validator_output"]["all_checks_passed"] is True
-    assert rc["spatial_profile"]["neotectonic_steep_calibration_pass"] is True
+# ==============================================================================
+# PASS 2: Leakage Canary, Capped 3-Experiment Budget & 92-Repo Uniqueness Audit
+# ==============================================================================
+def test_pass2_leakage_canary_all_176_channels() -> None:
+    canary = json.loads((ROOT / "evidence" / "leakage_canary.json").read_text())
+    assert canary["passed"] is True
+    assert canary["n_features_checked"] == 176
+    assert canary["sgmc_channels_included"] == 0
+    assert canary["prior_rasters_in_features"] == 0
+    assert canary["max_effective_auc"] <= 0.90
+    assert len(canary["flagged_features"]) == 0
+    assert len(canary["all_features"]) == 176
+    for feat in canary["all_features"]:
+        assert 0.50 <= feat["symmetric_auc"] <= 0.90, f"Canary ceiling exceeded on {feat}"
 
 
-def test_documentation_and_github_pages_links():
+def test_pass2_experiments_cap_and_statistical_victory() -> None:
+    exp = json.loads((ROOT / "evidence" / "experiments_summary.json").read_text())
+    assert exp["experiments_executed"] == 3
+    assert exp["experiment_budget_cap"] == 3
+    assert exp["winner_arm"] == "H80-E3-LagrangianUnique"
+
+    s20 = exp["arms_seed20"]["H80-E3-LagrangianUnique"]["pooled_holdout_dti"]
+    s30 = exp["arms_seed30"]["H80-E3-LagrangianUnique"]["pooled_holdout_dti"]
+    b1_20 = exp["arms_seed20"]["B1-H33-FoldFair"]["pooled_holdout_dti"]
+    b1_30 = exp["arms_seed30"]["B1-H33-FoldFair"]["pooled_holdout_dti"]
+
+    assert s20 > 0.178 and s20 > b1_20 + 0.080
+    assert s30 > 0.200 and s30 > b1_30 + 0.100
+    assert exp["paired_deltas_seed20"]["B1-H33-FoldFair"]["ci95"][0] > 0.070
+    assert exp["paired_deltas_seed30"]["B1-H33-FoldFair"]["ci95"][0] > 0.080
+
+
+def test_pass2_live_recheck_against_all_1081_registry_rasters() -> None:
+    from gems80.fast_uniqueness import RegistryUniquenessScanner
+
+    exp = json.loads((ROOT / "evidence" / "experiments_summary.json").read_text())
+    e3 = exp["arms_seed20"]["H80-E3-LagrangianUnique"]
+    for kind_key in ("surface_uniqueness", "dots_uniqueness"):
+        u = e3[kind_key]
+        assert u["repos_scanned"] == 92
+        assert u["n_registry_rasters_scanned"] == 1081
+        assert u["n_discriminating_priors"] == 1001
+        assert u["binding_duplicate"] is False
+        assert u["discriminating_overlap_firings_count"] == 0
+        assert u["max_discriminating_overlap_3px"] <= 0.70
+        assert u["max_discriminating_spearman"] <= 0.90
+
+    # Re-scan the actual physical GeoTIFF bytes live against the 1,081-raster index
+    grid = load_grid(DATA_DIR)
+    scanner = RegistryUniquenessScanner(grid.footprint & (~grid.catalogue))
+    dl_tif = ROOT / "docs" / "downloads" / EXPECTED_TIF_NAME
+    with rasterio.open(dl_tif) as src:
+        live_arr = src.read(1)
+    live_check = scanner.check(live_arr, "dots")
+    assert live_check["binding_duplicate"] is False
+    assert live_check["discriminating_overlap_firings_count"] == 0
+    assert live_check["max_discriminating_overlap_3px"] <= 0.70
+    assert live_check["max_discriminating_spearman"] <= 0.90
+
+
+# ==============================================================================
+# PASS 3: Website Links, Run Card Sync, SHA-256 & <= 140-Char UI Note Audit
+# ==============================================================================
+def test_pass3_docs_site_links_assets_and_metadata_sync() -> None:
+    rc = json.loads((ROOT / "evidence" / "run_card.json").read_text())
+    dl_tif = ROOT / "docs" / "downloads" / EXPECTED_TIF_NAME
+    actual_sha = _sha256(dl_tif)
+
+    assert rc["verdict"] == "promote"
+    assert rc["submission"]["sha256"] == actual_sha
+    assert 1 <= len(rc["submission"]["submission_note"]) <= 140
+
+    html_pages = [
+        "index.html",
+        "executive-summary.html",
+        "gemsdoe32-diagnosis.html",
+        "hypotheses-and-methods.html",
+        "experiments-and-uniqueness.html",
+    ]
+    for page_name in html_pages:
+        page_path = ROOT / "docs" / page_name
+        assert page_path.is_file(), f"Missing page {page_path}"
+        html = page_path.read_text()
+
+        # Verify every relative href and src resolves to an actual file in `docs/`
+        refs = re.findall(r'(?:href|src)="([^"#?]+)"', html)
+        assert len(refs) > 0
+        for ref in refs:
+            if ref.startswith(("http://", "https://", "mailto:")):
+                continue
+            target = (ROOT / "docs" / ref).resolve()
+            assert target.is_file(), f"Broken local reference '{ref}' inside {page_name} -> {target}"
+
+    # Verify SHA-256 and direct download link appear at the top of both index.html and executive-summary.html
+    for hero_page in ("index.html", "executive-summary.html"):
+        text = (ROOT / "docs" / hero_page).read_text()
+        assert actual_sha in text
+        assert f"downloads/{EXPECTED_TIF_NAME}" in text
+
     readme = (ROOT / "README.md").read_text()
-    assert "PARALLEL-RUN PROTOCOL" in readme
-    assert "HOLDOUT-DTI" in readme
-    assert "ORGANIZER-CONFIRMED" in readme
-    assert "0.2778" in readme
-    assert "0.4413" in readme
-    assert "Error: Predicted values must be in range [0, 1]" in readme
-
-    for page_rel in ("docs/index.html", "docs/executive-summary.html"):
-        page = (ROOT / page_rel).read_text()
-        assert "DO NOT SUBMIT" in page
-        assert "gems80-h80-dpvc-updip-vent-submod-41600-20261021-zeros.tif" in page
-        assert "gems80-h80-dpvc-updip-vent-submod-41600-20261021-zeros.zip" in page
-        assert "research download only" in page
-
-    for fig_idx in (
-        "fig1_h33_forensic_autopsy.png",
-        "fig2_h80_holdout_benchmark_ladder.png",
-        "fig3_h80_spatial_discovery_maps.png",
-        "fig4_h80_uniqueness_and_canary.png",
-    ):
-        p = ROOT / "docs" / "assets" / fig_idx
-        assert p.exists() and p.stat().st_size > 20000
+    assert actual_sha in readme
+    assert EXPECTED_TIF_NAME in readme
+    assert "HOLDOUT-DTI" in readme and "ORGANIZER-CONFIRMED" in readme
+    assert "https://www.drivendata.org/competitions/306/competition-doe-gems/" in readme
+    assert "https://github.com/drivendataorg/gems-prize-reference-solution" in readme
+    assert "https://gdr.openei.org/submissions/1391" in readme

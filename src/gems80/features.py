@@ -1,1056 +1,785 @@
-"""Multi-physics, updip 60-degree normal-fault basement-to-surface advection,
-hydrothermal magnetite-destruction / clay-cap / geothermometer vent conduits,
-TIGER/BLM/Lahontan-deconfounded 1m/10m tectonic geomorphology, and fold-proper
-fracture-transfer features for Lane H80-DPVC (`GEMSDOE80`).
+"""Zero-leakage multi-physics feature engineering for GEMSDOE80 (Lane H80: ADPT-80).
 
-Memory-engineered for `< 1.1 GB` peak container RSS on a 3.85 GB sandbox:
-- Each physical domain computes its channels inside an isolated helper scope and
-  releases all `(3730, 3292)` intermediates via `gc.collect()`;
-- Static features are persisted on disk as clipped `float16` (`5,167,373 x 50`),
-  lossless for 255-bin gradient boosted trees.
+Core scientific innovations in this module:
+1. **360° Directed Normal-Fault Half-Space Tomography & Step Monotonicity (`Group B`)**:
+   Evaluates antisymmetric half-space steps across 8 directed azimuths covering [0, 2*pi)
+   at short scarp (200 m, 400 m) and range-front piedmont (800 m, 1600 m) baselines,
+   paired with the **Step Monotonicity Ratio** `M(x, phi; h) in [0, 1]` (equal to 1 on a
+   monotone normal-fault scarp and ~0 on incised stream valleys and symmetric ridges)
+   and **Cross-Physics Hanging-Wall / Footwall Polarity Concordance** (co-polarized
+   elevation drop + hanging-wall basement cover thickening + isostatic gravity low +
+   magnetic tilt zero-crossing + smectite/brine conductivity increase).
+2. **Fluvial Interfluve vs Knickpoint Separation & Pleistocene Lake Lahontan Guard**:
+   Uses upstream drainage area `log10(A)` and normalized channel steepness `k_sn` to
+   separate un-incised alluvial-fan interfluve scarps and fault-crossing wash knickpoints
+   from ordinary fluvial banks, plus orthometric elevation distance from Pleistocene
+   Lake Lahontan (~1332 m) and Lake Bonneville (~1552 m) highstand benches.
+3. **Label-Free 10 m -> 1 m LiDAR Cross-Sensor Super-Resolution Bridge**:
+   Trains a purely physical regressor inside the 75.3% interior-eroded 1 m LiDAR domain
+   (never touching `existing_faults.tif` or any labels) to impute 1 m scarp dipole
+   equivalent across the 24.7% non-LiDAR gap without tile-edge seam artifacts.
+4. **Strictly Fold-Visible Elastic Fracture-Mechanics Continuation Features**:
+   Computed fresh for any visible fault network `vis` (never seeing hidden truth).
 """
 from __future__ import annotations
 
+import csv
 import gc
 import io
-import json
 import struct
 import zipfile
-from dataclasses import dataclass
 from pathlib import Path
-from typing import Dict, List, Tuple
 
 import numpy as np
 import pandas as pd
 import rasterio
-from rasterio.warp import transform as warp_transform
+from pyproj import Transformer
 from scipy import ndimage as ndi
-from scipy.spatial import cKDTree
-from skimage.morphology import skeletonize
-from sklearn.metrics import roc_auc_score
+from sklearn.ensemble import HistGradientBoostingRegressor
 
-GRID_SHAPE = (3730, 3292)
-ORIGIN_X = 243350.0
-ORIGIN_Y = 4508550.0
-PIXEL_M = 100.0
-COT_60_DEG = float(1.0 / np.sqrt(3.0))  # 0.57735027
-
-LIDAR_SCALES: Dict[int, Tuple[float, float]] = {
-    1: (0.0, 2.5),
-    2: (0.0, 0.8),
-    3: (0.0, 6.0),
-    4: (0.0, 2.5),
-    5: (0.0, 2.5),
-    6: (0.0, 1.5),
-    7: (0.0, 1.5),
-    8: (0.0, 2.5),
-    9: (0.0, 60.0),     # True 1m local relief (m)
-    10: (0.0, 1.0),     # 100 m scarp strike coherence
-    11: (0.0, np.pi),   # Local scarp strike (radians)
-}
-
-SCARP_STATIC_NAMES: List[str] = [
-    "lid_deconf_piedmont_step",   # 0
-    "lid_deconf_scarp_dipole",    # 1
-    "lid_tect_vs_fluvial",        # 2
-    "lid_antislope_scarp",        # 3
-    "lid_step_anom11",            # 4
-    "lid_coh100",                 # 5
-    "lid_worm_1100m",             # 6
-    "t10_deconf_piedmont_break",  # 7
-    "t10_aspect_planar",          # 8
-    "t10_slope_local_anom",       # 9
-    "t10_worm_1500m",             # 10
-    "t10_relief_norm",            # 11
-    "chi_knick_raised",           # 12
-    "chi_ksn_anom",               # 13
-    "chi_interfluve_scarp",       # 14
-    "lahontan_shoreline_idx",     # 15
-    "det_elev_hp9",               # 16
-    "det_slope_worm_1500m",       # 17
-]
-
-GEOTHERM_STATIC_NAMES: List[str] = [
-    "mt_clay_cap_feeder",         # 18
-    "mt_cond_grad_hp",            # 19
-    "mt_cond_worm_1500m",         # 20
-    "mt_cond_raw",                # 21
-    "hydro_demag_trough",         # 22
-    "hydro_shallow_demag_u150",   # 23
-    "rad_tc_grad_f32",            # 24
-    "rad_sinter_leach_edge",      # 25
-    "rad_worm_tc_1500m",          # 26
-    "rad_k_th_adularia",          # 27
-    "rad_u_th_redox_grad",        # 28
-    "gdr_vent_aniso_near",        # 29
-    "gdr_vent_aniso_far",         # 30
-    "gdr_vent_x_subsurf_edge",    # 31
-    "volc_vent_conduit",          # 32
-    "geotherm_multiline_idx",     # 33
-]
-
-SUBSURF_UPDIP_STATIC_NAMES: List[str] = [
-    "verduzco_grav_tilt_edge",    # 34
-    "verduzco_grav_worm_2000m",   # 35
-    "verduzco_mag_tilt_edge",     # 36
-    "verduzco_mag_worm_2000m",    # 37
-    "updip60_grav_step",          # 38  <-- H80-A Novel Updip 60-deg Advected Gravity Step
-    "updip60_grav_tilt",          # 39  <-- H80-A Novel Updip 60-deg Advected Tilt Zero-Crossing
-    "updip60_dbase_grad",         # 40  <-- H80-A Novel Updip 60-deg Advected Basement Fault Step
-    "updip60_dipole_asymmetry",   # 41  <-- H80-A Novel Updip vs Downdip Basement Asymmetry
-    "updip60_x_piedmont_scarp",   # 42  <-- H80-A Novel Updip Step x Deconfounded Piedmont Scarp
-    "crossgrad_parallel_gm",      # 43
-    "crossgrad_ortho_gm",         # 44
-    "dbase_grad_norm",            # 45
-    "dbase_curv_horst",           # 46
-    "grav_hp8",                   # 47
-    "strain_transtension",        # 48
-    "seismic_micro_line",         # 49
-]
-
-STATIC_FEATURE_NAMES: List[str] = (
-    SCARP_STATIC_NAMES + GEOTHERM_STATIC_NAMES + SUBSURF_UPDIP_STATIC_NAMES
+STATIC_FEATURE_NAMES: tuple[str, ...] = (
+    # Group A: Seamless 1m LiDAR + 10m DEM + Fluvial Chi / k_sn Geomorphology (14)
+    "lid_ex_max_clean",
+    "lid_step_max_clean",
+    "lid_scarp_dipole_clean",
+    "lid_down_up_max_clean",
+    "lid_cross_contour_clean",
+    "lid_coh100_clean",
+    "superres_scarp_seamless",
+    "topo10_slope_p90",
+    "topo10_slope_std",
+    "topo10_curv_prof",
+    "topo10_aspect_coh",
+    "topo10_hs_lineament",
+    "chi_step_max",
+    "chi_ksn_knickpoint",
+    # Group B: 360-deg Signed Dip-Polarity Tomography, Step Monotonicity & Lake Guard (12)
+    "bipolar_step_200m",
+    "bipolar_mono_200m",
+    "bipolar_step_400m",
+    "bipolar_mono_400m",
+    "bipolar_step_800m",
+    "bipolar_mono_800m",
+    "hw_basement_thickening",
+    "hw_gravity_drop",
+    "hw_mag_tilt_drop",
+    "hw_cond_increase",
+    "bipolar_normal_fault_index",
+    "along_strike_step_1km",
+    # Group C: Fluvial / Pluvial Geomorphic Guards & Official Elevation/Potential Bands (12)
+    "fluvial_log10_area",
+    "interfluve_scarp_index",
+    "lahontan_highstand_guard",
+    "det_elev_hp3",
+    "det_elev_hp10",
+    "det_elev_slope",
+    "rtp_hp8",
+    "tmi_hg_abs",
+    "tc_zero_prox",
+    "iso_grav_hp8",
+    "iso_grav_hg_abs",
+    "crossgrad_gm_parallel",
+    # Group D: Deep Crustal Mechanics, Alteration & GDR #1391 Hydrothermal Conduits (8)
+    "depth_to_base",
+    "depth_base_grad",
+    "cond_surf_val",
+    "cond_surf_grad",
+    "crustal_strain_comb",
+    "seismic_density_grad",
+    "hydro_alteration_maglow",
+    "gdr_thermal_conduit_plume",
+    # Group E: Multi-Scale 2D Piedmont Range-Front Structural Context (6)
+    "ctx_slope_600m",
+    "ctx_slope_2km",
+    "ctx_piedmont_transition_2km",
+    "ctx_depth_2km",
+    "ctx_relief_std_2km",
+    "ctx_scarp_chain_1km",
 )
-assert len(STATIC_FEATURE_NAMES) == 50
 
-FOLD_MECH_NAMES: List[str] = [
-    "vis_ray_collinear_short",    # 50
-    "vis_ray_collinear_long",     # 51
-    "vis_wingcrack_splay",        # 52
-    "vis_relay_bridge",           # 53
-    "vis_strike_corridor",        # 54
-    "vis_dist_capped",            # 55
-    "vis_host_len_transfer",      # 56
-    "vis_completeness_deficit",   # 57
-    "vis_updip_relay_coupler",    # 58  <-- H80-A Fold-Proper Relay x Updip Basement Coupler
-]
-
-ALL_BASE_FEATURE_NAMES: List[str] = STATIC_FEATURE_NAMES + FOLD_MECH_NAMES
-assert len(ALL_BASE_FEATURE_NAMES) == 59
-
-
-def _clean_band(arr: np.ndarray, fp: np.ndarray) -> np.ndarray:
-    ok = fp & np.isfinite(arr) & (arr > -1e20) & (arr < 1e20)
-    med = float(np.median(arr[ok]))
-    return np.where(ok, arr, med).astype(np.float32)
-
-
-def _robust_pos_z(arr: np.ndarray, fp: np.ndarray) -> np.ndarray:
-    v = arr[fp & np.isfinite(arr)]
-    p50 = float(np.percentile(v, 50.0))
-    iqr = float(np.percentile(v, 84.0) - p50) + 1e-6
-    z = np.clip((np.nan_to_num(arr, nan=p50) - p50) / iqr, 0.0, 6.0)
-    return z.astype(np.float32)
-
-
-def _grad_mag_f32(arr: np.ndarray) -> np.ndarray:
-    gy = np.empty_like(arr, dtype=np.float32)
-    gx = np.empty_like(arr, dtype=np.float32)
-    gy[1:-1, :] = 0.5 * (arr[2:, :] - arr[:-2, :])
-    gy[0, :] = arr[1, :] - arr[0, :]
-    gy[-1, :] = arr[-1, :] - arr[-2, :]
-    gx[:, 1:-1] = 0.5 * (arr[:, 2:] - arr[:, :-2])
-    gx[:, 0] = arr[:, 1] - arr[:, 0]
-    gx[:, -1] = arr[:, -1] - arr[:, -2]
-    return np.hypot(gy, gx).astype(np.float32)
-
-
-def _grad_yx_f32(arr: np.ndarray) -> Tuple[np.ndarray, np.ndarray]:
-    gy = np.empty_like(arr, dtype=np.float32)
-    gx = np.empty_like(arr, dtype=np.float32)
-    gy[1:-1, :] = 0.5 * (arr[2:, :] - arr[:-2, :])
-    gy[0, :] = arr[1, :] - arr[0, :]
-    gy[-1, :] = arr[-1, :] - arr[-2, :]
-    gx[:, 1:-1] = 0.5 * (arr[:, 2:] - arr[:, :-2])
-    gx[:, 0] = arr[:, 1] - arr[:, 0]
-    gx[:, -1] = arr[:, -1] - arr[:, -2]
-    return gy, gx
-
-
-def _strike_worm(
-    arr: np.ndarray,
-    length_px: int = 15,
-    flank_px: int = 3,
-    n_angles: int = 6,
-) -> Tuple[np.ndarray, np.ndarray]:
-    best = np.full(arr.shape, -1e9, dtype=np.float32)
-    best_theta = np.zeros(arr.shape, dtype=np.float32)
-    base = np.nan_to_num(arr, nan=0.0).astype(np.float32)
-    for k in range(n_angles):
-        deg = k * (180.0 / n_angles)
-        rot = ndi.rotate(base, deg, reshape=False, order=1, mode="nearest")
-        line = ndi.uniform_filter1d(rot, size=length_px, axis=0, mode="nearest")
-        flank = 0.5 * (np.roll(line, flank_px, axis=1) + np.roll(line, -flank_px, axis=1))
-        w = ndi.rotate((line - flank).astype(np.float32), -deg, reshape=False, order=1, mode="nearest")
-        upd = w > best
-        best = np.where(upd, w, best)
-        best_theta = np.where(upd, np.deg2rad(deg), best_theta)
-    return best, best_theta
-
-
-def updip_advect_field(
-    field: np.ndarray,
-    uy_downdip: np.ndarray,
-    ux_downdip: np.ndarray,
-    shift_px: np.ndarray,
-) -> np.ndarray:
-    """Advect a deep subsurface gradient/tilt field updip to the predicted surface
-    rupture trace by sampling `field` at `(y + shift_px * uy_downdip, x + shift_px * ux_downdip)`
-    (nearest/bilinear grid lookup, zero float64 overhead)."""
-    H, W = field.shape
-    yy, xx = np.indices((H, W), dtype=np.float32)
-    sy = np.clip(np.rint(yy + shift_px * uy_downdip).astype(np.int32), 0, H - 1)
-    sx = np.clip(np.rint(xx + shift_px * ux_downdip).astype(np.int32), 0, W - 1)
-    return field[sy, sx].astype(np.float32)
-
-
-def fill_axial_context_valid(
-    out_mat: np.ndarray,
-    col_offset: int,
-    prob_map: np.ndarray,
-    fp: np.ndarray,
-    valid_idx: np.ndarray,
-) -> None:
-    """Write 6 exact 8-azimuth 2D multi-scale axial-ridge channels directly into
-    `out_mat[:, col_offset : col_offset + 6]` (`float16`)."""
-    p = np.where(fp & np.isfinite(prob_map), prob_map, 0.0).astype(np.float32)
-    dirs = (
-        (1, 0, 0, 3, 0, 2),
-        (2, 1, -1, 2, -1, 2),
-        (1, 1, -2, 2, -1, 1),
-        (1, 2, -2, 1, -2, 1),
-        (0, 1, -3, 0, -2, 0),
-        (1, -2, 2, 1, 2, 1),
-        (1, -1, 2, 2, 1, 1),
-        (2, -1, 1, 2, 1, 2),
-    )
-    pad = 22
-    pp = np.pad(p, pad, mode="edge")
-    H, W = p.shape
-
-    best_r9 = np.full((H, W), -1e9, dtype=np.float32)
-    best_r21 = np.full((H, W), -1e9, dtype=np.float32)
-    best_m21 = np.full((H, W), -1e9, dtype=np.float32)
-    best_nms = np.full((H, W), -1e9, dtype=np.float32)
-    acc = np.zeros((H + 2 * pad, W + 2 * pad), dtype=np.float32)
-    c0, c1 = pad, pad + H
-    d0, d1 = pad, pad + W
-
-    for dy, dx, ny3, nx3, ny2, nx2 in dirs:
-        step_len = float(np.hypot(dy, dx))
-        k9 = max(1, int(round(4.0 / step_len)))
-        k21 = max(2, int(round(10.0 / step_len)))
-
-        line9 = pp[c0:c1, d0:d1].copy()
-        for s in range(1, k9 + 1):
-            line9 += pp[c0 + s * dy : c1 + s * dy, d0 + s * dx : d1 + s * dx]
-            line9 += pp[c0 - s * dy : c1 - s * dy, d0 - s * dx : d1 - s * dx]
-        line9 *= 1.0 / float(2 * k9 + 1)
-
-        line21 = line9 * float(2 * k9 + 1)
-        for s in range(k9 + 1, k21 + 1):
-            line21 += pp[c0 + s * dy : c1 + s * dy, d0 + s * dx : d1 + s * dx]
-            line21 += pp[c0 - s * dy : c1 - s * dy, d0 - s * dx : d1 - s * dx]
-        line21 *= 1.0 / float(2 * k21 + 1)
-
-        acc[c0:c1, d0:d1] = line9
-        flank3 = 0.5 * (
-            acc[c0 + ny3 : c1 + ny3, d0 + nx3 : d1 + nx3]
-            + acc[c0 - ny3 : c1 - ny3, d0 - nx3 : d1 - nx3]
-        )
-        flank2 = 0.5 * (
-            acc[c0 + ny2 : c1 + ny2, d0 + nx2 : d1 + nx2]
-            + acc[c0 - ny2 : c1 - ny2, d0 - nx2 : d1 - nx2]
-        )
-        np.maximum(best_r9, line9 - flank3, out=best_r9)
-        np.maximum(best_nms, line9 - flank2, out=best_nms)
-        del line9, flank3, flank2
-
-        acc[c0:c1, d0:d1] = line21
-        ny4, nx4 = int(round(ny3 * 1.34)), int(round(nx3 * 1.34))
-        flank4 = 0.5 * (
-            acc[c0 + ny4 : c1 + ny4, d0 + nx4 : d1 + nx4]
-            + acc[c0 - ny4 : c1 - ny4, d0 - nx4 : d1 - nx4]
-        )
-        np.maximum(best_r21, line21 - flank4, out=best_r21)
-        np.maximum(best_m21, line21, out=best_m21)
-        del line21, flank4
-
-    del pp, acc
-    out_mat[:, col_offset + 0] = best_r9.ravel()[valid_idx].astype(np.float16)
-    out_mat[:, col_offset + 1] = best_r21.ravel()[valid_idx].astype(np.float16)
-    out_mat[:, col_offset + 2] = best_m21.ravel()[valid_idx].astype(np.float16)
-    out_mat[:, col_offset + 3] = best_nms.ravel()[valid_idx].astype(np.float16)
-    del best_r9, best_r21, best_m21, best_nms
-    gc.collect()
-
-    g15 = ndi.gaussian_filter(p, sigma=1.5)
-    g8 = ndi.gaussian_filter(p, sigma=8.0)
-    out_mat[:, col_offset + 4] = (g15 - g8).ravel()[valid_idx].astype(np.float16)
-    del g15, g8
-    out_mat[:, col_offset + 5] = ndi.gaussian_filter(p, sigma=25.0).ravel()[valid_idx].astype(np.float16)
-    gc.collect()
-
-
-def _anisotropic_strike_plume(
-    impulse: np.ndarray,
-    sigma_along: float,
-    sigma_across: float,
-    strike_deg_cw_from_north: float,
-) -> np.ndarray:
-    rot = ndi.rotate(impulse, -strike_deg_cw_from_north, reshape=False, order=1, mode="constant")
-    filt = ndi.gaussian_filter(rot, sigma=(sigma_along, sigma_across))
-    return ndi.rotate(filt, strike_deg_cw_from_north, reshape=False, order=1, mode="constant").astype(
-        np.float32
-    )
-
-
-def _rasterize_geothermal_evidence(ext_dir: Path, fp: np.ndarray) -> Tuple[np.ndarray, np.ndarray]:
-    """Rasterize GDR-1391 well/spring temperatures, quartz/chalcedony/Na-K-Ca geothermometers,
-    2-meter shallow temperature probe anomalies (`F2mDAB`), paleo-geothermal sinter/travertine
-    deposits, and Quaternary volcanic vents — strictly excluding `dist_known_fault_px`."""
-    H, W = fp.shape
-    vent_imp = np.zeros((H, W), dtype=np.float32)
-    volc_imp = np.zeros((H, W), dtype=np.float32)
-
-    ws = pd.read_csv(ext_dir / "gdr_wellspring_in_footprint.csv")
-    temp = pd.to_numeric(ws["temp_c"], errors="coerce").fillna(0.0).to_numpy()
-    qtz = pd.to_numeric(ws["geothermquartz_c"], errors="coerce").fillna(0.0).to_numpy()
-    chal = pd.to_numeric(ws["geothermchalc_c"], errors="coerce").fillna(0.0).to_numpy()
-    cat = pd.to_numeric(ws["geothermcat_c"], errors="coerce").fillna(0.0).to_numpy()
-    w_therm = (
-        np.clip((temp - 24.0) / 45.0, 0.0, 3.0)
-        + 0.45 * np.clip((np.maximum(qtz, chal) - 70.0) / 80.0, 0.0, 2.0)
-        + 0.35 * np.clip((cat - 85.0) / 90.0, 0.0, 1.8)
-    )
-    sel = w_therm > 0.05
-    rr = np.clip(ws["row"].to_numpy()[sel].astype(int), 0, H - 1)
-    cc = np.clip(ws["col"].to_numpy()[sel].astype(int), 0, W - 1)
-    np.add.at(vent_imp, (rr, cc), w_therm[sel].astype(np.float32))
-
-    z2m = ext_dir / "2m_temperature_probe_INGENIOUS_regional_data.zip"
-    if z2m.exists():
-        with zipfile.ZipFile(z2m) as zf:
-            dbf = zf.read(
-                "2m_temperature_probe_INGENIOUS_regional_data/"
-                "2m_temperature_probe_n83geo/2m_temperature_probe_n83geo.dbf"
-            )
-        nrec, hdrlen, reclen = struct.unpack("<IHH", dbf[4:12])
-        fields = []
-        off = 32
-        while dbf[off] != 0x0D:
-            fn = dbf[off : off + 11].split(b"\x00")[0].decode("latin1")
-            fl = dbf[off + 16]
-            fields.append((fn, fl))
-            off += 32
-        lons, lats, anoms = [], [], []
-        pos = hdrlen
-        for _ in range(nrec):
-            if dbf[pos] == 0x2A:
-                pos += reclen
-                continue
-            p = pos + 1
-            row_d = {}
-            for fn, fl in fields:
-                if fn in ("LatDegreeN", "LongDegree", "F2mDAB"):
-                    row_d[fn] = dbf[p : p + fl].decode("latin1").strip()
-                p += fl
-            pos += reclen
-            try:
-                lat = float(row_d["LatDegreeN"])
-                lon = float(row_d["LongDegree"])
-                anom = float(row_d["F2mDAB"])
-            except (KeyError, ValueError):
-                continue
-            if np.isfinite(lat) and np.isfinite(lon) and np.isfinite(anom) and anom >= 1.5:
-                lons.append(lon)
-                lats.append(lat)
-                anoms.append(min(anom / 3.0, 4.0))
-        if lons:
-            xs, ys = warp_transform("EPSG:4269", "EPSG:32611", lons, lats)
-            r2 = ((ORIGIN_Y - np.asarray(ys)) // PIXEL_M).astype(int)
-            c2 = ((np.asarray(xs) - ORIGIN_X) // PIXEL_M).astype(int)
-            inb = (r2 >= 0) & (r2 < H) & (c2 >= 0) & (c2 < W)
-            np.add.at(vent_imp, (r2[inb], c2[inb]), np.asarray(anoms, dtype=np.float32)[inb])
-
-    zpal = ext_dir / "paleo_geothermal_regional.zip"
-    if zpal.exists():
-        with zipfile.ZipFile(zpal) as zf:
-            txt = zf.read("Paleo_geothermal_final.csv").decode("cp1252")
-        dfp = pd.read_csv(io.StringIO(txt))
-        lons = pd.to_numeric(dfp["Long_deg_NAD83"], errors="coerce").to_numpy()
-        lats = pd.to_numeric(dfp["Lat_deg_NAD83"], errors="coerce").to_numpy()
-        okp = np.isfinite(lons) & np.isfinite(lats)
-        if np.any(okp):
-            xs, ys = warp_transform("EPSG:4269", "EPSG:32611", lons[okp].tolist(), lats[okp].tolist())
-            rp = ((ORIGIN_Y - np.asarray(ys)) // PIXEL_M).astype(int)
-            cp = ((np.asarray(xs) - ORIGIN_X) // PIXEL_M).astype(int)
-            inb = (rp >= 0) & (rp < H) & (cp >= 0) & (cp < W)
-            np.add.at(vent_imp, (rp[inb], cp[inb]), 2.5)
-
-    vv_path = ext_dir / "gdr_volcanic_vents_in_footprint.csv"
-    if vv_path.exists():
-        vv = pd.read_csv(vv_path)
-        rv = np.clip(vv["row"].to_numpy().astype(int), 0, H - 1)
-        cv = np.clip(vv["col"].to_numpy().astype(int), 0, W - 1)
-        np.maximum.at(volc_imp, (rv, cv), 1.5)
-
-    return vent_imp, volc_imp
-
-
-@dataclass
-class StaticStack:
-    valid_idx: np.ndarray          # flat indices of `fp` (`5,167,373` pixels)
-    X_mmap: np.memmap              # shape `(len(valid_idx), 50)`, dtype `float16`
-    feature_names: List[str]
-    slope10_full: np.ndarray       # shape `(3730, 3292)` float32
-    lidar_valid_full: np.ndarray   # shape `(3730, 3292)` bool
-    best_strike_full: np.ndarray   # shape `(3730, 3292)` float32
-    tect_bg_full: np.ndarray       # shape `(3730, 3292)` float32
-    updip_energy_full: np.ndarray  # shape `(3730, 3292)` float32 (updip 60-deg basement-step energy)
-
-
-def _put_f16(X_mm: np.memmap, col: int, arr2d: np.ndarray, valid_idx: np.ndarray) -> None:
-    vec = arr2d.ravel()[valid_idx].astype(np.float32)
-    vec = np.where(np.isfinite(vec), np.clip(vec, -60000.0, 60000.0), np.nan)
-    X_mm[:, col] = vec.astype(np.float16)
-
-
-def _compute_scarp_domain(
-    X_mm: np.memmap, data_dir: Path, ext_dir: Path, fp: np.ndarray, valid_idx: np.ndarray
-) -> Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
-    """Compute columns 0..17 inside isolated scope with TIGER road & BLM mine deconfounding."""
-    # Anthropogenic deconfounding gate from US Census TIGER roads and BLM mining claims
-    anthro_gate = np.ones(fp.shape, dtype=np.float32)
-    road_p = ext_dir / "tiger_road_distance_m.tif"
-    if road_p.exists():
-        with rasterio.open(road_p) as sr:
-            d_road = np.maximum(sr.read(1).astype(np.float32), 0.0)
-        anthro_gate *= (1.0 - 0.55 * np.exp(-((d_road / 160.0) ** 2))).astype(np.float32)
-        del d_road
-    mine_p = ext_dir / "blm_closed_claim_distance_m.tif"
-    if mine_p.exists():
-        with rasterio.open(mine_p) as sm:
-            d_mine = np.maximum(sm.read(1).astype(np.float32), 0.0)
-        anthro_gate *= (1.0 - 0.30 * np.exp(-((d_mine / 140.0) ** 2))).astype(np.float32)
-        del d_mine
-
-    with rasterio.open(ext_dir / "lidar_scarp_features_u8.tif") as s:
-        lid_valid = (s.read(12) > 0) & fp
-
-        def read_lid(band: int) -> np.ndarray:
-            lo, hi = LIDAR_SCALES[band]
-            return lo + (s.read(band).astype(np.float32) / 255.0) * (hi - lo)
-
-        l_step = read_lid(3)
-        l_lapn = read_lid(4)
-        l_lapp = read_lid(5)
-        l_down = read_lid(6)
-        l_up = read_lid(7)
-        l_cross = read_lid(8)
-        l_relief = read_lid(9)
-        l_coh = read_lid(10)
-        l_strike = read_lid(11)
-
-    nan_mask = ~lid_valid
-    lid_piedmont = (l_step / np.sqrt(l_relief + 9.0)) * anthro_gate
-    lid_w, _ = _strike_worm(np.where(lid_valid, lid_piedmont * (0.4 + l_coh), 0.0), length_px=11, flank_px=3)
-
-    _put_f16(X_mm, 0, np.where(nan_mask, np.nan, lid_piedmont), valid_idx)
-    _put_f16(X_mm, 1, np.where(nan_mask, np.nan, np.sqrt(np.maximum(l_lapn * l_lapp, 0.0)) * anthro_gate), valid_idx)
-    _put_f16(
-        X_mm,
-        2,
-        np.where(nan_mask, np.nan, np.maximum(l_down, 1.35 * l_up) * (0.30 + l_coh) * anthro_gate / (l_cross + 0.08)),
-        valid_idx,
-    )
-    _put_f16(X_mm, 3, np.where(nan_mask, np.nan, l_up * (0.25 + l_coh) * anthro_gate / (l_cross + 0.10)), valid_idx)
-    _put_f16(
-        X_mm,
-        4,
-        np.where(nan_mask, np.nan, (l_step - ndi.uniform_filter(np.where(lid_valid, l_step, 0.0), size=11)) * anthro_gate),
-        valid_idx,
-    )
-    _put_f16(X_mm, 5, np.where(nan_mask, np.nan, l_coh), valid_idx)
-    _put_f16(X_mm, 6, np.where(nan_mask, np.nan, lid_w), valid_idx)
-    del l_step, l_lapn, l_lapp, l_down, l_up, l_cross, l_relief, l_coh, lid_piedmont, lid_w
-    gc.collect()
-
-    with rasterio.open(ext_dir / "topo_10m_derived_100m_u8.tif") as s:
-        t_slp90 = _clean_band(s.read(1).astype(np.float32), fp)
-        t_slp_std = _clean_band(s.read(4).astype(np.float32), fp)
-        t_rel = _clean_band(s.read(5).astype(np.float32), fp)
-        t_curv = _clean_band(s.read(6).astype(np.float32), fp)
-        t_asp_coh = _clean_band(s.read(7).astype(np.float32), fp) / 255.0
-        t_line = _clean_band(s.read(8).astype(np.float32), fp)
-
-    slp_bg13 = ndi.uniform_filter(t_slp90, size=13)
-    t10_slp_anom = ((t_slp90 - slp_bg13) / (slp_bg13 + 12.0)) * anthro_gate
-    t10_w, strike_t10 = _strike_worm(t10_slp_anom, length_px=15, flank_px=3)
-
-    piedmont_break_10m = ((0.45 * t_slp_std + 0.35 * t_curv + 0.20 * t_line) / np.sqrt(t_rel + 12.0)) * anthro_gate
-    _put_f16(X_mm, 7, piedmont_break_10m, valid_idx)
-    _put_f16(X_mm, 8, t_asp_coh * t_curv / np.sqrt(t_rel + 12.0), valid_idx)
-    _put_f16(X_mm, 9, t10_slp_anom, valid_idx)
-    _put_f16(X_mm, 10, t10_w, valid_idx)
-    _put_f16(X_mm, 11, np.log1p(np.maximum(t_rel, 0.0)), valid_idx)
-    del t_slp_std, t_rel, t_curv, t_line, slp_bg13
-    gc.collect()
-
-    with rasterio.open(ext_dir / "dem10_chi_100m_u8.tif") as s:
-        knick_n = s.read(2).astype(np.float32)
-        raised_n = s.read(3).astype(np.float32)
-    with rasterio.open(ext_dir / "dem10_chi_100m_i16.tif") as s:
-        ksn = _clean_band(s.read(3).astype(np.float32), fp)
-        log_area = _clean_band(s.read(4).astype(np.float32) / 1000.0, fp)
-        zmean_m = _clean_band(s.read(5).astype(np.float32), fp)
-
-    _put_f16(X_mm, 12, np.log1p(np.maximum(knick_n + 2.0 * raised_n, 0.0)), valid_idx)
-    _put_f16(X_mm, 13, ksn - ndi.uniform_filter(ksn, size=17), valid_idx)
-    _put_f16(X_mm, 14, t10_slp_anom * np.clip(4.2 - log_area, 0.0, 3.0), valid_idx)
-    lahontan = (
-        np.exp(-(((zmean_m - 1334.0) / 16.0) ** 2))
-        + 0.75 * np.exp(-(((zmean_m - 1298.0) / 14.0) ** 2))
-        + 0.65 * np.exp(-(((zmean_m - 1212.0) / 15.0) ** 2))
-    ) * t_asp_coh
-    _put_f16(X_mm, 15, lahontan, valid_idx)
-    del knick_n, raised_n, ksn, log_area, zmean_m, lahontan, t10_slp_anom, t_asp_coh, anthro_gate
-    gc.collect()
-
-    with rasterio.open(data_dir / "training_features.tif") as src:
-        b_det_elev = _clean_band(src.read(12), fp)
-        b_det_slp = _clean_band(src.read(19), fp)
-    det_slp_bg = ndi.uniform_filter(b_det_slp, size=15)
-    det_slp_ratio = (b_det_slp - det_slp_bg) / (det_slp_bg + 2.5)
-    det_slp_w, _ = _strike_worm(det_slp_ratio, length_px=15, flank_px=3)
-    _put_f16(X_mm, 16, b_det_elev - ndi.gaussian_filter(b_det_elev, sigma=9.0), valid_idx)
-    _put_f16(X_mm, 17, det_slp_w, valid_idx)
-    X_mm.flush()
-
-    t10_z = _robust_pos_z(t10_w, fp)
-    pied_z = _robust_pos_z(piedmont_break_10m, fp)
-    del b_det_elev, b_det_slp, det_slp_bg, det_slp_ratio, det_slp_w, piedmont_break_10m
-    gc.collect()
-    return t_slp90, lid_valid, l_strike, strike_t10, t10_z, pied_z
-
-
-def _compute_geotherm_and_subsurf_domains(
-    X_mm: np.memmap,
-    data_dir: Path,
-    ext_dir: Path,
-    fp: np.ndarray,
-    valid_idx: np.ndarray,
-    lid_valid: np.ndarray,
-    l_strike: np.ndarray,
-    strike_t10: np.ndarray,
-    t10_z: np.ndarray,
-    pied_z: np.ndarray,
-) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
-    """Compute columns 18..49 including H80-A's Updip 60-Deg Basement-to-Surface Advection."""
-    with rasterio.open(data_dir / "training_features.tif") as src:
-        b_rtp = _clean_band(src.read(2), fp)
-        b_tmi_hg = _clean_band(src.read(3), fp)
-        b_grav_slp = _clean_band(src.read(5), fp)
-        b_rad_tc = _clean_band(src.read(6), fp)
-        b_tmi_vg = _clean_band(src.read(9), fp)
-        b_grav_vg = _clean_band(src.read(11), fp)
-        b_dbase = _clean_band(src.read(15), fp)
-        b_cond = _clean_band(src.read(17), fp)
-
-    # Verduzco–Miller–Singh depth-invariant tilt zero-crossing edges
-    tdr_grav = np.arctan2(b_grav_vg, np.maximum(b_grav_slp, 1e-4)).astype(np.float32)
-    egrav_tilt = (_grad_mag_f32(tdr_grav) * np.exp(-((tdr_grav / 0.5) ** 2))).astype(np.float32)
-    del tdr_grav, b_grav_vg
-    w_egrav, strike_grav = _strike_worm(egrav_tilt, length_px=20, flank_px=4)
-
-    tdr_mag = np.arctan2(b_tmi_vg, np.maximum(b_tmi_hg, 1e-4)).astype(np.float32)
-    emag_tilt = (_grad_mag_f32(tdr_mag) * np.exp(-((tdr_mag / 0.5) ** 2))).astype(np.float32)
-    del tdr_mag, b_tmi_vg
-    w_emag, _ = _strike_worm(emag_tilt, length_px=20, flank_px=4)
-
-    _put_f16(X_mm, 34, egrav_tilt, valid_idx)
-    _put_f16(X_mm, 35, w_egrav, valid_idx)
-    _put_f16(X_mm, 36, emag_tilt, valid_idx)
-    _put_f16(X_mm, 37, w_emag, valid_idx)
-    del emag_tilt, w_emag
-    gc.collect()
-
-    # H80-A Core Innovation: Updip 60-Deg Normal-Fault Basement-to-Surface Advection
-    db_smooth = ndi.gaussian_filter(np.maximum(b_dbase, 0.0), sigma=3.0)
-    dby, dbx = _grad_yx_f32(db_smooth)
-    db_grad_mag = np.hypot(dby, dbx) + 1e-5
-    # Unit vector pointing down-dip (into deeper basin fill)
-    uy_down = (dby / db_grad_mag).astype(np.float32)
-    ux_down = (dbx / db_grad_mag).astype(np.float32)
-    # Horizontal offset from mid-basement scarp (0.5 * z_b * cot(60 deg)) in 100m pixels
-    shift_px = np.clip((0.5 * db_smooth * COT_60_DEG) / PIXEL_M, 0.5, 12.0).astype(np.float32)
-    db_step_norm = (db_grad_mag / np.sqrt(db_smooth + 100.0)).astype(np.float32)
-
-    updip_grav_step = updip_advect_field(b_grav_slp, uy_down, ux_down, shift_px)
-    updip_grav_tilt = updip_advect_field(egrav_tilt, uy_down, ux_down, shift_px)
-    updip_dbase_grad = updip_advect_field(db_step_norm, uy_down, ux_down, shift_px)
-    downdip_dbase_grad = updip_advect_field(db_step_norm, -uy_down, -ux_down, shift_px)
-    updip_dipole_asym = (updip_dbase_grad - downdip_dbase_grad).astype(np.float32)
-
-    updip_energy = (
-        0.40 * _robust_pos_z(updip_grav_step, fp)
-        + 0.35 * _robust_pos_z(updip_grav_tilt, fp)
-        + 0.25 * _robust_pos_z(updip_dbase_grad, fp)
-    ).astype(np.float32)
-
-    _put_f16(X_mm, 38, updip_grav_step, valid_idx)
-    _put_f16(X_mm, 39, updip_grav_tilt, valid_idx)
-    _put_f16(X_mm, 40, updip_dbase_grad, valid_idx)
-    _put_f16(X_mm, 41, updip_dipole_asym, valid_idx)
-    _put_f16(X_mm, 42, updip_energy * pied_z, valid_idx)
-    _put_f16(X_mm, 45, db_step_norm, valid_idx)
-    _put_f16(X_mm, 46, -ndi.laplace(db_smooth), valid_idx)
-    del db_smooth, dby, dbx, db_grad_mag, uy_down, ux_down, shift_px
-    del updip_grav_step, updip_grav_tilt, updip_dbase_grad, downdip_dbase_grad, updip_dipole_asym, db_step_norm, b_dbase
-    gc.collect()
-
-    # Geothermal Domain (`18..33`): MT clay-cap feeder, shallow demagnetization, radiometrics, GDR vents
-    cond_grad = _grad_mag_f32(ndi.gaussian_filter(b_cond, sigma=2.0))
-    mt_feeder = np.maximum(-(b_cond - ndi.uniform_filter(b_cond, size=31)), 0.0) * cond_grad
-    w_mt, _ = _strike_worm(cond_grad, length_px=15, flank_px=3)
-    _put_f16(X_mm, 18, mt_feeder, valid_idx)
-    _put_f16(X_mm, 19, cond_grad - ndi.uniform_filter(cond_grad, size=21), valid_idx)
-    _put_f16(X_mm, 20, w_mt, valid_idx)
-    _put_f16(X_mm, 21, b_cond, valid_idx)
-    del w_mt, b_cond
-    gc.collect()
-
-    with rasterio.open(ext_dir / "geodawn_extensions_u8.tif") as s:
-        ext_k_th = _clean_band(s.read(1).astype(np.float32), fp)
-        ext_u_th = _clean_band(s.read(3).astype(np.float32), fp)
-        ext_up150 = _clean_band(s.read(4).astype(np.float32), fp)
-
-    demag_trough = np.maximum(-(b_rtp - ndi.uniform_filter(b_rtp, size=17)), 0.0) * np.log1p(
-        np.maximum(b_tmi_hg, 0.0)
-    )
-    z_u150 = (ext_up150 - ndi.uniform_filter(ext_up150, 25)) / (float(np.std(ext_up150[fp])) + 1e-5)
-    z_rtp = (b_rtp - ndi.uniform_filter(b_rtp, 25)) / (float(np.std(b_rtp[fp])) + 1e-5)
-    _put_f16(X_mm, 22, demag_trough, valid_idx)
-    _put_f16(X_mm, 23, z_u150 - z_rtp, valid_idx)
-    del ext_up150, z_u150, z_rtp
-
-    rad_grad_f32 = _grad_mag_f32(ndi.gaussian_filter(b_rad_tc, sigma=1.2))
-    w_rad, _ = _strike_worm(rad_grad_f32, length_px=15, flank_px=3)
-    _put_f16(X_mm, 24, rad_grad_f32, valid_idx)
-    _put_f16(X_mm, 25, np.maximum(-(b_rad_tc - ndi.uniform_filter(b_rad_tc, size=21)), 0.0) * rad_grad_f32, valid_idx)
-    _put_f16(X_mm, 26, w_rad, valid_idx)
-    _put_f16(X_mm, 27, ext_k_th - ndi.uniform_filter(ext_k_th, size=21), valid_idx)
-    _put_f16(X_mm, 28, _grad_mag_f32(ndi.gaussian_filter(ext_u_th, sigma=1.5)), valid_idx)
-    del b_rad_tc, w_rad, ext_k_th, ext_u_th
-    gc.collect()
-
-    vent_imp, volc_imp = _rasterize_geothermal_evidence(ext_dir, fp)
-    vent_near = 0.68 * _anisotropic_strike_plume(vent_imp, 14.0, 3.5, 22.0) + 0.32 * _anisotropic_strike_plume(
-        vent_imp, 14.0, 3.5, -35.0
-    )
-    vent_far = 0.68 * _anisotropic_strike_plume(vent_imp, 40.0, 12.0, 22.0) + 0.32 * _anisotropic_strike_plume(
-        vent_imp, 40.0, 12.0, -35.0
-    )
-    volc_conduit = 0.70 * _anisotropic_strike_plume(volc_imp, 18.0, 4.0, 20.0) + 0.30 * _anisotropic_strike_plume(
-        volc_imp, 18.0, 4.0, -35.0
-    )
-    del vent_imp, volc_imp
-
-    subsurf_edge_z = (
-        0.35 * _robust_pos_z(cond_grad, fp)
-        + 0.40 * updip_energy
-        + 0.25 * _robust_pos_z(rad_grad_f32, fp)
-    )
-    geotherm_multi = (
-        (0.65 * _robust_pos_z(vent_near, fp) + 0.35 * _robust_pos_z(vent_far, fp))
-        * (0.45 * _robust_pos_z(mt_feeder, fp) + 0.35 * _robust_pos_z(demag_trough, fp) + 0.20 * updip_energy + 0.25)
-    ).astype(np.float32)
-
-    _put_f16(X_mm, 29, vent_near, valid_idx)
-    _put_f16(X_mm, 30, vent_far, valid_idx)
-    _put_f16(X_mm, 31, vent_near * subsurf_edge_z, valid_idx)
-    _put_f16(X_mm, 32, volc_conduit, valid_idx)
-    _put_f16(X_mm, 33, geotherm_multi, valid_idx)
-    vent_far_z = _robust_pos_z(vent_far, fp)
-    del cond_grad, egrav_tilt, rad_grad_f32, mt_feeder, demag_trough, vent_near, vent_far, volc_conduit, subsurf_edge_z, geotherm_multi
-    gc.collect()
-
-    with rasterio.open(data_dir / "training_features.tif") as src:
-        b_geod_2inv = _clean_band(src.read(4), fp)
-        b_shear = _clean_band(src.read(7), fp)
-        b_dilate = _clean_band(src.read(8), fp)
-        b_deq = _clean_band(src.read(10), fp)
-        b_grav = _clean_band(src.read(13), fp)
-        b_ieq = _clean_band(src.read(16), fp)
-
-    gs = ndi.gaussian_filter(b_grav, sigma=2.0)
-    ms = ndi.gaussian_filter(b_rtp, sigma=2.0)
-    gg_y, gg_x = _grad_yx_f32(gs)
-    gm_y, gm_x = _grad_yx_f32(ms)
-    ng = np.hypot(gg_y, gg_x) + 1e-6
-    nm = np.hypot(gm_y, gm_x) + 1e-6
-    amp_gm = np.sqrt(ng * nm)
-    _put_f16(X_mm, 43, (np.abs(gg_y * gm_y + gg_x * gm_x) / (ng * nm)) * amp_gm, valid_idx)
-    _put_f16(X_mm, 44, (np.abs(gg_x * gm_y - gg_y * gm_x) / (ng * nm)) * amp_gm, valid_idx)
-    _put_f16(X_mm, 47, b_grav - ndi.gaussian_filter(b_grav, sigma=8.0), valid_idx)
-    del gs, ms, gg_y, gg_x, gm_y, gm_x, ng, nm, amp_gm, b_rtp, b_grav, b_grav_slp, b_tmi_hg
-    gc.collect()
-
-    strain_tt = (
-        0.45 * _robust_pos_z(b_shear - ndi.gaussian_filter(b_shear, 35.0), fp)
-        + 0.35 * _robust_pos_z(b_dilate - ndi.gaussian_filter(b_dilate, 35.0), fp)
-        + 0.20 * _robust_pos_z(b_geod_2inv, fp)
-    ).astype(np.float32)
-    leq = np.log1p(np.maximum(b_ieq, 0.0))
-    seismic_line = (leq - ndi.uniform_filter(leq, size=25)) - 0.25 * np.log1p(np.maximum(b_deq, 0.0))
-    _put_f16(X_mm, 48, strain_tt, valid_idx)
-    _put_f16(X_mm, 49, seismic_line, valid_idx)
-    X_mm.flush()
-
-    best_strike = np.where(lid_valid, l_strike, 0.65 * strike_t10 + 0.35 * strike_grav).astype(np.float32)
-    tect_bg = ndi.gaussian_filter(
-        0.30 * t10_z + 0.25 * _robust_pos_z(w_egrav, fp) + 0.25 * updip_energy + 0.20 * (strain_tt + 0.5 * vent_far_z),
-        sigma=25.0,
-    ).astype(np.float32)
-    return best_strike, tect_bg, updip_energy
-
-
-def build_or_load_static_stack(
-    data_dir: Path,
-    ext_dir: Path,
-    cache_dir: Path,
-    fp: np.ndarray,
-    force_rebuild: bool = False,
-) -> StaticStack:
-    cache_dir.mkdir(parents=True, exist_ok=True)
-    mmap_path = cache_dir / "gems80_static_v1.f16.mmap"
-    aux_path = cache_dir / "gems80_static_v1_aux.npz"
-    meta_path = cache_dir / "gems80_static_v1_meta.json"
-
-    valid_idx = np.flatnonzero(fp).astype(np.int64)
-    n_pix = int(valid_idx.size)
-    n_feat = len(STATIC_FEATURE_NAMES)
-
-    if (
-        not force_rebuild
-        and mmap_path.exists()
-        and aux_path.exists()
-        and meta_path.exists()
-        and json.loads(meta_path.read_text()).get("feature_names") == STATIC_FEATURE_NAMES
-    ):
-        X_mm = np.memmap(mmap_path, dtype=np.float16, mode="r", shape=(n_pix, n_feat))
-        aux = np.load(aux_path)
-        return StaticStack(
-            valid_idx=valid_idx,
-            X_mmap=X_mm,
-            feature_names=list(STATIC_FEATURE_NAMES),
-            slope10_full=aux["slope10_full"],
-            lidar_valid_full=aux["lidar_valid_full"],
-            best_strike_full=aux["best_strike_full"],
-            tect_bg_full=aux["tect_bg_full"],
-            updip_energy_full=aux["updip_energy_full"],
-        )
-
-    X_mm = np.memmap(mmap_path, dtype=np.float16, mode="w+", shape=(n_pix, n_feat))
-    t_slp90, lid_valid, l_strike, strike_t10, t10_z, pied_z = _compute_scarp_domain(
-        X_mm, data_dir, ext_dir, fp, valid_idx
-    )
-    gc.collect()
-    best_strike, tect_bg, updip_energy = _compute_geotherm_and_subsurf_domains(
-        X_mm, data_dir, ext_dir, fp, valid_idx, lid_valid, l_strike, strike_t10, t10_z, pied_z
-    )
-    del l_strike, strike_t10, t10_z, pied_z
-    del X_mm
-    gc.collect()
-
-    np.savez_compressed(
-        aux_path,
-        slope10_full=t_slp90.astype(np.float32),
-        lidar_valid_full=lid_valid,
-        best_strike_full=best_strike,
-        tect_bg_full=tect_bg,
-        updip_energy_full=updip_energy,
-    )
-    meta_path.write_text(
-        json.dumps(
-            {
-                "version": "gems80_static_v1_f16",
-                "n_pixels": n_pix,
-                "n_features": n_feat,
-                "feature_names": STATIC_FEATURE_NAMES,
-            },
-            indent=2,
-        )
-    )
-    X_mm_ro = np.memmap(mmap_path, dtype=np.float16, mode="r", shape=(n_pix, n_feat))
-    return StaticStack(
-        valid_idx=valid_idx,
-        X_mmap=X_mm_ro,
-        feature_names=list(STATIC_FEATURE_NAMES),
-        slope10_full=t_slp90.astype(np.float32),
-        lidar_valid_full=lid_valid,
-        best_strike_full=best_strike,
-        tect_bg_full=tect_bg,
-        updip_energy_full=updip_energy,
-    )
-
-
-def compute_fold_mechanics_2d(
-    vis_mask: np.ndarray,
-    fp: np.ndarray,
-    best_strike_full: np.ndarray,
-    tect_bg_full: np.ndarray,
-    updip_energy_full: np.ndarray,
-) -> np.ndarray:
-    """Compute all 9 fold-proper fracture-transfer features strictly from `vis_mask`."""
-    H, W = vis_mask.shape
-    vis = vis_mask & fp
-
-    comp_lbl, _ = ndi.label(vis, structure=np.ones((3, 3), dtype=int))
-    comp_sizes = np.bincount(comp_lbl.ravel()).astype(np.float32)
-    comp_sizes[0] = 0.0
-
-    skel = skeletonize(vis)
-    sr, sc = np.nonzero(skel)
-    if len(sr) == 0:
-        return np.zeros((H, W, len(FOLD_MECH_NAMES)), dtype=np.float32)
-
-    dist_px, (nr_idx, nc_idx) = ndi.distance_transform_edt(~vis, return_indices=True)
-    dist_f32 = dist_px.astype(np.float32)
-    host_len = comp_sizes[comp_lbl[nr_idx, nc_idx]]
-    del dist_px, nr_idx, nc_idx
-
-    skel_tree = cKDTree(np.column_stack([sr, sc]).astype(np.float32))
-    skel_comp = comp_lbl[sr, sc]
-
-    deg = ndi.convolve(skel.astype(np.uint8), np.ones((3, 3), dtype=np.uint8), mode="constant")
-    tip_mask = skel & (deg <= 2)
-    tr, tc = np.nonzero(tip_mask)
-    tip_comp = comp_lbl[tr, tc]
-    keep = comp_sizes[tip_comp] >= 4.0
-    tr, tc, tip_comp = tr[keep], tc[keep], tip_comp[keep]
-
-    ray_short = np.zeros((H, W), dtype=np.float32)
-    ray_long = np.zeros((H, W), dtype=np.float32)
-    splay = np.zeros((H, W), dtype=np.float32)
-    bridge = np.zeros((H, W), dtype=np.float32)
-    corridor = np.zeros((H, W), dtype=np.float32)
-
-    R = 44
-    yy, xx = np.mgrid[-R : R + 1, -R : R + 1].astype(np.float32)
-    rr_d = np.hypot(yy, xx) + 1e-6
-    uy = yy / rr_d
-    ux = xx / rr_d
-
-    tip_ty = np.zeros(len(tr), dtype=np.float32)
-    tip_tx = np.zeros(len(tr), dtype=np.float32)
-    tip_w = np.log1p(comp_sizes[tip_comp]).astype(np.float32)
-
-    nbr_lists = skel_tree.query_ball_point(np.column_stack([tr, tc]), r=11.0)
-    valid_tips = []
-    for i, nbrs in enumerate(nbr_lists):
-        nbrs_arr = np.asarray(nbrs, dtype=np.int64)
-        same = nbrs_arr[skel_comp[nbrs_arr] == tip_comp[i]]
-        dy = tr[i] - sr[same]
-        dx = tc[i] - sc[same]
-        dd = np.hypot(dy, dx)
-        ring = same[(dd >= 3.0) & (dd <= 11.0)]
-        if len(ring) == 0:
-            ring = same[dd >= 1.0]
-        if len(ring) == 0:
+FRACTURE_FEATURE_NAMES: tuple[str, ...] = (
+    "vis_dist_capped",
+    "vis_axial_tip_lobe",
+    "vis_wing_crack_lobe",
+    "vis_relay_stepover",
+    "vis_host_len_prox",
+    "vis_accomm_density_2km",
+    "vis_lateral_flank_ring",
+)
+
+ALL_FEATURE_NAMES: tuple[str, ...] = STATIC_FEATURE_NAMES + FRACTURE_FEATURE_NAMES
+N_STATIC = len(STATIC_FEATURE_NAMES)     # 52
+N_FRACTURE = len(FRACTURE_FEATURE_NAMES) # 7
+
+# 8 unit normal vectors covering full 360 deg: (dy, dx)
+DIRS_8: tuple[tuple[float, float], ...] = tuple(
+    (float(np.sin(k * np.pi / 4.0)), float(np.cos(k * np.pi / 4.0))) for k in range(8)
+)
+
+
+def _clean_band(arr: np.ndarray, valid: np.ndarray) -> np.ndarray:
+    out = arr.astype(np.float32, copy=True)
+    good = valid & np.isfinite(out) & (out > -1e25) & (out < 1e25)
+    med = float(np.median(out[good])) if good.any() else 0.0
+    out[~good] = med
+    return out
+
+
+def _robust_z_pos(arr: np.ndarray, valid: np.ndarray, clip: float = 8.0) -> np.ndarray:
+    vals = arr[valid]
+    med = float(np.median(vals))
+    q25, q75 = np.percentile(vals, [25.0, 75.0])
+    iqr_sd = max(float(q75 - q25) / 1.349, 1e-6)
+    return np.clip((arr - med) / iqr_sd, -clip, clip).astype(np.float32)
+
+
+def _shift2d(arr: np.ndarray, dy: int, dx: int) -> np.ndarray:
+    """Fast edge-clamped integer 2D shift without wrap-around seam artifacts."""
+    h, w = arr.shape
+    out = np.empty_like(arr)
+    sy0 = max(0, -dy)
+    sy1 = min(h, h - dy)
+    dy0 = max(0, dy)
+    dy1 = min(h, h + dy)
+
+    sx0 = max(0, -dx)
+    sx1 = min(w, w - dx)
+    dx0 = max(0, dx)
+    dx1 = min(w, w + dx)
+
+    out[dy0:dy1, dx0:dx1] = arr[sy0:sy1, sx0:sx1]
+    if dy0 > 0:
+        out[:dy0, dx0:dx1] = arr[0:1, sx0:sx1]
+    if dy1 < h:
+        out[dy1:, dx0:dx1] = arr[h - 1 : h, sx0:sx1]
+    if dx0 > 0:
+        out[:, :dx0] = out[:, dx0 : dx0 + 1]
+    if dx1 < w:
+        out[:, dx1:] = out[:, dx1 - 1 : dx1]
+    return out
+
+
+def _directed_step_and_monotonicity(
+    field_smooth: np.ndarray, h_px: int
+) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
+    """Compute max signed drop S(x) >= 0, Step Monotonicity Ratio M(x) in [0, 1], and argmax dir index.
+
+    For normal vector n_a = (dy_a, dx_a):
+      up_a  = field(x - h * n_a)   (uplifted footwall side)
+      dn_a  = field(x + h * n_a)   (down-thrown hanging-wall side)
+      step  = up_a - dn_a          (> 0 when hanging wall is lower than footwall)
+      mono  = |up_a - dn_a| / (|up_a - c| + |c - dn_a| + eps)
+              -> 1.0 on a monotone normal-fault scarp; ~0.0 on stream valleys and symmetric ridges!
+    """
+    best_step = np.full(field_smooth.shape, -1e9, dtype=np.float32)
+    best_mono = np.zeros(field_smooth.shape, dtype=np.float32)
+    best_dir = np.zeros(field_smooth.shape, dtype=np.uint8)
+    c = field_smooth
+    eps = np.float32(1e-4)
+
+    for a_idx, (uy, ux) in enumerate(DIRS_8):
+        dy = int(round(h_px * uy))
+        dx = int(round(h_px * ux))
+        up = _shift2d(c, -dy, -dx)
+        dn = _shift2d(c, dy, dx)
+        step = up - dn
+        denom = np.abs(up - c) + np.abs(c - dn) + eps
+        mono = np.abs(step) / denom
+        better = step > best_step
+        best_step = np.where(better, step, best_step)
+        best_mono = np.where(better, mono, best_mono)
+        best_dir = np.where(better, np.uint8(a_idx), best_dir)
+    return np.maximum(best_step, 0.0), best_mono, best_dir
+
+
+def _directed_contrast_at_phi(field_smooth: np.ndarray, phi_idx: np.ndarray, h_px: int, sign: float) -> np.ndarray:
+    """Evaluate sign * (field(x + h * n_{phi*}) - field(x - h * n_{phi*})) at pixel's down-thrown azimuth phi*."""
+    out = np.zeros_like(field_smooth, dtype=np.float32)
+    for a_idx, (uy, ux) in enumerate(DIRS_8):
+        mask = phi_idx == a_idx
+        if not mask.any():
             continue
-        vy = float(tr[i] - np.mean(sr[ring]))
-        vx = float(tc[i] - np.mean(sc[ring]))
-        vn = float(np.hypot(vy, vx))
-        if vn < 1e-4:
+        dy = int(round(h_px * uy))
+        dx = int(round(h_px * ux))
+        hw = _shift2d(field_smooth, dy, dx)
+        fw = _shift2d(field_smooth, -dy, -dx)
+        out[mask] = sign * (hw[mask] - fw[mask])
+    return out
+
+
+def _along_strike_continuity(step_field: np.ndarray, phi_idx: np.ndarray, half_len: int = 4) -> np.ndarray:
+    """Integrate scarp step strength along orthogonal strike tangent t = (-dx, dy) over 2*half_len + 1 px."""
+    # Tangent index is (phi_idx + 2) % 4 among the 4 undirected axes
+    axis_idx = phi_idx % 4
+    out = np.zeros_like(step_field, dtype=np.float32)
+    for ax in range(4):
+        mask = axis_idx == ax
+        if not mask.any():
             continue
-        tip_ty[i] = vy / vn
-        tip_tx[i] = vx / vn
-        valid_tips.append(i)
+        # Normal is DIRS_8[ax] = (uy, ux) -> strike tangent is (-ux, uy)
+        uy, ux = DIRS_8[ax]
+        ty, tx = int(round(-ux)), int(round(uy))
+        acc = step_field.copy()
+        for k in range(1, half_len + 1):
+            acc += _shift2d(step_field, k * ty, k * tx)
+            acc += _shift2d(step_field, -k * ty, -k * tx)
+        out[mask] = acc[mask] / float(2 * half_len + 1)
+    return out
 
-    for i in valid_tips:
-        r0, c0 = int(tr[i]), int(tc[i])
-        y0, y1 = max(0, r0 - R), min(H, r0 + R + 1)
-        x0, x1 = max(0, c0 - R), min(W, c0 + R + 1)
-        py0, py1 = y0 - (r0 - R), y1 - (r0 - R)
-        px0, px1 = x0 - (c0 - R), x1 - (c0 - R)
 
-        cos_a = uy[py0:py1, px0:px1] * tip_ty[i] + ux[py0:py1, px0:px1] * tip_tx[i]
-        d = rr_d[py0:py1, px0:px1]
-        w = tip_w[i]
+def _load_gdr_hydrothermal_grid(
+    ext_dir: Path, shape: tuple[int, int], transform: rasterio.Affine
+) -> np.ndarray:
+    """Rasterize verified DOE GDR #1391 thermal springs/geothermometers, 2m probes, and paleo-sinter."""
+    grid = np.zeros(shape, dtype=np.float32)
 
-        np.maximum(
-            ray_short[y0:y1, x0:x1],
-            w * np.exp(-d / 11.0) * np.exp(-(((1.0 - cos_a) / 0.055) ** 2)),
-            out=ray_short[y0:y1, x0:x1],
+    # 1. Well & spring geothermometry + measured thermal springs
+    ws_path = ext_dir / "gdr_wellspring_in_footprint.csv"
+    if ws_path.is_file():
+        df = pd.read_csv(ws_path)
+        for col in ("temp_c", "geothermquartz_c", "geothermchalc_c", "geothermcat_c", "row", "col"):
+            df[col] = pd.to_numeric(df[col], errors="coerce")
+        df = df.dropna(subset=["row", "col"])
+        r = df["row"].to_numpy(dtype=np.int32)
+        c = df["col"].to_numpy(dtype=np.int32)
+        inb = (r >= 0) & (r < shape[0]) & (c >= 0) & (c < shape[1])
+        t_surf = np.nan_to_num(df["temp_c"].to_numpy(dtype=np.float32), nan=0.0)
+        t_geo = np.nanmax(
+            np.column_stack([
+                np.nan_to_num(df["geothermquartz_c"].to_numpy(dtype=np.float32), nan=0.0),
+                np.nan_to_num(df["geothermchalc_c"].to_numpy(dtype=np.float32), nan=0.0),
+                np.nan_to_num(df["geothermcat_c"].to_numpy(dtype=np.float32), nan=0.0),
+            ]),
+            axis=1,
         )
-        np.maximum(
-            ray_long[y0:y1, x0:x1],
-            w * np.exp(-d / 26.0) * np.exp(-(((1.0 - cos_a) / 0.075) ** 2)),
-            out=ray_long[y0:y1, x0:x1],
-        )
-        np.maximum(
-            splay[y0:y1, x0:x1],
-            w * np.exp(-d / 15.0) * np.exp(-(((0.85 - cos_a) / 0.07) ** 2)),
-            out=splay[y0:y1, x0:x1],
-        )
-        np.maximum(
-            corridor[y0:y1, x0:x1],
-            w * np.exp(-d / 12.0) * (np.abs(cos_a) ** 3),
-            out=corridor[y0:y1, x0:x1],
-        )
+        weight = np.clip((t_surf - 22.0) / 35.0, 0.0, 2.5) + np.clip((t_geo - 85.0) / 80.0, 0.0, 2.5)
+        keep = inb & (weight > 0.05)
+        np.maximum.at(grid, (r[keep], c[keep]), weight[keep])
 
-    if len(valid_tips) >= 2:
-        vt = np.asarray(valid_tips, dtype=np.int64)
-        pts = np.column_stack([tr[vt], tc[vt]]).astype(np.float32)
-        pairs = cKDTree(pts).query_pairs(r=48.0, output_type="ndarray")
-        for ia, ib in pairs:
-            a, b = int(vt[ia]), int(vt[ib])
-            if tip_comp[a] == tip_comp[b]:
-                continue
-            dy = float(tr[b] - tr[a])
-            dx = float(tc[b] - tc[a])
-            gap = float(np.hypot(dy, dx))
-            if gap < 3.0:
-                continue
-            gy, gx = dy / gap, dx / gap
-            dot_a = tip_ty[a] * gy + tip_tx[a] * gx
-            dot_b = -(tip_ty[b] * gy + tip_tx[b] * gx)
-            anti = -(tip_ty[a] * tip_ty[b] + tip_tx[a] * tip_tx[b])
-            align = max(0.0, min(dot_a, dot_b))
-            relay_score = 0.0
-            if align > 0.30:
-                relay_score = align * (tip_w[a] + tip_w[b]) * 0.5
-            elif anti > 0.70 and dot_a > -0.25 and dot_b > -0.25 and gap <= 26.0:
-                relay_score = 0.75 * anti * (tip_w[a] + tip_w[b]) * 0.5
-            if relay_score <= 0.05:
-                continue
+    # 2. UNR 2-meter temperature probes (NAD83 lon/lat shapefile inside zip)
+    probe_zip = ext_dir / "2m_temperature_probe_INGENIOUS_regional_data.zip"
+    if probe_zip.is_file():
+        with zipfile.ZipFile(probe_zip) as zf:
+            shp_names = [n for n in zf.namelist() if n.endswith(".shp")]
+            dbf_names = [n for n in zf.namelist() if n.endswith(".dbf")]
+            if shp_names and dbf_names:
+                shp_bytes = zf.read(shp_names[0])
+                dbf_bytes = zf.read(dbf_names[0])
+                xs, ys = _parse_point_shp(shp_bytes)
+                records = _parse_simple_dbf(dbf_bytes)
+                if len(xs) == len(records) and len(xs) > 0:
+                    tr = Transformer.from_crs("EPSG:4269", "EPSG:32611", always_xy=True)
+                    ux, uy = tr.transform(np.asarray(xs, dtype=np.float64), np.asarray(ys, dtype=np.float64))
+                    cols = np.floor((ux - transform.c) / transform.a).astype(np.int32)
+                    rows = np.floor((uy - transform.f) / transform.e).astype(np.int32)
+                    for i, rec in enumerate(records):
+                        rr, cc = int(rows[i]), int(cols[i])
+                        if 0 <= rr < shape[0] and 0 <= cc < shape[1]:
+                            anom = 0.0
+                            for k, val in rec.items():
+                                if "2m" in k.lower() or "anom" in k.lower() or "temp" in k.lower():
+                                    try:
+                                        v = float(val)
+                                        if np.isfinite(v) and v > 1.2 and v < 80.0:
+                                            anom = max(anom, min(2.5, v / 3.0))
+                                    except (ValueError, TypeError):
+                                        pass
+                            if anom > 0.1:
+                                grid[rr, cc] = max(float(grid[rr, cc]), anom + 0.5)
 
-            pad = 7
-            y0 = max(0, min(int(tr[a]), int(tr[b])) - pad)
-            y1 = min(H, max(int(tr[a]), int(tr[b])) + pad + 1)
-            x0 = max(0, min(int(tc[a]), int(tc[b])) - pad)
-            x1 = min(W, max(int(tc[a]), int(tc[b])) + pad + 1)
-            gyy, gxx = np.mgrid[y0:y1, x0:x1].astype(np.float32)
-            proj = np.clip(((gyy - tr[a]) * gy + (gxx - tc[a]) * gx) / gap, 0.0, 1.0)
-            perp = np.hypot(gyy - (tr[a] + proj * dy), gxx - (tc[a] + proj * dx))
-            tube = relay_score * np.exp(-((perp / 4.2) ** 2)) * np.exp(-gap / 36.0)
-            np.maximum(bridge[y0:y1, x0:x1], tube, out=bridge[y0:y1, x0:x1])
+    # 3. Paleo-geothermal sinter / travertine / tufa deposits (CSV inside zip)
+    sinter_zip = ext_dir / "paleo_geothermal_regional.zip"
+    if sinter_zip.is_file():
+        with zipfile.ZipFile(sinter_zip) as zf:
+            csv_names = [n for n in zf.namelist() if n.endswith(".csv")]
+            if csv_names:
+                text = zf.read(csv_names[0]).decode("utf-8", errors="ignore")
+                reader = csv.DictReader(io.StringIO(text))
+                lons, lats = [], []
+                for row in reader:
+                    lat = row.get("lat") or row.get("LAT") or row.get("Latitude") or row.get("Y")
+                    lon = row.get("lon") or row.get("LON") or row.get("Longitude") or row.get("X")
+                    try:
+                        la, lo = float(lat), float(lon)
+                        if -125.0 < lo < -110.0 and 34.0 < la < 44.0:
+                            lons.append(lo)
+                            lats.append(la)
+                    except (TypeError, ValueError):
+                        pass
+                if lons:
+                    tr = Transformer.from_crs("EPSG:4326", "EPSG:32611", always_xy=True)
+                    ux, uy = tr.transform(np.asarray(lons), np.asarray(lats))
+                    cols = np.floor((ux - transform.c) / transform.a).astype(np.int32)
+                    rows = np.floor((uy - transform.f) / transform.e).astype(np.int32)
+                    inb = (rows >= 0) & (rows < shape[0]) & (cols >= 0) & (cols < shape[1])
+                    np.maximum.at(grid, (rows[inb], cols[inb]), 2.5)
 
-    vis_dens = ndi.gaussian_filter(vis.astype(np.float32), sigma=28.0)
-    scale_bg = float(np.percentile(vis_dens[fp], 90.0)) / (
-        float(np.percentile(tect_bg_full[fp], 90.0)) + 1e-6
+    return grid
+
+
+def _parse_point_shp(buf: bytes) -> tuple[list[float], list[float]]:
+    xs, ys = [], []
+    off = 100
+    n = len(buf)
+    while off + 8 <= n:
+        _, content_words = struct.unpack(">2i", buf[off : off + 8])
+        off += 8
+        rec_len = content_words * 2
+        if off + rec_len > n or rec_len < 20:
+            break
+        shp_type = struct.unpack("<i", buf[off : off + 4])[0]
+        if shp_type in (1, 11, 21):
+            x, y = struct.unpack("<2d", buf[off + 4 : off + 20])
+            xs.append(x)
+            ys.append(y)
+        off += rec_len
+    return xs, ys
+
+
+def _parse_simple_dbf(buf: bytes) -> list[dict[str, str]]:
+    n_rec, header_len, rec_len = struct.unpack("<IHH", buf[4:12])
+    fields = []
+    pos = 32
+    while pos + 32 <= header_len and buf[pos] != 0x0D:
+        name = buf[pos : pos + 11].split(b"\x00", 1)[0].decode("ascii", errors="ignore")
+        flen = buf[pos + 16]
+        fields.append((name, flen))
+        pos += 32
+    rows = []
+    off = header_len
+    for _ in range(n_rec):
+        if off + rec_len > len(buf):
+            break
+        p = off + 1
+        d = {}
+        for name, flen in fields:
+            d[name] = buf[p : p + flen].decode("latin1", errors="ignore").strip()
+            p += flen
+        rows.append(d)
+        off += rec_len
+    return rows
+
+
+def build_or_load_static_features(
+    valid: np.ndarray, data_dir: Path, ext_dir: Path, cache_path: Path
+) -> tuple[np.memmap, np.ndarray]:
+    """Compute or load the 52-channel zero-catalogue static feature matrix on `valid`."""
+    meta_path = cache_path.with_suffix(".strike.npy")
+    n_valid = int(valid.sum())
+    if cache_path.is_file() and meta_path.is_file():
+        mm = np.memmap(cache_path, dtype=np.float32, mode="r", shape=(n_valid, N_STATIC))
+        phi_idx = np.load(meta_path)
+        if phi_idx.shape == valid.shape:
+            return mm, phi_idx
+
+    cache_path.parent.mkdir(parents=True, exist_ok=True)
+    mm = np.memmap(cache_path, dtype=np.float32, mode="w+", shape=(n_valid, N_STATIC))
+
+    # --- 1. Read 10m DEM + Fluvial Chi / k_sn / Orthometric Elevation (100% AOI) ---
+    with rasterio.open(ext_dir / "topo_10m_derived_100m_u8.tif") as ds:
+        t10_slp90 = ds.read(1).astype(np.float32) / 255.0
+        t10_slpstd = ds.read(4).astype(np.float32) / 255.0
+        t10_relief = ds.read(5).astype(np.float32) / 255.0
+        t10_curv = ds.read(6).astype(np.float32) / 255.0
+        t10_coh = ds.read(7).astype(np.float32) / 255.0
+        t10_line = ds.read(8).astype(np.float32) / 255.0
+
+    with rasterio.open(ext_dir / "dem10_chi_100m_i16.tif") as ds:
+        chi_step = np.where(ds.read(1) == -32768, 0.0, ds.read(1).astype(np.float32) / 1000.0)
+        chi_ksn = np.where(ds.read(3) == -32768, 0.0, ds.read(3).astype(np.float32))
+        log10_area = np.where(ds.read(4) == -32768, 3.0, ds.read(4).astype(np.float32) / 1000.0)
+        zmean_m = _clean_band(np.where(ds.read(5) == -32768, np.nan, ds.read(5).astype(np.float32)), valid)
+        transform = ds.transform
+
+    # --- 2. Read 1m LiDAR Scarp stack (interior eroded by 2 px to eliminate tile-edge seams!) ---
+    with rasterio.open(ext_dir / "lidar_scarp_features_u8.tif") as ds:
+        lid_valid_raw = (ds.read(12) > 0) & valid
+        lid_interior = ndi.binary_erosion(lid_valid_raw, iterations=2)
+        b_ex = ds.read(1).astype(np.float32) / 255.0
+        b_step = ds.read(3).astype(np.float32) / 255.0
+        b_dipole = 0.5 * (ds.read(4).astype(np.float32) + ds.read(5).astype(np.float32)) / 255.0
+        b_du = np.maximum(ds.read(6), ds.read(7)).astype(np.float32) / 255.0
+        b_cross = ds.read(8).astype(np.float32) / 255.0
+        b_coh = ds.read(10).astype(np.float32) / 255.0
+
+    for idx_col, raw_arr in enumerate((b_ex, b_step, b_dipole, b_du, b_cross, b_coh)):
+        tmp = np.where(lid_interior, raw_arr, np.nan).astype(np.float32)
+        mm[:, idx_col] = tmp[valid]
+    lid_composite_target = 0.35 * b_ex + 0.30 * b_dipole + 0.20 * b_cross + 0.15 * b_coh
+    del b_ex, b_step, b_dipole, b_du, b_cross, b_coh
+    gc.collect()
+
+    mm[:, 7] = t10_slp90[valid]
+    mm[:, 8] = t10_slpstd[valid]
+    mm[:, 9] = t10_curv[valid]
+    mm[:, 10] = t10_coh[valid]
+    mm[:, 11] = t10_line[valid]
+    mm[:, 12] = np.log1p(np.maximum(chi_step, 0.0)).astype(np.float32)[valid]
+    mm[:, 13] = np.log1p(np.maximum(chi_ksn, 0.0)).astype(np.float32)[valid]
+
+    # --- 3. Read official 19-band geophysical + detrended elevation channels ---
+    with rasterio.open(data_dir / "training_features.tif") as ds:
+        rtp = _clean_band(ds.read(2), valid)
+        tmi_hg = _clean_band(ds.read(3), valid)
+        geod_inv = _clean_band(ds.read(4), valid)
+        tc = _clean_band(ds.read(6), valid)
+        geod_shr = _clean_band(ds.read(7), valid)
+        geod_dil = _clean_band(ds.read(8), valid)
+        deq = _clean_band(ds.read(10), valid)
+        det_elev = _clean_band(ds.read(12), valid)
+        iso_grav = _clean_band(ds.read(13), valid)
+        depth_base = _clean_band(ds.read(15), valid)
+        ieq = _clean_band(ds.read(16), valid)
+        cond_surf = _clean_band(ds.read(17), valid)
+        grav_hg = _clean_band(ds.read(18), valid)
+        det_slope = _clean_band(ds.read(19), valid)
+
+    # --- 4. Group B: 360-deg Signed Dip-Polarity Normal-Fault Half-Space Tomography ---
+    z_sm1 = ndi.gaussian_filter(det_elev, sigma=1.0)
+    z_sm2 = ndi.gaussian_filter(det_elev, sigma=2.2)
+    z_sm4 = ndi.gaussian_filter(det_elev, sigma=4.5)
+
+    step2, mono2, phi2 = _directed_step_and_monotonicity(z_sm1, h_px=2)
+    step4, mono4, phi4 = _directed_step_and_monotonicity(z_sm2, h_px=4)
+    step8, mono8, phi8 = _directed_step_and_monotonicity(z_sm4, h_px=8)
+
+    mm[:, 14] = np.log1p(step2).astype(np.float32)[valid]
+    mm[:, 15] = mono2[valid]
+    mm[:, 16] = np.log1p(step4).astype(np.float32)[valid]
+    mm[:, 17] = mono4[valid]
+    mm[:, 18] = np.log1p(step8).astype(np.float32)[valid]
+    mm[:, 19] = mono8[valid]
+
+    # Signed hanging-wall vs footwall subsurface contrasts at down-thrown azimuth phi4!
+    dep_sm = ndi.gaussian_filter(depth_base, sigma=3.0)
+    grv_sm = ndi.gaussian_filter(iso_grav, sigma=3.0)
+    tc_sm = ndi.gaussian_filter(tc, sigma=2.0)
+    cnd_sm = ndi.gaussian_filter(cond_surf, sigma=3.0)
+
+    hw_dep = _directed_contrast_at_phi(dep_sm, phi4, h_px=8, sign=+1.0)  # + if hanging wall deeper!
+    hw_grv = _directed_contrast_at_phi(grv_sm, phi4, h_px=8, sign=-1.0)  # + if hanging wall lower density!
+    hw_tc = _directed_contrast_at_phi(tc_sm, phi4, h_px=5, sign=-1.0)    # + if magnetic tilt drops into basin!
+    hw_cnd = _directed_contrast_at_phi(cnd_sm, phi4, h_px=6, sign=+1.0)  # + if hanging wall more conductive!
+
+    mm[:, 20] = hw_dep[valid]
+    mm[:, 21] = hw_grv[valid]
+    mm[:, 22] = hw_tc[valid]
+    mm[:, 23] = hw_cnd[valid]
+
+    # Combined 360-deg Co-Polarized Normal-Fault Tomography Index
+    z_scarp = np.maximum(0.0, _robust_z_pos(np.log1p(step4) * mono4, valid))
+    z_dep = np.maximum(0.0, _robust_z_pos(hw_dep, valid))
+    z_grv = np.maximum(0.0, _robust_z_pos(hw_grv, valid))
+    z_tc = np.maximum(0.0, _robust_z_pos(hw_tc, valid))
+    bipolar_nf = z_scarp * (0.45 + 0.25 * z_dep + 0.20 * z_grv + 0.10 * z_tc)
+    mm[:, 24] = bipolar_nf.astype(np.float32)[valid]
+
+    strike_cont = _along_strike_continuity(np.log1p(step2) * mono2, phi2, half_len=4)
+    mm[:, 25] = strike_cont.astype(np.float32)[valid]
+    np.save(meta_path, phi2)
+
+    del z_sm1, z_sm2, z_sm4, dep_sm, grv_sm, tc_sm, cnd_sm, z_scarp, z_dep, z_grv, z_tc
+    gc.collect()
+
+    # --- 5. Group C: Fluvial Interfluve Index, Lake Lahontan Guard & Potential Fields ---
+    mm[:, 26] = log10_area.astype(np.float32)[valid]
+    interfluve_w = np.clip((4.6 - log10_area) / 1.4, 0.0, 1.0)
+    interfluve_scarp = (np.log1p(step2) * mono2) * interfluve_w + 0.25 * np.log1p(np.maximum(chi_ksn, 0.0)) * (1.0 - interfluve_w)
+    mm[:, 27] = interfluve_scarp.astype(np.float32)[valid]
+
+    # Distance in elevation from Pleistocene Lake Lahontan (~1332 m) & Bonneville (~1552 m) highstands
+    d_lahontan = np.minimum(np.abs(zmean_m - 1332.0), np.abs(zmean_m - 1270.0))
+    d_bonneville = np.abs(zmean_m - 1552.0)
+    pluvial_prox = np.exp(-0.5 * (np.minimum(d_lahontan, d_bonneville) / 14.0) ** 2).astype(np.float32)
+    mm[:, 28] = pluvial_prox[valid]
+
+    det_hp3 = det_elev - ndi.gaussian_filter(det_elev, sigma=3.0)
+    det_hp10 = det_elev - ndi.gaussian_filter(det_elev, sigma=10.0)
+    rtp_hp8 = rtp - ndi.gaussian_filter(rtp, sigma=8.0)
+    grav_hp8 = iso_grav - ndi.gaussian_filter(iso_grav, sigma=8.0)
+
+    mm[:, 29] = det_hp3.astype(np.float32)[valid]
+    mm[:, 30] = det_hp10.astype(np.float32)[valid]
+    mm[:, 31] = det_slope.astype(np.float32)[valid]
+    mm[:, 32] = rtp_hp8.astype(np.float32)[valid]
+    mm[:, 33] = np.log1p(np.abs(tmi_hg)).astype(np.float32)[valid]
+    tc_p90 = float(np.percentile(np.abs(tc[valid]), 90)) + 1e-6
+    mm[:, 34] = np.clip(1.0 - np.abs(tc) / tc_p90, 0.0, 1.0).astype(np.float32)[valid]
+    mm[:, 35] = grav_hp8.astype(np.float32)[valid]
+    mm[:, 36] = np.log1p(np.abs(grav_hg)).astype(np.float32)[valid]
+
+    gy_g, gx_g = np.gradient(ndi.gaussian_filter(iso_grav, sigma=2.5))
+    gy_m, gx_m = np.gradient(ndi.gaussian_filter(rtp, sigma=2.5))
+    ng = np.hypot(gy_g, gx_g) + 1e-8
+    nm = np.hypot(gy_m, gx_m) + 1e-8
+    cos_gm = ((gy_g * gy_m + gx_g * gx_m) / (ng * nm)) ** 2
+    mm[:, 37] = (cos_gm * np.log1p(ng * 10.0) * np.log1p(nm * 0.1)).astype(np.float32)[valid]
+    del gy_g, gx_g, gy_m, gx_m, ng, nm, cos_gm
+    gc.collect()
+
+    # --- 6. Group D: Deep Crustal Mechanics, Hydrothermal Alteration & GDR Conduits ---
+    gy_d, gx_d = np.gradient(ndi.gaussian_filter(depth_base, sigma=2.0))
+    gy_c, gx_c = np.gradient(ndi.gaussian_filter(cond_surf, sigma=2.0))
+    mm[:, 38] = depth_base.astype(np.float32)[valid]
+    mm[:, 39] = np.hypot(gy_d, gx_d).astype(np.float32)[valid]
+    mm[:, 40] = cond_surf.astype(np.float32)[valid]
+    mm[:, 41] = np.hypot(gy_c, gx_c).astype(np.float32)[valid]
+    del gy_d, gx_d, gy_c, gx_c
+
+    strain_comb = (
+        np.abs(_robust_z_pos(geod_inv, valid))
+        + np.abs(_robust_z_pos(geod_shr, valid))
+        + 0.5 * np.abs(_robust_z_pos(geod_dil, valid))
     )
-    deficit = np.maximum(tect_bg_full * scale_bg - vis_dens, 0.0).astype(np.float32)
-    updip_relay = ((ray_short + 0.7 * bridge + 0.5 * splay) * (0.25 + updip_energy_full)).astype(np.float32)
+    gy_eq, gx_eq = np.gradient(ndi.gaussian_filter(ieq, sigma=3.0))
+    mm[:, 42] = strain_comb.astype(np.float32)[valid]
+    mm[:, 43] = (np.hypot(gy_eq, gx_eq) + 0.1 * np.exp(-np.maximum(deq, 0.0) / 25.0)).astype(np.float32)[valid]
+    del geod_inv, geod_shr, geod_dil, deq, ieq, gy_eq, gx_eq
 
-    return np.stack(
-        [
-            ray_short,
-            ray_long,
-            splay,
-            bridge,
-            corridor,
-            np.minimum(dist_f32, 45.0).astype(np.float32),
-            (np.log1p(host_len) * np.exp(-dist_f32 / 18.0)).astype(np.float32),
-            deficit,
-            updip_relay,
-        ],
-        axis=-1,
+    with rasterio.open(ext_dir / "geodawn_rad_u8.tif") as ds:
+        rad_k = ds.read(1).astype(np.float32)
+        rad_th = ds.read(2).astype(np.float32)
+    with rasterio.open(ext_dir / "geodawn_extensions_u8.tif") as ds:
+        tmi_up150 = ds.read(4).astype(np.float32)
+
+    k_th_z = np.maximum(0.0, _robust_z_pos(rad_k / (rad_th + 8.0), valid))
+    mag_low_z = np.maximum(0.0, _robust_z_pos(-rtp_hp8, valid))
+    up_diff = np.abs(_robust_z_pos(rtp_hp8, valid) - _robust_z_pos(tmi_up150 - ndi.gaussian_filter(tmi_up150, 8.0), valid))
+    mm[:, 44] = (mag_low_z * (0.4 + 0.6 * k_th_z) + 0.25 * up_diff).astype(np.float32)[valid]
+    del rad_k, rad_th, tmi_up150, k_th_z, mag_low_z, up_diff, rtp, iso_grav, rtp_hp8, grav_hp8
+    gc.collect()
+
+    gdr_pts = _load_gdr_hydrothermal_grid(ext_dir, valid.shape, transform)
+    gdr_plume = 0.65 * ndi.gaussian_filter(gdr_pts, sigma=3.5) + 0.35 * ndi.gaussian_filter(gdr_pts, sigma=11.0)
+    mm[:, 45] = np.log1p(gdr_plume * 15.0).astype(np.float32)[valid]
+    del gdr_pts, gdr_plume
+
+    # --- 7. Group E: Multi-Scale 2D Piedmont Range-Front Structural Context ---
+    slp_600 = ndi.gaussian_filter(det_slope, sigma=6.0)
+    slp_2km = ndi.gaussian_filter(det_slope, sigma=18.0)
+    # Signed upslope minus downslope slope difference across 1.6 km: peaks right on the piedmont range-front break!
+    pied_trans = _directed_contrast_at_phi(slp_600, phi4, h_px=12, sign=-1.0)
+    dep_2km = ndi.gaussian_filter(depth_base, sigma=18.0)
+    rel_sq = ndi.gaussian_filter(det_elev * det_elev, sigma=15.0) - ndi.gaussian_filter(det_elev, sigma=15.0) ** 2
+    rel_std_2km = np.sqrt(np.maximum(rel_sq, 0.0))
+    scarp_chain_1km = ndi.gaussian_filter(strike_cont, sigma=4.0)
+
+    mm[:, 46] = slp_600.astype(np.float32)[valid]
+    mm[:, 47] = slp_2km.astype(np.float32)[valid]
+    mm[:, 48] = pied_trans.astype(np.float32)[valid]
+    mm[:, 49] = dep_2km.astype(np.float32)[valid]
+    mm[:, 50] = rel_std_2km.astype(np.float32)[valid]
+    mm[:, 51] = scarp_chain_1km.astype(np.float32)[valid]
+
+    del slp_600, slp_2km, pied_trans, dep_2km, rel_sq, rel_std_2km, scarp_chain_1km, det_elev, det_slope, depth_base
+    gc.collect()
+
+    # --- 8. Fill `superres_scarp_seamless` (col 6) using ONLY zero-label 10m + physical features! ---
+    # Trained strictly on interior-LiDAR pixels (`lid_interior[valid]`) with ZERO access to any fault catalogue.
+    predictor_cols = [7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 25, 26, 27, 29, 31, 46, 48]
+    lid_mask_v = lid_interior[valid]
+    y_super = lid_composite_target[valid]
+    rng = np.random.default_rng(8001)
+    tr_idx = rng.choice(np.flatnonzero(lid_mask_v), size=min(220_000, int(lid_mask_v.sum())), replace=False)
+    sr_reg = HistGradientBoostingRegressor(
+        max_iter=120, learning_rate=0.07, max_leaf_nodes=31, min_samples_leaf=150, l2_regularization=3.0, random_state=8001
+    )
+    sr_reg.fit(np.asarray(mm[tr_idx][:, predictor_cols], dtype=np.float32), y_super[tr_idx])
+    super_pred = np.empty(n_valid, dtype=np.float32)
+    step = 600_000
+    for s in range(0, n_valid, step):
+        super_pred[s : s + step] = sr_reg.predict(np.asarray(mm[s : s + step, predictor_cols], dtype=np.float32))
+    # Inside interior-valid 1m LiDAR, blend 75% actual 1m LiDAR composite + 25% super-resolved 10m;
+    # outside 1m LiDAR (the 24.7% non-LiDAR gap + 2-px tile seams), use quantile-matched super-resolved 10m!
+    gap_v = ~lid_mask_v
+    q_grid = np.linspace(0.0, 1.0, 1001)
+    super_cal = super_pred.copy()
+    super_cal[gap_v] = np.interp(
+        super_pred[gap_v],
+        np.quantile(super_pred[gap_v], q_grid),
+        np.quantile(y_super[lid_mask_v], q_grid),
+    ).astype(np.float32)
+    super_cal[lid_mask_v] = 0.75 * y_super[lid_mask_v] + 0.25 * super_pred[lid_mask_v]
+    mm[:, 6] = super_cal
+    mm.flush()
+
+    del lid_composite_target, super_pred, super_cal, t10_slp90, t10_slpstd, t10_relief, t10_curv, t10_coh, t10_line
+    gc.collect()
+    return np.memmap(cache_path, dtype=np.float32, mode="r", shape=(n_valid, N_STATIC)), phi2
+
+
+def compute_component_tips(catalogue: np.ndarray) -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
+    """Extract principal endpoints and outward unit tangents for each 8-connected trace >= 4 px."""
+    cat = np.asarray(catalogue, bool)
+    comp, n = ndi.label(cat, structure=np.ones((3, 3), dtype=int))
+    if n == 0:
+        z = np.zeros(0, dtype=np.float32)
+        return z, z, z, z, z
+    ys, xs = np.nonzero(cat)
+    ids = comp[ys, xs]
+    counts = np.bincount(ids, minlength=n + 1).astype(np.float64)
+    keep_ids = np.flatnonzero(counts >= 4)
+    if keep_ids.size == 0:
+        z = np.zeros(0, dtype=np.float32)
+        return z, z, z, z, z
+
+    cy = np.bincount(ids, weights=ys, minlength=n + 1) / np.maximum(counts, 1.0)
+    cx = np.bincount(ids, weights=xs, minlength=n + 1) / np.maximum(counts, 1.0)
+    dy = ys - cy[ids]
+    dx = xs - cx[ids]
+    syy = np.bincount(ids, weights=dy * dy, minlength=n + 1)
+    sxx = np.bincount(ids, weights=dx * dx, minlength=n + 1)
+    sxy = np.bincount(ids, weights=dy * dx, minlength=n + 1)
+    theta = 0.5 * np.arctan2(2.0 * sxy, sxx - syy + 1e-12)
+    vy = np.cos(theta)  # note: sxx - syy uses x first! Be exact with eigenvector below:
+    # Exact principal eigenvector of [[syy, sxy], [sxy, sxx]]:
+    ang = 0.5 * np.arctan2(2.0 * sxy, syy - sxx + 1e-12)
+    ey = np.cos(ang)
+    ex = np.sin(ang)
+
+    proj = dy * ey[ids] + dx * ex[ids]
+    order = np.argsort(ids, kind="mergesort")
+    ids_s = ids[order]
+    proj_s = proj[order]
+    ys_s = ys[order]
+    xs_s = xs[order]
+    splits = np.flatnonzero(np.diff(ids_s)) + 1
+    groups_idx = np.split(np.arange(ids_s.size), splits)
+
+    ty_list, tx_list, oy_list, ox_list, len_list = [], [], [], [], []
+    for g in groups_idx:
+        cid = int(ids_s[g[0]])
+        cnt = float(counts[cid])
+        if cnt < 4.0:
+            continue
+        p_g = proj_s[g]
+        i_min = g[int(np.argmin(p_g))]
+        i_max = g[int(np.argmax(p_g))]
+        # Local tangent from pixels within 8 px of each tip for curved faults!
+        for tip_idx, sign in ((i_min, -1.0), (i_max, +1.0)):
+            ty0, tx0 = float(ys_s[tip_idx]), float(xs_s[tip_idx])
+            d2 = (ys_s[g] - ty0) ** 2 + (xs_s[g] - tx0) ** 2
+            near = g[(d2 > 0.5) & (d2 <= 64.0)]
+            if near.size >= 2:
+                vy_loc = float(ty0 - np.mean(ys_s[near]))
+                vx_loc = float(tx0 - np.mean(xs_s[near]))
+                nrm = float(np.hypot(vy_loc, vx_loc))
+                if nrm > 1e-4:
+                    uy, ux = vy_loc / nrm, vx_loc / nrm
+                else:
+                    uy, ux = float(sign * ey[cid]), float(sign * ex[cid])
+            else:
+                uy, ux = float(sign * ey[cid]), float(sign * ex[cid])
+            ty_list.append(ty0)
+            tx_list.append(tx0)
+            oy_list.append(uy)
+            ox_list.append(ux)
+            len_list.append(cnt)
+
+    return (
+        np.asarray(ty_list, dtype=np.float32),
+        np.asarray(tx_list, dtype=np.float32),
+        np.asarray(oy_list, dtype=np.float32),
+        np.asarray(ox_list, dtype=np.float32),
+        np.asarray(len_list, dtype=np.float32),
     )
 
 
-def run_leakage_canary_audit(
-    stack: StaticStack,
-    folds: List[dict],
-    fp: np.ndarray,
-    max_allowed_auc: float = 0.90,
-    seed: int = 80,
-) -> dict:
-    """Test every single feature (all 50 static + 9 fold-visible mechanics = 59 features)
-    alone on the spatially-blocked holdout before trusting any model result (`Protocol Rule 4`)."""
-    rng = np.random.default_rng(seed)
-    inv_map = np.full(fp.size, -1, dtype=np.int64)
-    inv_map[stack.valid_idx] = np.arange(stack.valid_idx.size, dtype=np.int64)
+def compute_fracture_mechanics_features(
+    visible: np.ndarray, valid: np.ndarray
+) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
+    """Compute strictly fold-proper 7 fracture-mechanics channels on `valid`, plus 2D `d_vis` & `tip_cone`.
 
-    pos_flat_parts = []
-    neg_flat_parts = []
-    mech_pos_parts = []
-    mech_neg_parts = []
+    Zero-leakage guarantee: depends ONLY on `visible` (the fold's un-hidden catalogue).
+    """
+    from scipy.spatial import cKDTree
 
-    for f in folds:
-        reg = f["region"]
-        truth = f["truth"] & reg
-        neg_pool = reg & (~f["visible"]) & (~f["hidden_all"])
-        p_idx = np.flatnonzero(truth)
-        n_pool = np.flatnonzero(neg_pool)
-        n_idx = rng.choice(n_pool, size=min(len(n_pool), 4 * len(p_idx)), replace=False)
+    vis = np.asarray(visible, dtype=bool)
+    d_vis, inds = ndi.distance_transform_edt(~vis, return_indices=True)
+    d_vis = d_vis.astype(np.float32)
 
-        mech2d = compute_fold_mechanics_2d(
-            f["visible"], fp, stack.best_strike_full, stack.tect_bg_full, stack.updip_energy_full
-        ).reshape(-1, len(FOLD_MECH_NAMES))
-        pos_flat_parts.append(p_idx)
-        neg_flat_parts.append(n_idx)
-        mech_pos_parts.append(mech2d[p_idx])
-        mech_neg_parts.append(mech2d[n_idx])
-        del mech2d
-        gc.collect()
+    comp, _ = ndi.label(vis, structure=np.ones((3, 3), dtype=int))
+    sizes = np.bincount(comp.ravel())
+    sizes[0] = 0
+    nearest_len = sizes[comp[inds[0], inds[1]]].astype(np.float32)
+    del comp, sizes, inds
 
-    pos_flat = np.concatenate(pos_flat_parts)
-    neg_flat = np.concatenate(neg_flat_parts)
-    y = np.concatenate([np.ones(len(pos_flat)), np.zeros(len(neg_flat))])
+    ty, tx, oy, ox, tlen = compute_component_tips(vis)
+    n_valid = int(valid.sum())
+    F = np.zeros((n_valid, N_FRACTURE), dtype=np.float32)
+    F[:, 0] = np.minimum(d_vis[valid], 50.0)
 
-    rows_pos = inv_map[pos_flat]
-    rows_neg = inv_map[neg_flat]
-    X_pos = np.hstack([np.asarray(stack.X_mmap[rows_pos], dtype=np.float32), np.vstack(mech_pos_parts)])
-    X_neg = np.hstack([np.asarray(stack.X_mmap[rows_neg], dtype=np.float32), np.vstack(mech_neg_parts)])
-    X_all = np.vstack([X_pos, X_neg])
+    tip_cone_2d = np.zeros(vis.shape, dtype=bool)
+    if ty.size > 0:
+        tree = cKDTree(np.column_stack([ty, tx]))
+        vy_all, vx_all = np.nonzero(valid)
+        k_q = min(2, ty.size)
+        # Chunked KD-tree query to keep peak RAM tiny (<120 MB)
+        ax_lobe = np.zeros(n_valid, dtype=np.float32)
+        wing_lobe = np.zeros(n_valid, dtype=np.float32)
+        relay_bridge = np.zeros(n_valid, dtype=np.float32)
+        tip_cone_v = np.zeros(n_valid, dtype=bool)
+        w_scale = np.log1p(tlen) / np.log1p(25.0)
 
-    results = []
-    violators = []
-    for j, name in enumerate(ALL_BASE_FEATURE_NAMES):
-        col = X_all[:, j]
-        fin = np.isfinite(col)
-        if np.sum(fin) < 200 or np.ptp(col[fin]) == 0.0:
-            auc = 0.5
-        else:
-            auc = float(roc_auc_score(y[fin], col[fin]))
-        sym_auc = float(max(auc, 1.0 - auc))
-        rec = {
-            "feature_index": j,
-            "feature": name,
-            "group": (
-                "deconfounded_scarp_geomorph"
-                if j < 18
-                else "geothermal_vent_mt_rad"
-                if j < 34
-                else "updip60_subsurface_tilt_strain"
-                if j < 50
-                else "fold_visible_fracture_mechanics"
-            ),
-            "roc_auc": round(auc, 5),
-            "symmetric_auc": round(sym_auc, 5),
-            "finite_fraction": round(float(np.mean(fin)), 5),
-            "status": "PASS" if sym_auc <= max_allowed_auc else "LEAKAGE_FAIL",
-        }
-        results.append(rec)
-        if sym_auc > max_allowed_auc:
-            violators.append(rec)
+        step = 500_000
+        sin25, cos25 = float(np.sin(np.deg2rad(26.0))), float(np.cos(np.deg2rad(26.0)))
+        for s in range(0, n_valid, step):
+            pts = np.column_stack([vy_all[s : s + step], vx_all[s : s + step]])
+            dists, idxs = tree.query(pts, k=k_q, distance_upper_bound=42.0)
+            if k_q == 1:
+                dists = dists[:, None]
+                idxs = idxs[:, None]
+            for j_col in range(k_q):
+                idx_j = idxs[:, j_col]
+                ok = idx_j < ty.size
+                if not ok.any():
+                    continue
+                idx_ok = idx_j[ok]
+                dy = pts[ok, 0] - ty[idx_ok]
+                dx = pts[ok, 1] - tx[idx_ok]
+                u = dy * oy[idx_ok] + dx * ox[idx_ok]       # along outward tip tangent
+                v = -dy * ox[idx_ok] + dx * oy[idx_ok]      # cross-strike signed offset
+                sc = w_scale[idx_ok]
 
-    results_sorted = sorted(results, key=lambda r: r["symmetric_auc"], reverse=True)
-    summary = {
-        "evidence_class": "LEAKAGE-CANARY-AUDIT",
-        "evaluator_version": "gems57-pooled-hide-v2",
-        "n_withheld_positives_tested": int(len(pos_flat)),
-        "n_off_fault_negatives_tested": int(len(neg_flat)),
-        "threshold_symmetric_auc": max_allowed_auc,
-        "max_symmetric_auc": results_sorted[0]["symmetric_auc"],
-        "top_feature": results_sorted[0]["feature"],
-        "n_features_tested": len(results),
-        "n_violations": len(violators),
-        "all_passed": len(violators) == 0,
-        "features_ranked": results_sorted,
-    }
-    if violators:
-        raise RuntimeError(f"LEAKAGE CANARY VIOLATION (> {max_allowed_auc}): {violators}")
-    return summary
+                # 1. Axial continuation lobe ahead of fault tip (u > 0, tight |v|)
+                lobe_a = np.where(
+                    u > 0.4,
+                    sc * np.exp(-u / 18.0) * np.exp(-0.5 * (v / 3.2) ** 2),
+                    0.0,
+                )
+                ax_lobe[s : s + step][ok] = np.maximum(ax_lobe[s : s + step][ok], lobe_a)
+
+                # Tip-cone exemption where unmapped trace continues right off a visible tip (`1.05 < d_vis <= 2.1`)
+                cone_hit = (u > 0.8) & (u < 6.0) & (np.abs(v) <= 1.8)
+                tip_cone_v[s : s + step][ok] |= cone_hit
+
+                # 2. +/- 26-deg Andersonian tensile wing-crack splays at fault tips
+                u_w1 = u * cos25 + v * sin25
+                v_w1 = -u * sin25 + v * cos25
+                u_w2 = u * cos25 - v * sin25
+                v_w2 = u * sin25 + v * cos25
+                w1 = np.where(u_w1 > 0.5, sc * np.exp(-u_w1 / 14.0) * np.exp(-0.5 * (v_w1 / 3.5) ** 2), 0.0)
+                w2 = np.where(u_w2 > 0.5, sc * np.exp(-u_w2 / 14.0) * np.exp(-0.5 * (v_w2 / 3.5) ** 2), 0.0)
+                wing_lobe[s : s + step][ok] = np.maximum(wing_lobe[s : s + step][ok], np.maximum(w1, w2))
+
+            # 3. En-echelon relay ramp / stepover bridge between TWO distinct fault tips!
+            if k_q >= 2:
+                both = (idxs[:, 0] < ty.size) & (idxs[:, 1] < ty.size) & (idxs[:, 0] != idxs[:, 1])
+                if both.any():
+                    i0, i1 = idxs[both, 0], idxs[both, 1]
+                    d0, d1 = dists[both, 0], dists[both, 1]
+                    # Facing / sub-parallel stepover geometry: dot(o0, o1) <= 0.25 or overlapping relay
+                    anti_align = np.clip(0.65 - 0.35 * (oy[i0] * oy[i1] + ox[i0] * ox[i1]), 0.15, 1.0)
+                    bridge = anti_align * np.exp(-(d0 + d1) / 22.0) * np.minimum(w_scale[i0], w_scale[i1])
+                    relay_bridge[s : s + step][both] = bridge
+
+        F[:, 1] = ax_lobe
+        F[:, 2] = wing_lobe
+        F[:, 3] = relay_bridge
+        tip_cone_2d[valid] = tip_cone_v
+
+    F[:, 4] = (np.log1p(nearest_len[valid]) * np.exp(-d_vis[valid] / 14.0)).astype(np.float32)
+    accomm = ndi.gaussian_filter(vis.astype(np.float32), sigma=16.0)
+    F[:, 5] = accomm[valid].astype(np.float32)
+    F[:, 6] = ((d_vis[valid] > 0.0) & (d_vis[valid] <= 2.2) & (~tip_cone_2d[valid])).astype(np.float32)
+    return F, d_vis, tip_cone_2d

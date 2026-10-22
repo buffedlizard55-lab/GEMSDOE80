@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
+# Restore SHA-256-verified official DrivenData GEMS & public USGS/DOE external inputs
+# via zero-auth GitHub codeload streams (works both in sandbox and on unrestricted machines).
 set -euo pipefail
-# Autonomous zero-manual-input competition, external federal geoscience, and
-# reference scored raster restoration for GEMSDOE80 (Lane H80-DPVC).
-# Every file is SHA-256 verified against registry/data_manifest.json.
-
-ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-cd "$ROOT_DIR"
-
-python3 scripts/restore_data.py
+ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+PY="${ROOT}/.venv/bin/python"
+if [ ! -x "${PY}" ]; then
+  PY="python3"
+fi
+exec "${PY}" "${ROOT}/scripts/restore_data.py" "$@"
