@@ -1,5 +1,5 @@
-"""GEMSDOE80 unique-lane tools: official-grid I/O, DTI metric, holdout, emission."""
+"""GEMSDOE80 — Lane H80-DPVC: Updip Dip-Projected Basement-to-Surface Coupler,
+Hydrothermal Magnetite-Destruction / Clay-Cap / Geothermometer Vent Conduit &
+Self-Masked Fracture-Transfer OOF Ensemble with Expected-DTI Hybrid Submodular Emission."""
 
-from .metric import ALPHA, BETA, RADIUS_M, dti_binary, dti_from_components
-
-__all__ = ["ALPHA", "BETA", "RADIUS_M", "dti_binary", "dti_from_components"]
+__version__ = "80.1.0"
