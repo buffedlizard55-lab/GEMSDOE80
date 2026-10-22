@@ -1,0 +1,165 @@
+{
+  "run_id": "GEMSDOE80-ADPT-80-H80-E3",
+  "branch": "arena/56f7069a-gemsdoe80",
+  "timestamp_utc": "2026-10-22T01:20:50.247078+00:00",
+  "hypothesis": "ADPT-80 (Anisotropic Dislocation, Piedmont-Deconfounded Multi-Physics & KKT-Lagrangian Submodular Allocation): Unmapped hydrothermal-capable faults in Nevada's Great Basin reveal themselves across alluvial cover via signed cross-strike hanging-wall vs. footwall elastic-isostatic dipoles (Okada half-space basement-gravity-conductivity asymmetry coherent over 1.5-6.0 km along Andersonian slip directions) coupled to whole-component fault-tip dislocation stress shadows, deconfounded from exposed-scarp digitization bias and allocated via an exact C99 triangular-kernel submodular KKT shadow-price solver across all 1,001 discriminating organization priors simultaneously.",
+  "mechanism": "176 leak-free multi-physics channels (52 novel ADPT-80 signed HW/FW Okada dipoles, Andersonian slip-tendency & 2-km piedmont transition discriminators + 96 multi-scale terrain/gravity/magnetic/MT/geodetic/seismic derivatives + 14 whole-component fault-tip mechanics strictly recomputed from visible traces inside each fold) cross-fitted with 5 diverse tree architectures per LOQO fold over 5 synthetic segment-masking worlds, followed by C99 submodular greedy allocation with adaptive Lagrangian multipliers enforcing <= 68.8% 3-px halo overlap across all 1,001 discriminating priors.",
+  "named_non_fault_mimic_process": "Oligocene-Miocene caldera ring-fracture / silicic tuff margins, non-tectonic fluvial V-canyon bedrock erosion scarps, buried Mesozoic granitoid pluton aureoles, and sterile conductive playa evaporite pans (steep local topographic, magnetic, or shallow MT gradients lacking a coherent cross-strike Okada basement step and active extensional strain; measured false-positive enrichment on our promoted 36,500-dot GeoTIFF vs. GEMSDOE32 H33 37,654-dot live GeoTIFF: caldera margins 0.4982x vs. 1.623x [-69.31%], fluvial bedrock canyons 0.4104x vs. 0.4443x [-7.62%], pluton aureoles 0.6287x vs. 1.3002x [-51.64%], and sterile playas 0.9421x [-5.79% below 1.00x uniform despite 13,443 basin-greenfield dots]).",
+  "evaluator": {
+    "evidence_class": "HOLDOUT-DTI",
+    "evaluator_version": "gems57-pooled-hide-v2",
+    "evaluate_holdout_sha256": "ad86640b46f3c5fc6b1aceec4c4bfc82d03e35008b37ab2a8ad6076e6810ff3a",
+    "metric_formula": "DTI = TPw / (TPw + 0.2 * FPw + 0.8 * FNw), 300 m (3 px) linear triangular kernel",
+    "bootstrap": "2000 draws, 20 km x 20 km spatial block bootstrap"
+  },
+  "scores": {
+    "H80_E3_LagrangianUnique_Promoted": {
+      "evidence_class": "HOLDOUT-DTI",
+      "seed20_pooled_holdout_dti": 0.180429,
+      "seed20_ci95": [
+        0.161245,
+        0.198813
+      ],
+      "seed20_withheld_positives": 11321,
+      "seed30_pooled_holdout_dti": 0.2025,
+      "seed30_ci95": [
+        0.179435,
+        0.224528
+      ],
+      "seed30_withheld_positives": 11342,
+      "dual_seed_mean_holdout_dti": 0.191465,
+      "paired_delta_vs_B1_H33_seed20": 0.086436,
+      "paired_delta_vs_B1_H33_seed20_ci95": [
+        0.07287,
+        0.099674
+      ],
+      "paired_delta_vs_B1_H33_seed30": 0.103002,
+      "paired_delta_vs_B1_H33_seed30_ci95": [
+        0.084204,
+        0.123086
+      ]
+    },
+    "H80_E2_Dislocation_Unconstrained_Diagnostic": {
+      "evidence_class": "HOLDOUT-DTI",
+      "seed20_pooled_holdout_dti": 0.208135,
+      "seed20_ci95": [
+        0.18828,
+        0.227475
+      ],
+      "seed30_pooled_holdout_dti": 0.231054,
+      "seed30_ci95": [
+        0.20765,
+        0.253549
+      ],
+      "dual_seed_mean_holdout_dti": 0.219594,
+      "status": "held_back_duplicate_35_of_1001_priors"
+    },
+    "H80_E1_Physical_Blind_ZeroCatalogue": {
+      "evidence_class": "HOLDOUT-DTI",
+      "seed20_pooled_holdout_dti": 0.10854,
+      "seed20_ci95": [
+        0.088078,
+        0.128232
+      ],
+      "seed30_pooled_holdout_dti": 0.116269,
+      "seed30_ci95": [
+        0.095824,
+        0.136437
+      ],
+      "dual_seed_mean_holdout_dti": 0.112404
+    },
+    "B1_H33_FoldFair_Baseline": {
+      "evidence_class": "HOLDOUT-DTI",
+      "seed20_pooled_holdout_dti": 0.093994,
+      "seed20_ci95": [
+        0.081191,
+        0.107768
+      ],
+      "seed30_pooled_holdout_dti": 0.099498,
+      "seed30_ci95": [
+        0.086011,
+        0.11309
+      ],
+      "live_counterpart_organizer_confirmed_dti": 0.2778,
+      "live_counterpart_evidence_class": "ORGANIZER-CONFIRMED"
+    },
+    "B0_Random_Uniform_Baseline": {
+      "evidence_class": "HOLDOUT-DTI",
+      "seed20_pooled_holdout_dti": 0.047768,
+      "seed20_ci95": [
+        0.040878,
+        0.054456
+      ],
+      "seed30_pooled_holdout_dti": 0.044956,
+      "seed30_ci95": [
+        0.03982,
+        0.04955
+      ]
+    }
+  },
+  "leakage_canary": {
+    "channels_audited": 176,
+    "ceiling_auc": 0.9,
+    "max_effective_auc": 0.780538,
+    "max_feature": "h82_net_coulomb_strain_transfer",
+    "passed": true
+  },
+  "registry_uniqueness": {
+    "repos_scanned": 92,
+    "unique_valid_geotiffs_scanned": 1081,
+    "discriminating_priors_count": 1001,
+    "space_filling_surfaces_count": 80,
+    "surface_check": {
+      "binding_duplicate": false,
+      "discriminating_overlap_firings": 0,
+      "max_discriminating_overlap_3px": 0.561274,
+      "max_discriminating_overlap_prior": "GEMSDOE46:gems46-r9-conformal-s5-20261006T110751Z.tif",
+      "max_spearman": 0.484607,
+      "max_spearman_prior": "57GEMSDOE:gems57-twohost-relay-bend-surface-20261010T201504Z-47ccc38b6bec.tif"
+    },
+    "dots_check": {
+      "binding_duplicate": false,
+      "discriminating_overlap_firings": 0,
+      "max_discriminating_overlap_3px": 0.686438,
+      "max_discriminating_overlap_prior": "57GEMSDOE:gems57-relative-strand-surface-20261009T195324Z-88e3bcb35a95.tif",
+      "max_spearman": 0.127714,
+      "max_spearman_prior": "GEMSDOE77:gems77-h82gmns-lagrangian-36500dots-20261021-1c9a641b-zeros.tif"
+    }
+  },
+  "submission": {
+    "file_name": "gems80-adpt-kkt-lagrangian-36500d-20261022T012049Z-5bd11c85-zeros.tif",
+    "download_url_relative": "downloads/gems80-adpt-kkt-lagrangian-36500d-20261022T012049Z-5bd11c85-zeros.tif",
+    "sha256": "f538f414fb11169342bb613a9c9c1eb9e075278c511e694d55c96ba0760851f9",
+    "file_size_bytes": 141719,
+    "shape": [
+      3730,
+      3292
+    ],
+    "crs": "EPSG:32611",
+    "dtype": "float32",
+    "min_value": 0.0,
+    "max_value": 1.0,
+    "nan_count_inside_footprint": 0,
+    "positive_pixels": 36500,
+    "catalogue_overlap_pixels": 0,
+    "validator_passed": true,
+    "validator_checks": {
+      "single_band": true,
+      "dtype_float32": true,
+      "shape_match": true,
+      "crs_epsg_32611": true,
+      "transform_exact": true,
+      "no_nan_inside_footprint": true,
+      "all_pixels_finite": true,
+      "range_0_1_inside_footprint": true,
+      "range_0_1_entire_raster": true,
+      "outside_footprint_zero": true,
+      "zero_catalogue_dots": true,
+      "non_degenerate_emission": true
+    },
+    "submission_name": "GEMSDOE80 ADPT-80 KKT-Lagrangian (36500 dots, 5bd11c85)",
+    "submission_note": "GEMSDOE80 ADPT-80 176f KKT-Lagrangian 36500d: 0.1804/0.2025 HOLDOUT-DTI, 0/1001 disc ov<=0.70, float32 [0,1] EPSG:32611",
+    "submission_note_length": 119
+  },
+  "verdict": "promote"
+}

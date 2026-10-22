@@ -1,0 +1,161 @@
+{
+  "project": "buffedlizard55-lab/GEMSDOE80",
+  "branch": "arena/f3698cb5-gemsdoe80",
+  "generated_utc": "2026-10-22T01:48:00Z",
+  "competition": "DrivenData #306 \u2014 DOE Geologic Enhanced Mapping System (GEMS) Prize",
+  "selected_experiment": "Experiment 3 of 3 (H80-Exp3-Choquet-Submodular)",
+  "hypothesis": "Unmapped geothermal-indicative faults in NW Great Basin follow two distinct geological regimes: (A) Mode-II/III elastic fracture-process-zone continuations, fracture-arrest stress shadows, and collinear/en-echelon relay bridges extending from known USGS/INGENIOUS fault tips, and (B) buried greenfield range-front and piedmont structures characterized by high 3D crustal slip/dilation tendency (Ts, Td), hanging-wall-pulled gravity/magnetic basement steps, 1m LiDAR scarp asymmetry, and convective hydrothermal upflow / boiling-zone K/Th alteration anomalies.",
+  "mechanism": "Two-Regime spatially blocked 4-quadrant out-of-fold LightGBM posterior fusing 34 strictly label-free multi-physics channels (1m 3DEP LiDAR scarps, 100m DEM breaklines + shoreline mimic rejection, 2.5-3.0 px up-dip potential-field worms, USGS 3D crustal Cauchy Ts/Td stress at sigma=25 km, GDR 1391 geothermometers, USGS convective heat-flow residuals, shallow 3D Euler contacts, GeoDAWN K/Th & demag) with 13 fold-strict directed topology channels trained via nested self-supervised hide-and-recover, allocated into sparse binary {0.0, 1.0} off-catalogue dots (d_cat > 200 m) via exact 6-shell discrete Choquet-survival Minoux-Dinkelbach fractional programming.",
+  "named_non_fault_mimic": "Pleistocene Lake Lahontan (~1332 m) & Lake Bonneville (~1463/1552 m) wave-cut paleoshoreline benches, Miocene basalt mesa rims, symmetric fluvial canyon risers, and un-slipped pluton contacts \u2014 suppressed explicitly by shoreline_mimic_penalty (contour breakline lacking subsurface gravity/basement offset), 1m LiDAR scarp asymmetry (lid_tect_ratio), and 3D Cauchy slip/dilation tendency (Ts * Td).",
+  "holdout_dti": {
+    "label": "HOLDOUT-DTI",
+    "organizer_confirmed": false,
+    "evaluator_version": "GEMSDOE80-evaluate_holdout.py-v2 (DTI alpha=0.2 beta=0.8 R=300m triangular kernel, Voronoi multinomial cluster CI)",
+    "withheld_positive_count": 18313,
+    "n_components_held": 957,
+    "n_components_total": 3199,
+    "score": 0.234863,
+    "ci95": [
+      0.220678,
+      0.248287
+    ],
+    "TP_w": 5772.554,
+    "FP_w": 43867.177,
+    "FN_w": 12540.446,
+    "n_pred_after_visible_mask": 47118,
+    "spatial_quadrant_dti": {
+      "NW": 0.236621,
+      "NE": 0.260499,
+      "SW": 0.225825,
+      "SE": 0.23085
+    },
+    "ablation_progression_3_of_3": [
+      {
+        "stage": "Prior GEMSDOE80 v1 (H80-C)",
+        "label": "HOLDOUT-DTI",
+        "score": 0.0507,
+        "dots": 28807
+      },
+      {
+        "stage": "Matched Random Control (NMS sep=3)",
+        "label": "HOLDOUT-DTI",
+        "score": 0.0588,
+        "ci95": [
+          0.0548,
+          0.0633
+        ],
+        "dots": 37654
+      },
+      {
+        "stage": "Exp 1/3: H80-Exp1-MPhys-NMS (34-ch label-free OOF)",
+        "label": "HOLDOUT-DTI",
+        "score": 0.0834,
+        "ci95": [
+          0.0779,
+          0.0886
+        ],
+        "dots": 37654
+      },
+      {
+        "stage": "Exp 2/3: H80-Exp2-TwoRegime-NMS (+ crack-tip & bridges)",
+        "label": "HOLDOUT-DTI",
+        "score": 0.1026,
+        "ci95": [
+          0.0969,
+          0.1084
+        ],
+        "dots": 37654
+      },
+      {
+        "stage": "Exp 3/3: H80-Exp3-Choquet-Submodular (selected)",
+        "label": "HOLDOUT-DTI",
+        "score": 0.2349,
+        "ci95": [
+          0.2207,
+          0.2483
+        ],
+        "dots": 47118
+      }
+    ]
+  },
+  "leakage_canary": {
+    "audited_features_count": 47,
+    "threshold_auc": 0.9,
+    "max_holdout_auc_all_47_features": 0.78864,
+    "max_raw_geodawn_19band_auc": 0.586539,
+    "leakage_flag": false
+  },
+  "registry_uniqueness": {
+    "registry_rasters_checked": 20,
+    "thresholds": {
+      "spearman_max": 0.9,
+      "dot_overlap_3px_max": 0.7
+    },
+    "pre_placement_surface_max_abs_spearman": 0.095177,
+    "pre_placement_duplicate": false,
+    "post_placement_max_abs_spearman_surface": 0.095177,
+    "post_placement_max_abs_spearman_dots": 0.047525,
+    "post_placement_max_dot_fraction_within_3px_genuine_models": 0.651615,
+    "vs_gemsdoe32_h33_2_b2": {
+      "name": "h33-h33-2-b2-zeros",
+      "spearman": 0.067928,
+      "spearman_dots": 0.019244,
+      "dot_fraction_within_3px": 0.37703,
+      "footprint_3px_coverage": 0.150853,
+      "space_filling_lattice_probe": false,
+      "duplicate": false,
+      "registry_positive_px": 37654
+    },
+    "duplicate_lane": false
+  },
+  "submission_artifacts": {
+    "primary_zeros_tif": "docs/downloads/gemsdoe80-h80g-choquet-tworegime-20261022T000000Z-zeros.tif",
+    "primary_zeros_sha256": "a3c14d76d1f58802c8bd3f13378cbeb037ad3618d5fbd9dbf5f5a0dae4a35ede",
+    "primary_zeros_bytes": 162346,
+    "zip_bundle": "docs/downloads/gemsdoe80-h80g-choquet-tworegime-20261022T000000Z-zeros.zip",
+    "zip_sha256": "9f7bc446d77ff88ca6d3bd874e0fd82413975d0aea148a8026993bc30b4b81c5",
+    "zip_bytes": 125701,
+    "nan_outside_twin": "docs/downloads/gemsdoe80-h80g-choquet-tworegime-20261022T000000Z-nan.tif",
+    "nan_outside_sha256": "b74b3a94abca4d5643ca1f41356c7e64ad8f5dfa608e4205b263873d4b9f995b",
+    "positive_unit_dots": 51667,
+    "on_catalogue_positive_px": 0
+  },
+  "validator_output": {
+    "format_valid": true,
+    "submit_format_ok": true,
+    "download_ready": true,
+    "organizer_confirmed": false,
+    "crs": "EPSG:32611",
+    "shape": [
+      3730,
+      3292
+    ],
+    "transform": [
+      100.0,
+      0.0,
+      243350.0,
+      0.0,
+      -100.0,
+      4508550.0
+    ],
+    "dtype": "float32",
+    "nodata": null,
+    "value_range": [
+      0.0,
+      1.0
+    ],
+    "values_in_0_1": true,
+    "nan_inside_footprint": 0,
+    "nan_anywhere_in_12279160_grid": 0,
+    "errors": []
+  },
+  "submission_name": "gemsdoe80-h80g-choquet-tworegime-20261022T000000Z-zeros",
+  "submission_note": "H80G 2-regime OOF 34ch multiphysics + crack-tip/bridge + 6-shell Choquet Dinkelbach; 51667 dots; HOLDOUT-DTI 0.2349 [0.2207,0.2483]",
+  "submission_note_length": 131,
+  "budget_compliance": {
+    "experiments_run": 3,
+    "max_experiments_allowed": 3,
+    "live_weekly_slots_spent": 0
+  },
+  "verdict": "promote"
+}

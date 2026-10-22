@@ -1,0 +1,32 @@
+{
+  "template": {
+    "height": 3730,
+    "width": 3292,
+    "crs": "EPSG:32611",
+    "transform": [
+      100.0,
+      0.0,
+      243350.0,
+      0.0,
+      -100.0,
+      4508550.0
+    ],
+    "nodata": NaN,
+    "footprint_px": 5167373,
+    "dtype": "float32"
+  },
+  "labels_positive_px": 60988,
+  "existing_faults_positive_px": 60988,
+  "labels_equal_existing_faults": true,
+  "feature_bands": 19,
+  "static_multiphysics_channels": 34,
+  "static_cache_path": "data/cache_h80v2/static_f16.mmap",
+  "static_cache_shape": [
+    5167373,
+    34
+  ],
+  "aux_fields": [
+    "cand_strike_az",
+    "stress_td"
+  ]
+}

@@ -1,52 +1,59 @@
 #!/usr/bin/env python3
-"""Prepare and cache the 50-channel static multi-physics + updip-advected + geothermal
-+ deconfounded scarp feature stack in `data/processed/`, and run the mandatory
-59-feature single-feature leakage canary audit (`AUC <= 0.90`, Protocol Rule 4)
-on the spatially-blocked buffered holdout (`gems57-pooled-hide-v2`)."""
+"""Verify official GeoDAWN inputs and materialize the 34-channel static memmap cache."""
+
 from __future__ import annotations
 
 import json
-import resource
 import sys
-import time
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
-sys.path.insert(0, str(ROOT / "vendor"))
 
-from gems57 import grid as GRID, holdout as HO  # noqa: E402
-from gems80.features import build_or_load_static_stack, run_leakage_canary_audit  # noqa: E402
+from gems80.features_multiphysics import build_or_load_static_stack
+from gems80.io_grid import feature_descriptions, load_labels, load_template
+
+REQUIRED = [
+    "training_features.tif",
+    "labels.tif",
+    "existing_faults.tif",
+    "sample_submission.tif",
+]
 
 
-def rss_mb() -> float:
-    return resource.getrusage(resource.RUSAGE_SELF).ru_maxrss / 1024.0
+def main() -> int:
+    data = ROOT / "data"
+    missing = [f for f in REQUIRED if not (data / f).is_file()]
+    if missing:
+        print("MISSING inputs in data/:", ", ".join(missing), file=sys.stderr)
+        print("Run `python scripts/restore_mirrors.py` first.", file=sys.stderr)
+        return 2
 
+    tmpl = load_template(data / "sample_submission.tif")
+    foot = tmpl["foot"]
+    lab = load_labels(data / "labels.tif", foot)
+    cat = load_labels(data / "existing_faults.tif", foot)
+    descs = feature_descriptions(data / "training_features.tif")
 
-def main() -> None:
-    t0 = time.time()
-    raw_dir = ROOT / "data" / "raw"
-    ext_dir = raw_dir / "external"
-    cache_dir = ROOT / "data" / "processed"
-    evid_dir = ROOT / "evidence"
-    evid_dir.mkdir(parents=True, exist_ok=True)
+    mm, aux, static_names = build_or_load_static_stack(data, foot, tmpl["meta"]["transform"])
 
-    g = GRID.load_grid(ROOT / "data" / "bridge")
-    print(f"[prepare_data] Loaded GEMS grid {g.shape}, footprint={int(g.footprint.sum()):,}, catalogue={int(g.catalogue.sum()):,}")
-
-    stack = build_or_load_static_stack(raw_dir, ext_dir, cache_dir, g.footprint, force_rebuild=False)
-    print(f"[prepare_data] Static stack ready: shape={stack.X_mmap.shape}, RSS={rss_mb():.1f} MB ({time.time() - t0:.1f}s)")
-
-    folds20, _ = HO.buffered_component_draw(g, seed=20, hide_frac=0.20, buffer_px=3)
-    canary = run_leakage_canary_audit(stack, folds20, g.footprint, max_allowed_auc=0.90, seed=80)
-    canary_path = evid_dir / "h80_leakage_canary.json"
-    canary_path.write_text(json.dumps(canary, indent=2) + "\n")
-    print(
-        f"[prepare_data] Leakage canary PASS: {canary['n_features_tested']} features tested, "
-        f"max_symmetric_auc={canary['max_symmetric_auc']:.5f} <= 0.90 "
-        f"(top={canary['top_feature']}), RSS={rss_mb():.1f} MB, total={time.time() - t0:.1f}s"
-    )
+    summary = {
+        "template": tmpl["report"],
+        "labels_positive_px": int(lab.sum()),
+        "existing_faults_positive_px": int(cat.sum()),
+        "labels_equal_existing_faults": bool((lab == cat).all()),
+        "feature_bands": len(descs),
+        "static_multiphysics_channels": len(static_names),
+        "static_cache_path": "data/cache_h80v2/static_f16.mmap",
+        "static_cache_shape": list(mm.shape),
+        "aux_fields": sorted(list(aux.keys())),
+    }
+    out = ROOT / "research" / "data-summary.json"
+    out.parent.mkdir(parents=True, exist_ok=True)
+    out.write_text(json.dumps(summary, indent=2) + "\n")
+    print(json.dumps(summary, indent=2))
+    return 0
 
 
 if __name__ == "__main__":
-    main()
+    raise SystemExit(main())

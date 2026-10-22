@@ -1,20 +1,20 @@
-.cache/
+# Virtual environments & Python caches
 .venv/
 __pycache__/
-*.pyc
-*.pyo
+*.py[cod]
 .pytest_cache/
-*.f32
-*.f16
-*.tmp
-data/raw
-data/raw/
-data/processed/
-data/external/
-evidence/*.npy
+.ruff_cache/
+.mypy_cache/
+*.egg-info/
+build/
+dist/
 
-# SHA-pinned cache inputs (regenerate with scripts/fetch_data.py)
-/data/sample_submission.tif
-/data/existing_faults.tif
-/data/geodawn_rad_u8.tif
-*.so
+# Large local competition & intermediate caches (restored automatically by scripts/restore_data.py)
+.cache/
+data/*.tif
+data/external/
+data/cache_h80v2/
+data/registry/
+data/scored/
+work/
+Unselected files/

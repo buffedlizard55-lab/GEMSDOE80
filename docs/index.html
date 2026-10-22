@@ -364,6 +364,63 @@
       </div>
     </div>
 
+    <!-- PRESERVED PARALLEL LANE #1 (PRIMARY ON `main`): H80-G TWO-REGIME CHOQUET -->
+    <div class="go-banner" style="border-color:var(--blue);background:linear-gradient(135deg, rgba(6, 78, 59, 0.55), rgba(17, 24, 39, 0.96));">
+      <div class="go-header">
+        <div>
+          <span class="go-pill" style="background:var(--blue);color:#f8fafc;">LANE #1 — H80-G (PRESERVED FROM main) — 0.2349 HOLDOUT-DTI</span>
+        </div>
+        <div class="go-sub">
+Separate lane, separate artifact — pairwise unique vs H80-DPVC (|rho| <= 0.070, 3-px overlap <= 0.527). 0 weekly slots spent.
+        </div>
+      </div>
+
+      <div class="btn-row" style="margin-top:14px;">
+        <a class="btn btn-primary" href="downloads/gemsdoe80-h80g-choquet-tworegime-20261022T000000Z-zeros.tif" download>
+          ⬇ Download H80-G Validated GeoTIFF (.tif · 159 KB)
+        </a>
+        <a class="btn btn-secondary" href="downloads/gemsdoe80-h80g-choquet-tworegime-20261022T000000Z-zeros.zip" download>
+          ⬇ Download H80-G Zipped Submission (.zip · 123 KB)
+        </a>
+        <a class="btn btn-outline" href="downloads/gemsdoe80-h80g-choquet-tworegime-20261022T000000Z-zeros.tif.validate.json" download>
+          📄 Download Validator Receipt (.json)
+        </a>
+      </div>
+
+      <div style="margin-top:10px;">
+        <div class="meta-label">H80-G Submission Name:</div>
+        <div class="copy-box">
+          <span id="sub-name-h80g">gemsdoe80-h80g-choquet-tworegime-20261022T000000Z-zeros</span>
+          <button class="copy-btn" onclick="copyText('sub-name-h80g', this)">Copy Name</button>
+        </div>
+        <div class="meta-label" style="margin-top:10px;">H80-G Note (131 / 140 chars) &amp; SHA-256:</div>
+        <div class="copy-box">
+          <span id="sub-note-h80g">H80G 2-regime OOF 34ch multiphysics + crack-tip/bridge + 6-shell Choquet Dinkelbach; 51667 dots; HOLDOUT-DTI 0.2349 [0.2207,0.2483]</span>
+        </div>
+        <div class="copy-box" style="margin-top:8px;">
+          TIF SHA-256: <code>a3c14d76d1f58802c8bd3f13378cbeb037ad3618d5fbd9dbf5f5a0dae4a35ede</code> · ZIP SHA-256: <code>9f7bc446d77ff88ca6d3bd874e0fd82413975d0aea148a8026993bc30b4b81c5</code>
+        </div>
+      </div>
+
+      <div class="meta-grid" style="margin-top:14px;">
+        <div class="meta-box">
+          <div class="meta-label">Holdout Dots</div>
+          <div class="meta-val" style="color:#38bdf8;">51,667 dots</div>
+          <div class="meta-sub">Binary {0.0, 1.0} Choquet-Dinkelbach optimum; 0 on-catalogue pixels</div>
+        </div>
+        <div class="meta-box">
+          <div class="meta-label">Max Holdout Canary AUC</div>
+          <div class="meta-val" style="color:#fbbf24;">0.7886 &le; 0.90</div>
+          <div class="meta-sub">Across all 47 features (leakage_flag = false)</div>
+        </div>
+        <div class="meta-box">
+          <div class="meta-label">Uniqueness vs Registry</div>
+          <div class="meta-val" style="color:#a78bfa;">|&rho;| &le; 0.095 · ov &le; 0.652</div>
+          <div class="meta-sub">0.377 3-px overlap vs GEMSDOE32 H33-2-B2</div>
+        </div>
+      </div>
+    </div>
+
     <!-- SECTION 1: AUTOMATED VALIDATOR MATRIX -->
     <div class="card" id="validator">
       <h2>1. Automated Pre-Upload Validator Matrix (Zero Human Intervention Required)</h2>

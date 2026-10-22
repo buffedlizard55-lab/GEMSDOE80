@@ -1,3 +1,5 @@
+> ⚠️ **SUPERSEDED 2026-10-22:** this page describes the retired H80-C lane. Current candidates/results: [`research/h81_candidates_20261022.md`](../research/h81_candidates_20261022.md), [`reports/h81-review-20261022.md`](../reports/h81-review-20261022.md). The H80-C download named below no longer exists — do not use it.
+
 # H81 proposals — ranked candidates we have NOT tried yet (GEMSDOE80 next lane)
 
 **Charter:** Before touching a weekly submission slot, every candidate must beat the current holdout best on the spatially-blocked holdout and pass leakage + registry checks. Budget: 3 of 3 experiments already spent on H80-A/B/C. Therefore H81 is **proposed, not validated** — no organizer slot will be spent until a future lane has budget.

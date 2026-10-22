@@ -1,3 +1,23 @@
+> **Metric erratum:** Section 1.1 below is historical and incorrect: it multiplies two dilated fields, unlike the shared truth-cell/dot-cell evaluator. Constant-TP causality and all live-score extrapolations are unverified. See reports/strict-review-20261022.md.
+
+## Current release decision — 2026-10-22 (supersedes historical promotion claims)
+
+**OK TO DOWNLOAD FOR RESEARCH. DO NOT SUBMIT. Verdict: NEGATIVE.**
+The TIFF is finite and in [0,1], but format validity is not scientific promotion.
+The recorded all-registry 3-pixel overlap is **1.0**, exceeding the required 0.70.
+Dense/space-filling rasters cannot be exempted under the user's protocol. This is
+logged as a protocol duplicate, not a claim that the raster bytes were copied.
+No new model was run: the recorded experiment budget is already exhausted.
+No weekly slot was used; promotion is a separate selector step.
+Grid matches an owner-mirror pin, not an authenticated organizer template.
+Historical HOLDOUT-DTI values below are inherited evidence, not re-run results.
+Neither 0.2778 nor any quoted leaderboard maximum is ORGANIZER-CONFIRMED here;
+no submission-page receipt exists. Conflicting 0.3195/0.4413 claims are unresolved.
+
+[Download research TIFF](../docs/downloads/gems80-h80-dpvc-updip-vent-submod-41600-20261021-zeros.tif) ·
+[Machine audit](../reports/release-audit-20261022.json) ·
+[Review and next steps](../reports/strict-review-20261022.md)
+
 # PhD-Level Forensic Autopsy of `GEMSDOE32` (`0.2778`) & Ranked Geological Hypotheses for Lane `H80-DPVC` (`GEMSDOE80`)
 
 - **Repository:** [`buffedlizard55-lab/GEMSDOE80`](https://github.com/buffedlizard55-lab/GEMSDOE80)
@@ -52,11 +72,11 @@ $$\frac{1}{S_i} = \frac{C_G}{\text{TP}_0} + \frac{0.2}{\text{TP}_0}\,TW(P_i)$$
 
 | Submission | Repository | Active Dots ($N_{\text{dots}}$) | Dilated Mass $TW(P_i)$ | Collar Rule | Reported Live DTI ($S_i$) | Reciprocal $1/S_i$ | Evidence Class |
 | :--- | :--- | :---: | :---: | :---: | :---: | :---: | :--- |
-| `D1.5` | `GEMSDOE24` | `60,069` | `415,241.0` | $d_{\text{cat}} \ge 1.0\text{ px}$, $r=1.5$ | `0.2477` | `4.03714` | `ORGANIZER-CONFIRMED (owner-reported)` |
-| `D2.8` | `GEMSDOE25` | `44,090` | `328,208.3` | $d_{\text{cat}} \ge 1.0\text{ px}$, $r=2.8$ | `0.2600` | `3.84615` | `ORGANIZER-CONFIRMED (owner-reported)` |
-| `H27-4` | `GEMSDOE28/31` | `40,199` | `299,242.1` | $d_{\text{cat}} \ge 2.0\text{ px}$ | `0.2708` | `3.69276` | `ORGANIZER-CONFIRMED (owner-reported)` |
-| `G36` | `GEMSDOE36` | `38,854` | `289,226.4` | $d_{\text{cat}} > 2.0\text{ px}$ + submod | `0.2750` | `3.63636` | `ORGANIZER-CONFIRMED (owner-reported)` |
-| `H33-2-B2` | `GEMSDOE32` | `37,654` | `280,336.6` | $d_{\text{cat}} > 2.0\text{ px}$ exact | `0.2778` | `3.59971` | `ORGANIZER-CONFIRMED (owner-reported)` |
+| `D1.5` | `GEMSDOE24` | `60,069` | `415,241.0` | $d_{\text{cat}} \ge 1.0\text{ px}$, $r=1.5$ | `0.2477` | `4.03714` | `USER-REPORTED; NOT ORGANIZER-CONFIRMED` |
+| `D2.8` | `GEMSDOE25` | `44,090` | `328,208.3` | $d_{\text{cat}} \ge 1.0\text{ px}$, $r=2.8$ | `0.2600` | `3.84615` | `USER-REPORTED; NOT ORGANIZER-CONFIRMED` |
+| `H27-4` | `GEMSDOE28/31` | `40,199` | `299,242.1` | $d_{\text{cat}} \ge 2.0\text{ px}$ | `0.2708` | `3.69276` | `USER-REPORTED; NOT ORGANIZER-CONFIRMED` |
+| `G36` | `GEMSDOE36` | `38,854` | `289,226.4` | $d_{\text{cat}} > 2.0\text{ px}$ + submod | `0.2750` | `3.63636` | `USER-REPORTED; NOT ORGANIZER-CONFIRMED` |
+| `H33-2-B2` | `GEMSDOE32` | `37,654` | `280,336.6` | $d_{\text{cat}} > 2.0\text{ px}$ exact | `0.2778` | `3.59971` | `USER-REPORTED; NOT ORGANIZER-CONFIRMED` |
 
 Across the collar-pruned ladder (`D2.8 -> H27-4 -> G36 -> H33`), the Pearson correlation between $N_{\text{dots}}$ and $1/S_i$ is **$r = 0.999261$** (`evidence/h33_forensic_autopsy.json`). Solving the two-point algebraic system between `D2.8` (`0.2600`) and `H33` (`0.2778`) under $\Delta\text{TP} = 0$:
 
