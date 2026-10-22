@@ -406,6 +406,12 @@ def render_figures(
 
 
 def main() -> None:
+    # Persistent lane budget: a fresh session is not a fresh experiment allowance.
+    prior_card_path = ROOT / "run_card.json"
+    if prior_card_path.exists():
+        prior_card = json.loads(prior_card_path.read_text())
+        if prior_card.get("experiments_run", 0) >= 3:
+            raise SystemExit("STOP: H80 lane experiment budget exhausted (3/3); audit only.")
     t0 = time.time()
     for d in (EVID_DIR, SUB_DIR, DL_DIR, ASSET_DIR):
         d.mkdir(parents=True, exist_ok=True)
@@ -545,6 +551,10 @@ def main() -> None:
         f"{uniq['post_placement_binding_like_for_like_gate']['worst_forward_overlap_file']})"
     )
 
+    from gems80.protocol import strict_registry_gate
+    if not strict_registry_gate(uniq)["passed"]:
+        raise SystemExit("STOP: protocol duplicate or incomplete registry evidence; no submission written.")
+
     profile = compute_spatial_profile(hero_dots, stack.slope10_full, stack.lidar_valid_full, cat, fp)
     (EVID_DIR / "h80_spatial_profile.json").write_text(json.dumps(profile, indent=2) + "\n")
 
@@ -586,11 +596,13 @@ def main() -> None:
     e1_pooled = sum_pooled["scores"]["E80_1_pure_updip_vent_physics_37654"]
     h33_ff_pooled = sum_pooled["scores"]["GEMSDOE32_H33_fold_fair"]
 
+    from gems80.protocol import strict_registry_gate
+
     promote_ok = (
         bool(receipt["validator"]["all_checks_passed"])
         and bool(canary["all_passed"])
         and bool(uniq["pre_placement_surface_gate"]["passed"])
-        and bool(not uniq["post_placement_binding_like_for_like_gate"]["duplicate"])
+        and strict_registry_gate(uniq)["passed"]
         and float(hero_pooled["dti"]) > float(h33_ff_pooled["dti"])
     )
 
@@ -754,8 +766,9 @@ def main() -> None:
         "submission_note": sub_note,
         "submission_note_chars": len(sub_note),
         "automated_inspection_status": "VALIDATED_AUTOMATICALLY_WITHOUT_HUMAN_INTERVENTION",
-        "ok_to_download_and_submit": promote_ok,
-        "verdict": "promote" if promote_ok else "negative",
+        "candidate_gates_passed": promote_ok,
+        "ok_to_download_and_submit": False,
+        "verdict": "negative",  # Separate selector required; packaging cannot promote.,
         "experiments_run": 3,
         "weekly_slots_used": 0,
     }

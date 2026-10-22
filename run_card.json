@@ -169,7 +169,8 @@
     "overlap_vs_GEMSDOE76_H76_3": 0.65144,
     "overlap_vs_GEMSDOE77_H85_EDTI": 0.6825,
     "binding_like_for_like_duplicate": false,
-    "literal_space_filling_overlap": 1.0
+    "literal_space_filling_overlap": 1.0,
+    "literal_protocol_duplicate": true
   },
   "spatial_profile": {
     "evidence_class": "SPATIAL-PROFILE-MEASUREMENT",
@@ -219,8 +220,10 @@
   "submission_note": "H80-DPVC: Updip 60deg basement+GDR vent/MT/demag+deconf 1m/10m DEM+self-masked fracture OOF+Expected-DTI 300m skeleton-submod [0,1]",
   "submission_note_chars": 131,
   "automated_inspection_status": "VALIDATED_AUTOMATICALLY_WITHOUT_HUMAN_INTERVENTION",
-  "ok_to_download_and_submit": true,
-  "verdict": "promote",
+  "ok_to_download_and_submit": false,
+  "verdict": "negative",
   "experiments_run": 3,
-  "weekly_slots_used": 0
+  "weekly_slots_used": 0,
+  "release_review": "reports/release-audit-20261022.json",
+  "review_note": "Protocol duplicate: all-registry overlap 1.0 > 0.70; no density exemptions. Historical holdout not rerun. No slot selection."
 }
