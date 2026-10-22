@@ -350,5 +350,56 @@
       "support_fraction": 0.153151
     }
   ],
-  "dots_packbits_sha256": "379576aa6b1744be59c4209e4e5ce8ca211a16fbc02f8fca1777cf6bffb74234"
+  "dots_packbits_sha256": "379576aa6b1744be59c4209e4e5ce8ca211a16fbc02f8fca1777cf6bffb74234",
+  "in_repo_gems80_peers": [
+    {
+      "name": "gems80-adpt-kkt-lagrangian-36500d-20261022T012049Z-5bd11c85-zeros.tif",
+      "dots": 36500,
+      "ours_in_theirs_3px": 0.281373,
+      "theirs_in_ours_3px": 0.244384,
+      "max_sym_3px": 0.281373,
+      "spearman": 0.011043
+    },
+    {
+      "name": "gems80-h80-dpvc-updip-vent-submod-41600-20261021-zeros.tif",
+      "dots": 41600,
+      "ours_in_theirs_3px": 0.220342,
+      "theirs_in_ours_3px": 0.325409,
+      "max_sym_3px": 0.325409,
+      "spearman": 0.023165
+    },
+    {
+      "name": "gems80-h81-core67-hybrid-41600-20261022-zeros.tif",
+      "dots": 41600,
+      "ours_in_theirs_3px": 0.22158,
+      "theirs_in_ours_3px": 0.339495,
+      "max_sym_3px": 0.339495,
+      "spearman": 0.024946
+    },
+    {
+      "name": "gemsdoe80-h80c-strain-accom-resid-20261021T233457Z-zeros.tif",
+      "dots": 28807,
+      "ours_in_theirs_3px": 0.164804,
+      "theirs_in_ours_3px": 0.12306,
+      "max_sym_3px": 0.164804,
+      "spearman": 0.001815
+    },
+    {
+      "name": "gemsdoe80-h80g-choquet-tworegime-20261022T000000Z-zeros.tif",
+      "dots": 51667,
+      "ours_in_theirs_3px": 0.351454,
+      "theirs_in_ours_3px": 0.332514,
+      "max_sym_3px": 0.351454,
+      "spearman": 0.023304
+    },
+    {
+      "name": "gemsdoe80-h81a-relay-20261022T010259Z-zeros.tif",
+      "dots": 7415,
+      "ours_in_theirs_3px": 0.084656,
+      "theirs_in_ours_3px": 0.252461,
+      "max_sym_3px": 0.252461,
+      "spearman": 0.009609
+    }
+  ],
+  "in_repo_gems80_max_symmetric_overlap_3px": 0.351454
 }

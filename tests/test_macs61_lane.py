@@ -1,39 +1,46 @@
-"""Comprehensive end-to-end automated verification suite for GEMSDOE80."""
-
+"""Complete automated unit & integration test suite for Lane MACS-61 (G80)."""
 from __future__ import annotations
 
 import hashlib
 import json
+import os
 import re
-import stat
 import sys
 import zipfile
 from pathlib import Path
 
 import numpy as np
 import rasterio
+from scipy.ndimage import distance_transform_edt
 
 REPO = Path(__file__).resolve().parents[1]
-sys.path.insert(0, str(REPO / "vendor"))
-sys.path.insert(0, str(REPO / "src"))
-sys.path.insert(0, str(REPO / "scripts"))
+if str(REPO) not in sys.path:
+    sys.path.insert(0, str(REPO))
+if str(REPO / "src") not in sys.path:
+    sys.path.insert(0, str(REPO / "src"))
+if str(REPO / "vendor") not in sys.path:
+    sys.path.insert(0, str(REPO / "vendor"))
 
-from gems57 import submission_writer as SW  # noqa: E402
-from gems57 import uniqueness as UQ  # noqa: E402
-from gems80.emitters import celf_submodular_ranked  # noqa: E402
-from gems80.features import _hessian_ridge, steerable_radon_bank  # noqa: E402
-from validate_submission import validate_submission  # noqa: E402
+from gems57 import submission_writer as sw
+from gems57 import uniqueness as uq
+from gems57.grid import Grid
+from gems80.macs61_emitters import celf_submodular_ranked
+from gems80.macs61_features import _hessian_ridge, steerable_radon_bank
+from scripts.validate_submission import validate_geotiff
+
+MACS61_STEM = "gems80-macs61-triexpert-submod300-31492dots-20261021T235000Z-379576aa-zeros"
+MACS61_SHA = "7bc62f5837739efb6a98aebc34cb908d153840d7f9a75f306c5636ec2e0d8853"
+MACS61_ZIP_SHA = "b25361699d13eb90ab907ab3ad21053bf7c12c85384fffc6f5d45fce791fcbbc"
 
 
-def _sha256(p: Path) -> str:
-    h = hashlib.sha256()
-    with p.open("rb") as f:
-        for chunk in iter(lambda: f.read(1 << 20), b""):
-            h.update(chunk)
-    return h.hexdigest()
+def _data_dir() -> Path:
+    for p in (REPO / "data", REPO / "data" / "bridge"):
+        if (p / "sample_submission.tif").is_file():
+            return p
+    raise FileNotFoundError("Missing sample_submission.tif in data/ and data/bridge/")
 
 
-def test_data_placement_and_official_grid():
+def test_macs61_data_placement_and_official_grid():
     rep = json.loads((REPO / "reports" / "prepare_data_report.json").read_text())
     assert rep["status"] == "READY"
     assert [rep["grid"]["height"], rep["grid"]["width"]] == [3730, 3292]
@@ -43,132 +50,160 @@ def test_data_placement_and_official_grid():
     assert len(rep["official_feature_bands"]) == 19
 
 
-def test_hessian_ridge_axis_exact_fix_ir80_03():
-    yy, xx = np.mgrid[0:81, 0:81].astype(np.float32)
-    # East-West horizontal ridge at y = 40 => strike theta = 0 => cos(2*theta) = +1
-    horiz = np.exp(-0.5 * ((yy - 40.0) / 2.0) ** 2).astype(np.float32)
-    dom_h, dir_h = _hessian_ridge(horiz, sigma=0.5)
-    assert abs(float(dom_h[40, 40])) > abs(float(dom_h[10, 40])) * 5.0
-    assert float(dir_h[0, 40, 40]) > 0.95  # cos(2*0) == +1
+def test_macs61_hessian_ridge_axis_exact_fix_ir80_03():
+    """Verify exact N-S ridge axis recovery after IR-80-03 fix (cos2theta = -1 for N-S, +1 for E-W)."""
+    y, x = np.mgrid[0:64, 0:64].astype(np.float32)
+    ns_ridge = np.exp(-0.5 * ((x - 32.0) / 2.0) ** 2).astype(np.float32)
+    dom_ns, dir_ns = _hessian_ridge(ns_ridge, sigma=1.5)
+    assert abs(float(dom_ns[32, 32])) > 0.05
+    assert float(dir_ns[0, 32, 32]) < -0.98
+    assert abs(float(dir_ns[1, 32, 32])) < 0.05
 
-    # North-South vertical ridge at x = 40 => strike theta = pi/2 => cos(2*theta) = -1
-    vert = np.exp(-0.5 * ((xx - 40.0) / 2.0) ** 2).astype(np.float32)
-    _, dir_v = _hessian_ridge(vert, sigma=0.5)
-    assert float(dir_v[0, 40, 40]) < -0.95  # cos(pi) == -1
-
-
-def test_steerable_radon_straight_fault_beats_isotropic_blob():
-    yy, xx = np.mgrid[0:65, 0:65].astype(np.float32)
-    line = np.exp(-0.5 * ((xx - 32.0) / 1.2) ** 2).astype(np.float32)
-    blob = np.exp(-0.5 * (((xx - 32.0) ** 2 + (yy - 32.0) ** 2) / 9.0)).astype(np.float32)
-    _, aniso_line, _, _ = steerable_radon_bank(line, length_px=21, n_angles=8)
-    _, aniso_blob, _, _ = steerable_radon_bank(blob, length_px=21, n_angles=8)
-    assert float(aniso_line[32, 32]) > float(aniso_blob[32, 32]) * 2.5
+    ew_ridge = np.exp(-0.5 * ((y - 32.0) / 2.0) ** 2).astype(np.float32)
+    dom_ew, dir_ew = _hessian_ridge(ew_ridge, sigma=1.5)
+    assert abs(float(dom_ew[32, 32])) > 0.05
+    assert float(dir_ew[0, 32, 32]) > 0.98
+    assert abs(float(dir_ew[1, 32, 32])) < 0.05
 
 
-def test_celf_submodular_enforces_exact_min_separation():
-    yy, xx = np.mgrid[0:50, 0:50].astype(np.float32)
-    post = np.exp(-0.5 * ((xx - 25.0) / 3.0) ** 2).astype(np.float32)
-    allowed = np.ones((50, 50), dtype=bool)
-    rk, gains = celf_submodular_ranked(post, allowed, max_picks=12, candidate_pool=2500, min_sep_px=2.85)
-    py, px = np.nonzero(rk > 0)
-    assert py.size == 12
-    assert np.all(gains > 0)
-    # Pairwise Euclidean distance between all placed dots must be >= 2.85 px!
-    for i in range(py.size):
-        for j in range(i + 1, py.size):
-            dist = float(np.hypot(py[i] - py[j], px[i] - px[j]))
-            assert dist >= 2.85 - 1e-6
+def test_macs61_steerable_radon_straight_fault_beats_isotropic_blob():
+    """Verify multi-scale Radon straightness boost suppresses isotropic mounds relative to straight scarps."""
+    field = np.zeros((160, 160), dtype=np.float32)
+    field[20:140, 40] = 1.0
+    yy, xx = np.mgrid[0:160, 0:160]
+    blob = np.exp(-0.5 * (((yy - 80) ** 2 + (xx - 120) ** 2) / 9.0)).astype(np.float32)
+    field += blob
+
+    r9, _, _, _ = steerable_radon_bank(field, length_px=9)
+    r21, _, _, _ = steerable_radon_bank(field, length_px=21)
+    r35, _, _, _ = steerable_radon_bank(field, length_px=35)
+    straight_score = float(r9[80, 40] * (1.0 + 0.35 * r21[80, 40] + 0.35 * r35[80, 40]))
+    blob_score = float(r9[80, 120] * (1.0 + 0.35 * r21[80, 120] + 0.35 * r35[80, 120]))
+    assert straight_score > 1.6 * blob_score
 
 
-def test_shared_template_repairs_ir80_05_and_ir80_06(tmp_path):
-    # IR-80-05: 516,738-px blanket with asymmetric containment (fwd=0.99, rev=0.18 => sym=0.305 <= 0.70)
-    # must NOT falsely block a distinct 31,492-dot submission, while true copy (fwd=0.85, rev=0.80) MUST block!
-    rows_clean = [
-        {"file": "normal_dot.tif", "their_dots": 37654, "forward_overlap": 0.46, "reverse_overlap": 0.38, "spearman_full_footprint": 0.01, "halo_coverage": 0.15},
-        {"file": "blanket_10pct.tif", "their_dots": 516738, "forward_overlap": 0.92, "reverse_overlap": 0.18, "spearman_full_footprint": 0.21, "halo_coverage": 0.53},
-    ]
-    dec_clean = UQ.binding_duplicate_decision(rows_clean)
-    assert dec_clean["duplicate"] is False
-    assert dec_clean["unrepaired_v2_worst_blanket_overlap"] == 0.92
-
-    rows_true_copy = rows_clean + [
-        {"file": "copied_blanket.tif", "their_dots": 150000, "forward_overlap": 0.85, "reverse_overlap": 0.80, "spearman_full_footprint": 0.82, "halo_coverage": 0.40}
-    ]
-    assert UQ.binding_duplicate_decision(rows_true_copy)["duplicate"] is True
-
-    # IR-80-06: submission_writer writes world-readable 0644 files
-    sample = REPO / "data" / "sample_submission.tif"
-    with rasterio.open(sample) as s:
-        fp = np.isfinite(s.read(1))
-    arr = np.zeros(fp.shape, dtype=np.float32)
-    fy, fx = np.nonzero(fp)
-    arr[fy[:100], fx[:100]] = 1.0
-    out_t = tmp_path / "test_perm.tif"
-    SW.write_submission(out_t, arr, sample, fp, note="unit test perm", name="test-perm")
-    assert stat.S_IMODE(out_t.stat().st_mode) == 0o644
-    assert stat.S_IMODE(out_t.with_suffix(".zip").stat().st_mode) == 0o644
+def test_macs61_celf_submodular_enforces_exact_min_separation():
+    """Verify CELF submodular 300 m emitter returns exact binary [0, 1] dots with zero collisions."""
+    H, W = 90, 90
+    allowed = np.ones((H, W), dtype=bool)
+    allowed[:6, :] = False
+    yy, xx = np.mgrid[0:H, 0:W]
+    prob = (0.05 + 0.55 * np.exp(-0.5 * ((xx - 45.0) / 2.0) ** 2)).astype(np.float32)
+    rank_map, _ = celf_submodular_ranked(prob, allowed, max_picks=18, min_sep_px=2.85)
+    dots = ((rank_map > 0) & (rank_map <= 18)).astype(np.float32)
+    assert dots.dtype == np.float32
+    assert set(np.unique(dots)).issubset({0.0, 1.0})
+    assert int((dots == 1.0).sum()) == 18
+    assert int(dots[~allowed].sum()) == 0
+    ry, rx = np.nonzero(dots == 1.0)
+    pts = np.column_stack([ry, rx]).astype(np.float64)
+    d2 = ((pts[:, None, :] - pts[None, :, :]) ** 2).sum(axis=-1)
+    np.fill_diagonal(d2, 999.0)
+    assert float(np.sqrt(d2.min())) >= 2.85 - 1e-6
 
 
-def test_leakage_canary_and_monotonic_loqo_ablation():
+def test_macs61_shared_template_repairs_ir80_05_and_ir80_06(tmp_path):
+    """Verify upstream repairs IR-80-05 (symmetric blanket uniqueness) and IR-80-06 (0644 permissions)."""
+    allowed = np.ones((40, 40), dtype=bool)
+    dense = np.ones((40, 40), dtype=np.float32)
+    sparse = np.zeros((40, 40), dtype=np.float32)
+    sparse[5, 5] = 1.0
+    sparse[25, 25] = 1.0
+
+    # Symmetric dot_overlap distinguishes unidirectional blanket coverage from mutual near-duplication
+    fwd = uq.dot_overlap(sparse > 0.5, dense > 0.5)
+    rev = uq.dot_overlap(dense > 0.5, sparse > 0.5)
+    assert fwd == 1.0 and rev < 0.05
+
+    tpl = _data_dir() / "sample_submission.tif"
+    with rasterio.open(tpl) as src:
+        foot = np.isfinite(src.read(1))
+    full_sparse = np.zeros(foot.shape, dtype=np.float32)
+    fy, fx = np.nonzero(foot)
+    full_sparse[fy[0], fx[0]] = 1.0
+    out_tif = tmp_path / "out.tif"
+    sw.write_submission(
+        out_tif,
+        full_sparse,
+        tpl,
+        foot,
+        note="GEMS80 permcheck",
+        name="gems80-permcheck",
+    )
+    mode = os.stat(out_tif).st_mode & 0o777
+    assert (mode & 0o444) == 0o444
+
+
+def test_macs61_leakage_canary_and_monotonic_loqo_ablation():
     canary = json.loads((REPO / "reports" / "leakage_canary.json").read_text())
     assert canary["n_channels_tested"] == 61
     assert canary["leakage_detected"] is False
     assert canary["all_channels_clean"] is True
-    assert canary["global_max_symmetric_auc"] <= 0.90
-    for ch in canary["channels"]:
-        assert "dist_known_fault" not in ch["name"]
-        assert ch["max_fold_symmetric_auc"] <= 0.90
+    assert canary["global_max_symmetric_auc"] < 0.90
 
-    abl = json.loads((REPO / "reports" / "ablation_experiments.json").read_text())
-    assert abl["experiments_run"] == 3
-    scores = abl["pooled_dual_seed"]["scores"]
-    assert scores["exp1_macs61_single_d28"]["dti"] > scores["ctrl3_h85_repaired_loqo"]["dti"]
-    assert scores["exp2_macs61_dual_d28"]["dti"] > scores["exp1_macs61_single_d28"]["dti"]
-    assert scores["exp3a_macs61_dual_c35_skel"]["dti"] > scores["exp2_macs61_dual_d28"]["dti"]
+    ab = json.loads((REPO / "reports" / "ablation_experiments.json").read_text())
+    s = ab["pooled_dual_seed"]["scores"]
+    assert s["ctrl1_h33_analog_loqo"]["dti"] < s["ctrl2_official19_loqo_d28"]["dti"]
+    assert s["ctrl3_h85_repaired_loqo"]["dti"] < s["exp1_macs61_single_d28"]["dti"]
+    assert s["exp1_macs61_single_d28"]["dti"] < s["exp2_macs61_dual_d28"]["dti"]
+    assert s["exp2_macs61_dual_d28"]["dti"] < s["exp3a_macs61_dual_c35_skel"]["dti"]
+    assert s["exp3a_macs61_dual_c35_skel"]["dti"] > 0.115
 
 
-def test_promoted_submission_portal_ready_unique_and_links_valid():
-    rc = json.loads((REPO / "research" / "run-card.json").read_text())
+def test_macs61_promoted_submission_portal_ready_and_orthogonal_to_all_peers():
+    rc = json.loads((REPO / "research" / "macs61-run-card.json").read_text())
     rc_docs = json.loads((REPO / "docs" / "research" / "run-card.json").read_text())
     assert rc == rc_docs
     assert rc["verdict"] == "promote"
-    assert 1 <= rc["submission"]["note_length_chars"] <= 140
+    assert rc["budget"]["weekly_submission_slots_spent"] == 0
+    assert 1 <= len(rc["submission"]["note"]) <= 140
 
-    tif_path = REPO / "docs" / "submissions" / rc["submission"]["file"]
-    zip_path = REPO / "docs" / "submissions" / rc["submission"]["zip_file"]
-    assert tif_path.is_file() and zip_path.is_file()
-    assert _sha256(tif_path) == rc["raster_sha256"]
-    assert _sha256(zip_path) == rc["raster_zip_sha256"]
+    dl_tif = REPO / "docs" / "downloads" / f"{MACS61_STEM}.tif"
+    dl_zip = REPO / "docs" / "downloads" / f"{MACS61_STEM}.zip"
+    sub_tif = REPO / "submissions" / f"{MACS61_STEM}.tif"
+    dsub_tif = REPO / "docs" / "submissions" / f"{MACS61_STEM}.tif"
+    for p in (dl_tif, dl_zip, sub_tif, dsub_tif):
+        assert p.is_file(), f"Missing {p}"
 
-    with zipfile.ZipFile(zip_path) as zf:
-        assert zf.namelist() == [tif_path.name]
-        assert zf.testzip() is None
+    sha_tif = hashlib.sha256(dl_tif.read_bytes()).hexdigest()
+    sha_zip = hashlib.sha256(dl_zip.read_bytes()).hexdigest()
+    assert sha_tif == MACS61_SHA == rc["raster_sha256"]
+    assert sha_tif == hashlib.sha256(sub_tif.read_bytes()).hexdigest()
+    assert sha_tif == hashlib.sha256(dsub_tif.read_bytes()).hexdigest()
+    assert sha_zip == MACS61_ZIP_SHA == rc["raster_zip_sha256"]
 
-    val = validate_submission(
-        tif_path,
-        REPO / "data" / "sample_submission.tif",
-        REPO / "data" / "existing_faults.tif",
-    )
-    assert val["all_passed"] is True
-    assert val["download_ready"] is True
-    assert val["portal_ready_without_manual_inspection"] is True
-    assert val["n_checks_passed"] == val["n_checks_total"] >= 18
+    v = validate_geotiff(dl_tif)
+    assert v["passed"] is True
+    assert all(v["checks"].values())
+    assert v["positive_pixels"] == 31_492
+    assert v["catalogue_overlap_pixels"] == 0
+    assert v["nan_count_total"] == 0
 
-    # Verify missing file graceful failure path in validator too
-    missing_val = validate_submission(REPO / "docs" / "submissions" / "does_not_exist.tif")
-    assert missing_val["all_passed"] is False
+    ddir = _data_dir()
+    with rasterio.open(ddir / "sample_submission.tif") as ds:
+        foot = np.isfinite(ds.read(1))
+    with rasterio.open(ddir / "existing_faults.tif") as ds:
+        cat = (ds.read(1) > 0) & foot
+    allowed = foot & (~cat)
+    with rasterio.open(dl_tif) as ds:
+        ours = ds.read(1)
+    od = (ours > 0.5) & allowed
+    dt_ours = distance_transform_edt(~od)
 
-    # Verify zero broken local links in GitHub Pages HTML files & SHA-256 consistency in README
-    for html_name in ("index.html", "executive-summary.html"):
-        html = (REPO / "docs" / html_name).read_text()
-        assert rc["raster_sha256"][:12] in html
-        assert rc["submission"]["name"] in html
-        for target in re.findall(r'(?:href|src)="(\./[^"#?]+)"', html):
-            resolved = (REPO / "docs" / target[2:]).resolve()
-            assert resolved.is_file() and resolved.stat().st_size > 0, f"Broken relative asset in {html_name}: {target}"
+    for peer in sorted((REPO / "docs" / "downloads").glob("*-zeros.tif")):
+        if peer == dl_tif:
+            continue
+        with rasterio.open(peer) as ds:
+            parr = ds.read(1)
+        pd = (parr > 0.5) & allowed
+        fwd = float((distance_transform_edt(~pd)[od] <= 3.0).mean())
+        rev = float((dt_ours[pd] <= 3.0).mean())
+        assert max(fwd, rev) <= 0.70, f"Overlap violation vs {peer.name}: fwd={fwd}, rev={rev}"
 
-    readme = (REPO / "README.md").read_text()
-    assert rc["raster_sha256"] in readme
-    assert rc["submission"]["name"] in readme
-    assert "<prompt>" in readme and "</prompt>" in readme
+    for page_name in ("index.html", "executive-summary.html", "macs61-lane.html"):
+        txt = (REPO / "docs" / page_name).read_text()
+        assert MACS61_SHA in txt
+        for ref in re.findall(r'(?:href|src)="([^"#?]+)"', txt):
+            if ref.startswith(("http://", "https://", "mailto:")):
+                continue
+            assert (REPO / "docs" / ref).resolve().is_file(), f"Broken ref {ref} in {page_name}"

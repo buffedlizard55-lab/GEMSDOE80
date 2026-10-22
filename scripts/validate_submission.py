@@ -1,15 +1,20 @@
 #!/usr/bin/env python3
 """
-Automated Zero-Touch Submission Validator for DrivenData Competition #306 (DOE GEMS).
+Validate a single-band GeoTIFF against the competition's sample raster.
 
-Emits structured JSON to stdout (and human checklist to stderr), enforcing:
-  1. `format_valid`: single-band float32 GeoTIFF, finite values strictly in [0.0, 1.0],
-     zero NaN/Inf inside footprint (fixes portal error "Predicted values must be in range [0, 1]"),
-     and exact CRS / shape / Affine transform / bounds match against `--template`.
-  2. `download_ready` (and `all_passed`): `format_valid` PLUS full competition promotion
-     verification (zero predictions on mapped catalogue when catalogue matches grid, valid
-     single-member .zip, SHA-256-matched sidecar & <=140-char note, verified 929-raster
-     uniqueness receipt, and matching promoted `research/run-card.json` entry).
+Format-safety check only. It does not train a model, score a raster against
+labels, prove novelty, or certify scientific merit.
+
+Usage:
+    python scripts/validate_submission.py PREDICTION.tif --template OFFICIAL_SAMPLE.tif [--labels LABELS.tif] [--features FEATURES.tif]
+
+Exit codes: 0 = format OK, 1 = format problems, 2 = missing dependencies/files.
+
+JSON report is printed to stdout and written next to the prediction as
+PREDICTION.validate.json. Report fields follow the project run-card convention:
+format_valid, download_ready, values_in_0_1, nan_inside_footprint, plus
+holdout DTI / leakage canary / lane check when labels/features/registry rasters
+are available.
 """
 
 from __future__ import annotations
@@ -17,13 +22,11 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import math
 import sys
-import zipfile
-from datetime import datetime, timezone
 from pathlib import Path
 
 import numpy as np
-import rasterio
 
 REPO = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(REPO / "src"))
@@ -129,49 +132,40 @@ def sha256_file(path: Path) -> str:
     return h.hexdigest()
 
 
-def validate_submission(
-    candidate_path: Path,
-    template_path: Path | None = None,
-    catalogue_path: Path | None = None,
-) -> dict:
-    checks: dict[str, bool] = {}
-    details: dict[str, dict] = {}
+def auc_from_ranks(scores, labels):
+    """Mann-Whitney U AUC with average ranks for ties (no sklearn required)."""
+    scores = np.asarray(scores, dtype=np.float64)
+    labels = np.asarray(labels, dtype=np.int64)
+    pos = labels == 1
+    neg = labels == 0
+    n_pos = int(pos.sum())
+    n_neg = int(neg.sum())
+    if n_pos == 0 or n_neg == 0:
+        return float("nan")
+    order = np.argsort(scores, kind="mergesort")
+    ranks = np.empty(scores.size, dtype=np.float64)
+    sorted_scores = scores[order]
+    i = 0
+    while i < scores.size:
+        j = i
+        while j + 1 < scores.size and sorted_scores[j + 1] == sorted_scores[i]:
+            j += 1
+        avg_rank = 0.5 * ((i + 1) + (j + 1))
+        ranks[order[i : j + 1]] = avg_rank
+        i = j + 1
+    u = float(ranks[pos].sum()) - n_pos * (n_pos + 1) / 2.0
+    return u / (n_pos * n_neg)
 
-    def record(name: str, passed: bool, observed, expected) -> None:
-        checks[name] = bool(passed)
-        details[name] = {
-            "passed": bool(passed),
-            "observed": observed,
-            "expected": expected,
-        }
 
-    record("file_exists", candidate_path.is_file(), str(candidate_path), "existing .tif file")
-    if not candidate_path.is_file():
-        return {
-            "format_valid": False,
-            "download_ready": False,
-            "portal_ready_without_manual_inspection": False,
-            "all_passed": False,
-            "candidate": str(candidate_path),
-            "n_checks_total": 1,
-            "n_checks_passed": 0,
-            "checks": checks,
-            "details": details,
-        }
+def triangular_kernel(d, r):
+    return np.clip(1.0 - d / r, 0.0, None)
 
-    with rasterio.open(candidate_path) as src:
-        band = src.read(1)
-        crs_str = str(src.crs)
-        dtype_str = src.dtypes[0]
-        count = src.count
-        shape = [src.height, src.width]
-        transform = list(src.transform)[:6]
-        bounds = list(src.bounds)
-        nodata = src.nodata
 
-    record("single_band", count == 1, count, 1)
-    record("dtype_float32", dtype_str == "float32", dtype_str, "float32")
-    record("nodata_unset_or_clean", nodata is None or np.isfinite(nodata) or np.isnan(nodata), nodata, "valid")
+def dti_weighted(pred, gt, resolution_m=RESOLUTION_M, alpha=ALPHA, beta=BETA):
+    """Distance-weighted Tversky index per the competition definition."""
+    R = int(math.ceil(KERNEL_R_M / resolution_m))
+    p = np.where(np.isfinite(pred), pred, 0.0).astype(np.float64)
+    g = (np.asarray(gt) > 0).astype(np.float64)
 
     offs = []
     for dy in range(-R, R + 1):
@@ -188,27 +182,13 @@ def validate_submission(
         shifted = padded[R + dy : R + dy + H, R + dx : R + dx + W]
         local_max = np.maximum(local_max, shifted * k)
 
-    foot = finite_mask
-    if template_path is not None and template_path.is_file():
-        with rasterio.open(template_path) as tmpl:
-            t_arr = tmpl.read(1)
-            t_nodata = tmpl.nodata
-            if t_nodata is not None and np.isfinite(t_nodata):
-                foot = np.isfinite(t_arr) & (t_arr != t_nodata)
-            else:
-                foot = np.isfinite(t_arr)
-            t_crs = str(tmpl.crs)
-            t_shape = [tmpl.height, tmpl.width]
-            t_transform = list(tmpl.transform)[:6]
-            t_bounds = list(tmpl.bounds)
+    try:
+        from scipy.ndimage import distance_transform_edt
 
-        shape_ok = shape == t_shape
-        record("crs_matches", crs_str == t_crs, crs_str, t_crs)
-        record("shape_matches", shape_ok, shape, t_shape)
-        t_diff = max(abs(a - b) for a, b in zip(transform, t_transform)) if shape_ok else 999.0
-        record("transform_matches", t_diff < 1e-6, transform, t_transform)
-        b_diff = max(abs(a - b) for a, b in zip(bounds, t_bounds)) if shape_ok else 999.0
-        record("bounds_match", b_diff < 1e-3, bounds, t_bounds)
+        dist_to_gt = distance_transform_edt((g == 0).astype(np.uint8))
+    except Exception:
+        dist_to_gt = np.full((H, W), np.inf)
+    kmap = triangular_kernel(dist_to_gt, R)
 
     gt_mask = g > 0
     pred_pos = p > 0
@@ -503,117 +483,14 @@ def main(argv=None):
         if args.labels.is_file() and args.features.is_file():
             holdout_dti(report, args.prediction, args.template, args.labels, args.features)
         else:
-            record("no_nan_or_infinite_inside_footprint", False, "shape mismatch", 0)
-            record("outside_footprint_zero", False, "shape mismatch", 0.0)
-    else:
-        record("crs_matches", crs_str == "EPSG:32611", crs_str, "EPSG:32611")
-        record("shape_matches", True, shape, shape)
-        record("transform_matches", True, transform, transform)
-        record("bounds_match", True, bounds, bounds)
-        record("no_nan_or_infinite_inside_footprint", nan_total == 0 and inf_total == 0, nan_total + inf_total, 0)
-        record("outside_footprint_zero", True, 0.0, 0.0)
+            report["holdout"]["note"] = "labels or features file not found"
+            report["leakage_canary"]["note"] = "labels or features file not found"
 
-    format_keys = (
-        "file_exists",
-        "single_band",
-        "dtype_float32",
-        "no_nan_anywhere",
-        "no_inf_anywhere",
-        "values_in_0_1",
-        "crs_matches",
-        "shape_matches",
-        "transform_matches",
-        "bounds_match",
-        "no_nan_or_infinite_inside_footprint",
-    )
-    format_valid = all(checks[k] for k in format_keys)
+    out_path = args.prediction.with_name(args.prediction.name + ".validate.json")
+    out_path.write_text(json.dumps(report, indent=2))
+    print(json.dumps(report, indent=2))
 
-    # Full competition promotion gates (distinguish promoted official candidates from ad-hoc test rasters)
-    actual_sha = sha256_file(candidate_path)
-    cat = None
-    if catalogue_path is not None and catalogue_path.is_file():
-        with rasterio.open(catalogue_path) as csrc:
-            if [csrc.height, csrc.width] == shape:
-                cat = csrc.read(1) == 1
-                on_cat = int(((band > 0.0) & cat).sum())
-                record("zero_predictions_on_mapped_catalogue", on_cat == 0, on_cat, 0)
-
-    if shape == [3730, 3292] and checks["shape_matches"]:
-        n_pos = int((band[foot] > 0.5).sum())
-        record("non_degenerate_positive_support", 5_000 <= n_pos <= 65_000, n_pos, "5,000..65,000")
-        shared_res = SHARED_VAL.validate(candidate_path, foot, cat)
-        record("shared_gems57_validator_all_passed", bool(shared_res["all_checks_passed"]), shared_res["all_checks_passed"], True)
-    else:
-        record("official_competition_grid_3730x3292", False, shape, [3730, 3292])
-
-    zip_path = candidate_path.with_suffix(".zip")
-    if zip_path.is_file():
-        with zipfile.ZipFile(zip_path, "r") as zf:
-            names = zf.namelist()
-            bad_zip = zf.testzip()
-        record("zip_archive_valid_single_tif", bad_zip is None and len(names) == 1 and names[0] == candidate_path.name, names, [candidate_path.name])
-    else:
-        record("zip_archive_valid_single_tif", False, "missing .zip", "present .zip")
-
-    sidecar_path = candidate_path.with_name(candidate_path.name + ".json")
-    if sidecar_path.is_file():
-        sc = json.loads(sidecar_path.read_text())
-        note = sc.get("note", "")
-        record("sidecar_sha256_matches_bytes", sc.get("sha256") == actual_sha, sc.get("sha256"), actual_sha)
-        record("submission_note_within_140_chars", 1 <= len(note) <= 140, len(note), "1..140")
-    else:
-        record("sidecar_sha256_matches_bytes", False, "missing sidecar", actual_sha)
-        record("submission_note_within_140_chars", False, 0, "1..140")
-
-    rc_path = REPO / "research" / "run-card.json"
-    rc_ok = False
-    if rc_path.is_file():
-        rc = json.loads(rc_path.read_text())
-        rc_ok = (
-            rc.get("verdict") == "promote"
-            and rc.get("raster_sha256") == actual_sha
-            and not rc.get("correlation_overlap_vs_registry", {}).get("binding_duplicate", True)
-            and rc.get("leakage_canary", {}).get("passes") is True
-        )
-    record("promoted_in_run_card_with_uniqueness_and_canary", rc_ok, rc_ok, True)
-
-    all_passed = all(checks.values())
-    return {
-        "validated_at_utc": datetime.now(timezone.utc).isoformat(),
-        "candidate": str(candidate_path),
-        "sha256": actual_sha,
-        "bytes": candidate_path.stat().st_size,
-        "format_valid": bool(format_valid),
-        "download_ready": bool(all_passed),
-        "portal_ready_without_manual_inspection": bool(all_passed),
-        "all_passed": bool(all_passed),
-        "n_checks_total": len(checks),
-        "n_checks_passed": sum(1 for v in checks.values() if v),
-        "checks": checks,
-        "details": details,
-    }
-
-
-def main() -> int:
-    ap = argparse.ArgumentParser(description=__doc__)
-    ap.add_argument("candidate", help="Path to candidate .tif submission")
-    ap.add_argument("--template", default=str(REPO / "data" / "sample_submission.tif"))
-    ap.add_argument("--catalogue", default=str(REPO / "data" / "existing_faults.tif"))
-    ap.add_argument("--report", default=None)
-    args = ap.parse_args()
-
-    res = validate_submission(Path(args.candidate), Path(args.template), Path(args.catalogue))
-    sys.stderr.write(
-        f"[validate_submission] target={res['candidate']} format_valid={res['format_valid']} "
-        f"download_ready={res['download_ready']} ({res['n_checks_passed']}/{res['n_checks_total']} checks)\n"
-    )
-    if args.report:
-        rp = Path(args.report)
-        rp.parent.mkdir(parents=True, exist_ok=True)
-        rp.write_text(json.dumps(res, indent=2) + "\n")
-
-    sys.stdout.write(json.dumps(res, indent=2) + "\n")
-    return 0 if res["format_valid"] else 1
+    return 0 if report["format_valid"] else 1
 
 
 if __name__ == "__main__":

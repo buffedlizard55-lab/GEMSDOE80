@@ -26,7 +26,6 @@ import sys
 import time
 from pathlib import Path
 
-import lightgbm as lgb
 import numpy as np
 
 ROOT = Path(__file__).resolve().parents[1]
