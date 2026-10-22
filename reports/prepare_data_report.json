@@ -1,0 +1,211 @@
+{
+  "generated_at_utc": "2026-10-21T23:27:25.414013+00:00",
+  "status": "READY",
+  "grid": {
+    "count": 1,
+    "dtype": "float32",
+    "crs": "EPSG:32611",
+    "height": 3730,
+    "width": 3292,
+    "transform": [
+      100.0,
+      0.0,
+      243350.0,
+      0.0,
+      -100.0,
+      4508550.0
+    ],
+    "resolution_x_m": 100.0,
+    "resolution_y_m": 100.0,
+    "nodata": "nan",
+    "bounds": [
+      243350.0,
+      4135550.0,
+      572550.0,
+      4508550.0
+    ],
+    "total_grid_pixels": 12279160,
+    "valid_footprint_pixels": 5167373,
+    "outside_footprint_pixels": 7111787
+  },
+  "labels": {
+    "shape_matches_template": true,
+    "crs_matches_template": true,
+    "transform_matches_template": true,
+    "known_fault_pixels": 60988,
+    "prevalence_in_footprint": 0.011802515514169385
+  },
+  "official_feature_bands": [
+    {
+      "band": 1,
+      "band_name": "mag_anom",
+      "category": "magnetic_data",
+      "description": "Magnetic anomaly - deviation from expected Earth's magnetic field"
+    },
+    {
+      "band": 2,
+      "band_name": "rtp",
+      "category": "magnetic_data",
+      "description": "Reduced to pole magnetic data - magnetic anomaly corrected for latitude effects"
+    },
+    {
+      "band": 3,
+      "band_name": "tmi_hg",
+      "category": "magnetic_data",
+      "description": "Total magnetic intensity horizontal gradient - rate of change in horizontal direction"
+    },
+    {
+      "band": 4,
+      "band_name": "geod_2ndinv",
+      "category": "geodetic_strain",
+      "description": "Geodetic second invariant - measure of strain rate tensor magnitude"
+    },
+    {
+      "band": 5,
+      "band_name": "iso_grav_anom_slope",
+      "category": "gravity_data",
+      "description": "Isostatic gravity anomaly slope - gradient of gravity after isostatic correction"
+    },
+    {
+      "band": 6,
+      "band_name": "tc",
+      "category": "magnetic_data",
+      "description": "Tilt angle or total curvature - magnetic field derivative for edge detection"
+    },
+    {
+      "band": 7,
+      "band_name": "geod_shearrate",
+      "category": "geodetic_strain",
+      "description": "Geodetic shear rate - rate of angular deformation from GPS/InSAR"
+    },
+    {
+      "band": 8,
+      "band_name": "geod_dilaterate",
+      "category": "geodetic_strain",
+      "description": "Geodetic dilatation rate - rate of volumetric strain (expansion/contraction)"
+    },
+    {
+      "band": 9,
+      "band_name": "tmi_vg",
+      "category": "magnetic_data",
+      "description": "Total magnetic intensity vertical gradient - rate of change in vertical direction"
+    },
+    {
+      "band": 10,
+      "band_name": "deq_n100a15",
+      "category": "seismic",
+      "description": "Distance to earthquake (n=100km radius, a=15\u00b0 azimuth parameters)"
+    },
+    {
+      "band": 11,
+      "band_name": "iso_grav_anom_vg",
+      "category": "gravity_data",
+      "description": "Isostatic gravity anomaly vertical gradient - vertical rate of change"
+    },
+    {
+      "band": 12,
+      "band_name": "det_elev",
+      "category": "topographic",
+      "description": "Detrended elevation - topography with regional trends removed"
+    },
+    {
+      "band": 13,
+      "band_name": "iso_grav_anom",
+      "category": "gravity_data",
+      "description": "Isostatic gravity anomaly - gravity after compensating for topographic mass"
+    },
+    {
+      "band": 14,
+      "band_name": "tmi",
+      "category": "magnetic_data",
+      "description": "Total magnetic intensity - total strength of magnetic field"
+    },
+    {
+      "band": 15,
+      "band_name": "depth_to_base_surf",
+      "category": "subsurface",
+      "description": "Depth to basement surface - thickness of sedimentary cover"
+    },
+    {
+      "band": 16,
+      "band_name": "ieq_n100a15",
+      "category": "seismic",
+      "description": "Earthquake intensity or density (n=100km radius, a=15\u00b0 parameters)"
+    },
+    {
+      "band": 17,
+      "band_name": "cond_surf",
+      "category": "subsurface",
+      "description": "Conductivity surface - electrical conductivity of subsurface"
+    },
+    {
+      "band": 18,
+      "band_name": "iso_grav_anom_hg",
+      "category": "gravity_data",
+      "description": "Isostatic gravity anomaly horizontal gradient - horizontal rate of change"
+    },
+    {
+      "band": 19,
+      "band_name": "det_elev_slope",
+      "category": "topographic",
+      "description": "Detrended elevation slope - gradient of elevation after detrending"
+    }
+  ],
+  "files": {
+    "training_features.tif": {
+      "present": true,
+      "bytes": 418912844,
+      "sha256": "4371c82e3b8339b807bdffcf4ef59a225520fe2988d521be208ae33743123bc5"
+    },
+    "labels.tif": {
+      "present": true,
+      "bytes": 425830,
+      "sha256": "7ba308ccdc4418b31a178f4f1ef21aaa6e152e4028f2f6f64b01f7eb25ae4093"
+    },
+    "existing_faults.tif": {
+      "present": true,
+      "bytes": 425830,
+      "sha256": "7ba308ccdc4418b31a178f4f1ef21aaa6e152e4028f2f6f64b01f7eb25ae4093"
+    },
+    "sample_submission.tif": {
+      "present": true,
+      "bytes": 1599597,
+      "sha256": "2176d08e485aa2cd2860ce8df539db4faf4d76163b38a4dd8c30a40454d35cbc"
+    },
+    "external/lidar_scarp_features_u8.tif": {
+      "present": true,
+      "bytes": 36943606,
+      "sha256": "d580bb8bdcdb941e32fefb8b38044bc5bf04e199bf2e83498c3576e6fc465568"
+    },
+    "external/geodawn_rad_u8.tif": {
+      "present": true,
+      "bytes": 26612970,
+      "sha256": "c22420f75999030d7cc65c9e31e50d232ea6158423bca051613a18a8b20ba682"
+    },
+    "external/geodawn_extensions_u8.tif": {
+      "present": true,
+      "bytes": 27132925,
+      "sha256": "a35a9c6d2a14786f4dab85481ee59769213072f5dab5b2535ea82ae4d9bb7d9b"
+    },
+    "external/derived_sgmc_faults_100m_u8.tif": {
+      "present": true,
+      "bytes": 198602,
+      "sha256": "643cbe992ef4ba37588fb469163ed8291e3ceb23d6c1f78a3cfaa462430c2da0"
+    },
+    "external/gdr_wellspring_in_footprint.csv": {
+      "present": true,
+      "bytes": 2146771,
+      "sha256": "122718e65bdf55aab0ee12ad20d80062f0deb1de957225a61ad880dd5dc196ea"
+    },
+    "external/gdr_volcanic_vents_in_footprint.csv": {
+      "present": true,
+      "bytes": 672,
+      "sha256": "f91bafbaccaaf2754e71d60434fc0f9eb2c7b880c6e714883f4974542ff6a0bf"
+    },
+    "external/sb_heat_flow_in_footprint.csv": {
+      "present": true,
+      "bytes": 909294,
+      "sha256": "9845263e658aeb66a4aeca6e64d995e74f0eb14b89768219ea9d223006dc8baf"
+    }
+  }
+}

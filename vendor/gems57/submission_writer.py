@@ -123,6 +123,7 @@ def write_submission(path, prediction, sample, footprint, *, note, name,
         # Stage auxiliary files first and commit the TIFF last as the primary artifact.
         for source, destination in ((tmp_zip, zip_path), (tmp_receipt, receipt_path), (tmp_tif, path)):
             os.replace(source, destination)
+            os.chmod(destination, 0o644)
             committed.append(destination)
         return receipt
     except Exception:

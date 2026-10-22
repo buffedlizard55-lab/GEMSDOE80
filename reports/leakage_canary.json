@@ -1,0 +1,1110 @@
+{
+  "evidence_class": "LEAKAGE-CANARY-MEASUREMENT",
+  "ceiling": 0.9,
+  "n_channels_tested": 61,
+  "n_holdout_folds_per_channel": 8,
+  "global_max_symmetric_auc": 0.778155,
+  "highest_signal_channel": "sub_sgmc_bedrock_prox",
+  "leakage_detected": false,
+  "all_channels_clean": true,
+  "channels": [
+    {
+      "index": 0,
+      "name": "sub_hp4_mag_anom",
+      "domain": "subsurface",
+      "mean_symmetric_auc": 0.512894,
+      "max_fold_symmetric_auc": 0.521991,
+      "passes_ceiling_0p90": true,
+      "per_fold_auc": {
+        "seed20_NW": 0.51673,
+        "seed20_NE": 0.507554,
+        "seed20_SW": 0.51183,
+        "seed20_SE": 0.502546,
+        "seed30_NW": 0.518293,
+        "seed30_NE": 0.509831,
+        "seed30_SW": 0.521991,
+        "seed30_SE": 0.514375
+      }
+    },
+    {
+      "index": 1,
+      "name": "sub_hp14_mag_anom",
+      "domain": "subsurface",
+      "mean_symmetric_auc": 0.514173,
+      "max_fold_symmetric_auc": 0.53023,
+      "passes_ceiling_0p90": true,
+      "per_fold_auc": {
+        "seed20_NW": 0.511494,
+        "seed20_NE": 0.513999,
+        "seed20_SW": 0.512704,
+        "seed20_SE": 0.500505,
+        "seed30_NW": 0.520202,
+        "seed30_NE": 0.512046,
+        "seed30_SW": 0.53023,
+        "seed30_SE": 0.512206
+      }
+    },
+    {
+      "index": 2,
+      "name": "sub_hp4_rtp",
+      "domain": "subsurface",
+      "mean_symmetric_auc": 0.513023,
+      "max_fold_symmetric_auc": 0.533676,
+      "passes_ceiling_0p90": true,
+      "per_fold_auc": {
+        "seed20_NW": 0.533676,
+        "seed20_NE": 0.504172,
+        "seed20_SW": 0.504219,
+        "seed20_SE": 0.50467,
+        "seed30_NW": 0.513096,
+        "seed30_NE": 0.510032,
+        "seed30_SW": 0.519033,
+        "seed30_SE": 0.515288
+      }
+    },
+    {
+      "index": 3,
+      "name": "sub_hp14_rtp",
+      "domain": "subsurface",
+      "mean_symmetric_auc": 0.517381,
+      "max_fold_symmetric_auc": 0.53446,
+      "passes_ceiling_0p90": true,
+      "per_fold_auc": {
+        "seed20_NW": 0.53446,
+        "seed20_NE": 0.517973,
+        "seed20_SW": 0.522443,
+        "seed20_SE": 0.503632,
+        "seed30_NW": 0.513292,
+        "seed30_NE": 0.517628,
+        "seed30_SW": 0.512604,
+        "seed30_SE": 0.517014
+      }
+    },
+    {
+      "index": 4,
+      "name": "sub_tmi_hg",
+      "domain": "subsurface",
+      "mean_symmetric_auc": 0.533701,
+      "max_fold_symmetric_auc": 0.558119,
+      "passes_ceiling_0p90": true,
+      "per_fold_auc": {
+        "seed20_NW": 0.558119,
+        "seed20_NE": 0.527873,
+        "seed20_SW": 0.532949,
+        "seed20_SE": 0.50789,
+        "seed30_NW": 0.514176,
+        "seed30_NE": 0.555826,
+        "seed30_SW": 0.537142,
+        "seed30_SE": 0.53563
+      }
+    },
+    {
+      "index": 5,
+      "name": "sub_geod_2ndinv",
+      "domain": "subsurface",
+      "mean_symmetric_auc": 0.525446,
+      "max_fold_symmetric_auc": 0.554255,
+      "passes_ceiling_0p90": true,
+      "per_fold_auc": {
+        "seed20_NW": 0.525612,
+        "seed20_NE": 0.52283,
+        "seed20_SW": 0.554255,
+        "seed20_SE": 0.506121,
+        "seed30_NW": 0.543504,
+        "seed30_NE": 0.504872,
+        "seed30_SW": 0.520302,
+        "seed30_SE": 0.526069
+      }
+    },
+    {
+      "index": 6,
+      "name": "sub_iso_grav_anom_slope",
+      "domain": "subsurface",
+      "mean_symmetric_auc": 0.554633,
+      "max_fold_symmetric_auc": 0.623663,
+      "passes_ceiling_0p90": true,
+      "per_fold_auc": {
+        "seed20_NW": 0.515267,
+        "seed20_NE": 0.527542,
+        "seed20_SW": 0.503811,
+        "seed20_SE": 0.56719,
+        "seed30_NW": 0.563103,
+        "seed30_NE": 0.622968,
+        "seed30_SW": 0.513518,
+        "seed30_SE": 0.623663
+      }
+    },
+    {
+      "index": 7,
+      "name": "sub_tc",
+      "domain": "subsurface",
+      "mean_symmetric_auc": 0.555534,
+      "max_fold_symmetric_auc": 0.573702,
+      "passes_ceiling_0p90": true,
+      "per_fold_auc": {
+        "seed20_NW": 0.508763,
+        "seed20_NE": 0.563048,
+        "seed20_SW": 0.54681,
+        "seed20_SE": 0.562351,
+        "seed30_NW": 0.564726,
+        "seed30_NE": 0.573702,
+        "seed30_SW": 0.559114,
+        "seed30_SE": 0.565755
+      }
+    },
+    {
+      "index": 8,
+      "name": "sub_geod_shearrate",
+      "domain": "subsurface",
+      "mean_symmetric_auc": 0.535297,
+      "max_fold_symmetric_auc": 0.566218,
+      "passes_ceiling_0p90": true,
+      "per_fold_auc": {
+        "seed20_NW": 0.532122,
+        "seed20_NE": 0.531999,
+        "seed20_SW": 0.559684,
+        "seed20_SE": 0.518984,
+        "seed30_NW": 0.547663,
+        "seed30_NE": 0.501358,
+        "seed30_SW": 0.566218,
+        "seed30_SE": 0.524344
+      }
+    },
+    {
+      "index": 9,
+      "name": "sub_geod_dilaterate",
+      "domain": "subsurface",
+      "mean_symmetric_auc": 0.523953,
+      "max_fold_symmetric_auc": 0.552481,
+      "passes_ceiling_0p90": true,
+      "per_fold_auc": {
+        "seed20_NW": 0.521558,
+        "seed20_NE": 0.522094,
+        "seed20_SW": 0.532542,
+        "seed20_SE": 0.509134,
+        "seed30_NW": 0.541363,
+        "seed30_NE": 0.505351,
+        "seed30_SW": 0.507099,
+        "seed30_SE": 0.552481
+      }
+    },
+    {
+      "index": 10,
+      "name": "sub_tmi_vg",
+      "domain": "subsurface",
+      "mean_symmetric_auc": 0.51156,
+      "max_fold_symmetric_auc": 0.539269,
+      "passes_ceiling_0p90": true,
+      "per_fold_auc": {
+        "seed20_NW": 0.539269,
+        "seed20_NE": 0.510713,
+        "seed20_SW": 0.501139,
+        "seed20_SE": 0.508976,
+        "seed30_NW": 0.509675,
+        "seed30_NE": 0.505995,
+        "seed30_SW": 0.507394,
+        "seed30_SE": 0.509316
+      }
+    },
+    {
+      "index": 11,
+      "name": "sub_deq_n100a15",
+      "domain": "subsurface",
+      "mean_symmetric_auc": 0.53882,
+      "max_fold_symmetric_auc": 0.578445,
+      "passes_ceiling_0p90": true,
+      "per_fold_auc": {
+        "seed20_NW": 0.52472,
+        "seed20_NE": 0.542436,
+        "seed20_SW": 0.522748,
+        "seed20_SE": 0.578445,
+        "seed30_NW": 0.526461,
+        "seed30_NE": 0.559427,
+        "seed30_SW": 0.505558,
+        "seed30_SE": 0.550767
+      }
+    },
+    {
+      "index": 12,
+      "name": "sub_iso_grav_anom_vg",
+      "domain": "subsurface",
+      "mean_symmetric_auc": 0.53421,
+      "max_fold_symmetric_auc": 0.585657,
+      "passes_ceiling_0p90": true,
+      "per_fold_auc": {
+        "seed20_NW": 0.510052,
+        "seed20_NE": 0.510029,
+        "seed20_SW": 0.508501,
+        "seed20_SE": 0.533724,
+        "seed30_NW": 0.585657,
+        "seed30_NE": 0.553711,
+        "seed30_SW": 0.503145,
+        "seed30_SE": 0.568862
+      }
+    },
+    {
+      "index": 13,
+      "name": "sub_hp4_iso_grav_anom",
+      "domain": "subsurface",
+      "mean_symmetric_auc": 0.535416,
+      "max_fold_symmetric_auc": 0.573527,
+      "passes_ceiling_0p90": true,
+      "per_fold_auc": {
+        "seed20_NW": 0.563898,
+        "seed20_NE": 0.52803,
+        "seed20_SW": 0.500584,
+        "seed20_SE": 0.546008,
+        "seed30_NW": 0.545823,
+        "seed30_NE": 0.573527,
+        "seed30_SW": 0.502797,
+        "seed30_SE": 0.522661
+      }
+    },
+    {
+      "index": 14,
+      "name": "sub_hp14_iso_grav_anom",
+      "domain": "subsurface",
+      "mean_symmetric_auc": 0.535656,
+      "max_fold_symmetric_auc": 0.568051,
+      "passes_ceiling_0p90": true,
+      "per_fold_auc": {
+        "seed20_NW": 0.56192,
+        "seed20_NE": 0.519531,
+        "seed20_SW": 0.500234,
+        "seed20_SE": 0.552262,
+        "seed30_NW": 0.544124,
+        "seed30_NE": 0.568051,
+        "seed30_SW": 0.509885,
+        "seed30_SE": 0.529244
+      }
+    },
+    {
+      "index": 15,
+      "name": "sub_hp4_tmi",
+      "domain": "subsurface",
+      "mean_symmetric_auc": 0.515089,
+      "max_fold_symmetric_auc": 0.540816,
+      "passes_ceiling_0p90": true,
+      "per_fold_auc": {
+        "seed20_NW": 0.540816,
+        "seed20_NE": 0.507237,
+        "seed20_SW": 0.502542,
+        "seed20_SE": 0.512291,
+        "seed30_NW": 0.52444,
+        "seed30_NE": 0.509548,
+        "seed30_SW": 0.514528,
+        "seed30_SE": 0.509312
+      }
+    },
+    {
+      "index": 16,
+      "name": "sub_hp14_tmi",
+      "domain": "subsurface",
+      "mean_symmetric_auc": 0.513684,
+      "max_fold_symmetric_auc": 0.542483,
+      "passes_ceiling_0p90": true,
+      "per_fold_auc": {
+        "seed20_NW": 0.542483,
+        "seed20_NE": 0.512553,
+        "seed20_SW": 0.51434,
+        "seed20_SE": 0.516355,
+        "seed30_NW": 0.501824,
+        "seed30_NE": 0.511046,
+        "seed30_SW": 0.504294,
+        "seed30_SE": 0.506581
+      }
+    },
+    {
+      "index": 17,
+      "name": "sub_hp4_depth_to_base_surf",
+      "domain": "subsurface",
+      "mean_symmetric_auc": 0.543891,
+      "max_fold_symmetric_auc": 0.611822,
+      "passes_ceiling_0p90": true,
+      "per_fold_auc": {
+        "seed20_NW": 0.526765,
+        "seed20_NE": 0.504953,
+        "seed20_SW": 0.504099,
+        "seed20_SE": 0.555852,
+        "seed30_NW": 0.549151,
+        "seed30_NE": 0.577151,
+        "seed30_SW": 0.521335,
+        "seed30_SE": 0.611822
+      }
+    },
+    {
+      "index": 18,
+      "name": "sub_hp14_depth_to_base_surf",
+      "domain": "subsurface",
+      "mean_symmetric_auc": 0.542175,
+      "max_fold_symmetric_auc": 0.605554,
+      "passes_ceiling_0p90": true,
+      "per_fold_auc": {
+        "seed20_NW": 0.531074,
+        "seed20_NE": 0.508988,
+        "seed20_SW": 0.502358,
+        "seed20_SE": 0.55431,
+        "seed30_NW": 0.540293,
+        "seed30_NE": 0.573941,
+        "seed30_SW": 0.520884,
+        "seed30_SE": 0.605554
+      }
+    },
+    {
+      "index": 19,
+      "name": "sub_ieq_n100a15",
+      "domain": "subsurface",
+      "mean_symmetric_auc": 0.530517,
+      "max_fold_symmetric_auc": 0.58636,
+      "passes_ceiling_0p90": true,
+      "per_fold_auc": {
+        "seed20_NW": 0.525664,
+        "seed20_NE": 0.503149,
+        "seed20_SW": 0.517948,
+        "seed20_SE": 0.505886,
+        "seed30_NW": 0.552515,
+        "seed30_NE": 0.525444,
+        "seed30_SW": 0.527168,
+        "seed30_SE": 0.58636
+      }
+    },
+    {
+      "index": 20,
+      "name": "sub_cond_surf",
+      "domain": "subsurface",
+      "mean_symmetric_auc": 0.538442,
+      "max_fold_symmetric_auc": 0.602956,
+      "passes_ceiling_0p90": true,
+      "per_fold_auc": {
+        "seed20_NW": 0.569942,
+        "seed20_NE": 0.556327,
+        "seed20_SW": 0.524857,
+        "seed20_SE": 0.526523,
+        "seed30_NW": 0.602956,
+        "seed30_NE": 0.508706,
+        "seed30_SW": 0.501595,
+        "seed30_SE": 0.516627
+      }
+    },
+    {
+      "index": 21,
+      "name": "sub_iso_grav_anom_hg",
+      "domain": "subsurface",
+      "mean_symmetric_auc": 0.529573,
+      "max_fold_symmetric_auc": 0.55263,
+      "passes_ceiling_0p90": true,
+      "per_fold_auc": {
+        "seed20_NW": 0.524807,
+        "seed20_NE": 0.537258,
+        "seed20_SW": 0.532231,
+        "seed20_SE": 0.505133,
+        "seed30_NW": 0.531423,
+        "seed30_NE": 0.527649,
+        "seed30_SW": 0.52545,
+        "seed30_SE": 0.55263
+      }
+    },
+    {
+      "index": 22,
+      "name": "sub_hess_tc",
+      "domain": "subsurface",
+      "mean_symmetric_auc": 0.520012,
+      "max_fold_symmetric_auc": 0.556842,
+      "passes_ceiling_0p90": true,
+      "per_fold_auc": {
+        "seed20_NW": 0.51728,
+        "seed20_NE": 0.516336,
+        "seed20_SW": 0.505106,
+        "seed20_SE": 0.52875,
+        "seed30_NW": 0.514577,
+        "seed30_NE": 0.513462,
+        "seed30_SW": 0.507747,
+        "seed30_SE": 0.556842
+      }
+    },
+    {
+      "index": 23,
+      "name": "sub_hess_rtp",
+      "domain": "subsurface",
+      "mean_symmetric_auc": 0.530437,
+      "max_fold_symmetric_auc": 0.563491,
+      "passes_ceiling_0p90": true,
+      "per_fold_auc": {
+        "seed20_NW": 0.561015,
+        "seed20_NE": 0.51161,
+        "seed20_SW": 0.53637,
+        "seed20_SE": 0.508395,
+        "seed30_NW": 0.510144,
+        "seed30_NE": 0.563491,
+        "seed30_SW": 0.533973,
+        "seed30_SE": 0.518498
+      }
+    },
+    {
+      "index": 24,
+      "name": "sub_hess_grav",
+      "domain": "subsurface",
+      "mean_symmetric_auc": 0.538663,
+      "max_fold_symmetric_auc": 0.580762,
+      "passes_ceiling_0p90": true,
+      "per_fold_auc": {
+        "seed20_NW": 0.524696,
+        "seed20_NE": 0.551786,
+        "seed20_SW": 0.506955,
+        "seed20_SE": 0.53349,
+        "seed30_NW": 0.530322,
+        "seed30_NE": 0.580762,
+        "seed30_SW": 0.53665,
+        "seed30_SE": 0.544643
+      }
+    },
+    {
+      "index": 25,
+      "name": "sub_grad_basement",
+      "domain": "subsurface",
+      "mean_symmetric_auc": 0.55286,
+      "max_fold_symmetric_auc": 0.643535,
+      "passes_ceiling_0p90": true,
+      "per_fold_auc": {
+        "seed20_NW": 0.533611,
+        "seed20_NE": 0.510499,
+        "seed20_SW": 0.506162,
+        "seed20_SE": 0.600261,
+        "seed30_NW": 0.532366,
+        "seed30_NE": 0.570149,
+        "seed30_SW": 0.526294,
+        "seed30_SE": 0.643535
+      }
+    },
+    {
+      "index": 26,
+      "name": "sub_grad_cond",
+      "domain": "subsurface",
+      "mean_symmetric_auc": 0.512922,
+      "max_fold_symmetric_auc": 0.535298,
+      "passes_ceiling_0p90": true,
+      "per_fold_auc": {
+        "seed20_NW": 0.500273,
+        "seed20_NE": 0.501449,
+        "seed20_SW": 0.527124,
+        "seed20_SE": 0.535298,
+        "seed30_NW": 0.506301,
+        "seed30_NE": 0.500879,
+        "seed30_SW": 0.519475,
+        "seed30_SE": 0.512574
+      }
+    },
+    {
+      "index": 27,
+      "name": "sub_grav_tilt_angle",
+      "domain": "subsurface",
+      "mean_symmetric_auc": 0.538,
+      "max_fold_symmetric_auc": 0.598953,
+      "passes_ceiling_0p90": true,
+      "per_fold_auc": {
+        "seed20_NW": 0.516758,
+        "seed20_NE": 0.507944,
+        "seed20_SW": 0.52508,
+        "seed20_SE": 0.524757,
+        "seed30_NW": 0.598953,
+        "seed30_NE": 0.554847,
+        "seed30_SW": 0.524237,
+        "seed30_SE": 0.551425
+      }
+    },
+    {
+      "index": 28,
+      "name": "sub_transtension_vorticity",
+      "domain": "subsurface",
+      "mean_symmetric_auc": 0.519666,
+      "max_fold_symmetric_auc": 0.539818,
+      "passes_ceiling_0p90": true,
+      "per_fold_auc": {
+        "seed20_NW": 0.527735,
+        "seed20_NE": 0.524231,
+        "seed20_SW": 0.520795,
+        "seed20_SE": 0.502165,
+        "seed30_NW": 0.521668,
+        "seed30_NE": 0.502613,
+        "seed30_SW": 0.518301,
+        "seed30_SE": 0.539818
+      }
+    },
+    {
+      "index": 29,
+      "name": "sub_seismic_strain_product",
+      "domain": "subsurface",
+      "mean_symmetric_auc": 0.527945,
+      "max_fold_symmetric_auc": 0.586092,
+      "passes_ceiling_0p90": true,
+      "per_fold_auc": {
+        "seed20_NW": 0.527436,
+        "seed20_NE": 0.5,
+        "seed20_SW": 0.531449,
+        "seed20_SE": 0.527976,
+        "seed30_NW": 0.543773,
+        "seed30_NE": 0.5,
+        "seed30_SW": 0.506834,
+        "seed30_SE": 0.586092
+      }
+    },
+    {
+      "index": 30,
+      "name": "sub_potassic_k_th_resid",
+      "domain": "subsurface",
+      "mean_symmetric_auc": 0.557553,
+      "max_fold_symmetric_auc": 0.613483,
+      "passes_ceiling_0p90": true,
+      "per_fold_auc": {
+        "seed20_NW": 0.572498,
+        "seed20_NE": 0.561374,
+        "seed20_SW": 0.594662,
+        "seed20_SE": 0.528855,
+        "seed30_NW": 0.613483,
+        "seed30_NE": 0.541906,
+        "seed30_SW": 0.542587,
+        "seed30_SE": 0.505056
+      }
+    },
+    {
+      "index": 31,
+      "name": "sub_rad_uk_ratio",
+      "domain": "subsurface",
+      "mean_symmetric_auc": 0.545271,
+      "max_fold_symmetric_auc": 0.578845,
+      "passes_ceiling_0p90": true,
+      "per_fold_auc": {
+        "seed20_NW": 0.557528,
+        "seed20_NE": 0.539503,
+        "seed20_SW": 0.533968,
+        "seed20_SE": 0.540722,
+        "seed30_NW": 0.578845,
+        "seed30_NE": 0.536893,
+        "seed30_SW": 0.522248,
+        "seed30_SE": 0.552464
+      }
+    },
+    {
+      "index": 32,
+      "name": "sub_mag_destruction_trough",
+      "domain": "subsurface",
+      "mean_symmetric_auc": 0.516548,
+      "max_fold_symmetric_auc": 0.53413,
+      "passes_ceiling_0p90": true,
+      "per_fold_auc": {
+        "seed20_NW": 0.509947,
+        "seed20_NE": 0.510073,
+        "seed20_SW": 0.501322,
+        "seed20_SE": 0.521594,
+        "seed30_NW": 0.529974,
+        "seed30_NE": 0.512608,
+        "seed30_SW": 0.51274,
+        "seed30_SE": 0.53413
+      }
+    },
+    {
+      "index": 33,
+      "name": "sub_gdr_geotherm_1p5km",
+      "domain": "subsurface",
+      "mean_symmetric_auc": 0.536678,
+      "max_fold_symmetric_auc": 0.564864,
+      "passes_ceiling_0p90": true,
+      "per_fold_auc": {
+        "seed20_NW": 0.541466,
+        "seed20_NE": 0.564864,
+        "seed20_SW": 0.538726,
+        "seed20_SE": 0.55937,
+        "seed30_NW": 0.530068,
+        "seed30_NE": 0.510024,
+        "seed30_SW": 0.53033,
+        "seed30_SE": 0.518574
+      }
+    },
+    {
+      "index": 34,
+      "name": "sub_gdr_geotherm_4km",
+      "domain": "subsurface",
+      "mean_symmetric_auc": 0.526008,
+      "max_fold_symmetric_auc": 0.562089,
+      "passes_ceiling_0p90": true,
+      "per_fold_auc": {
+        "seed20_NW": 0.527287,
+        "seed20_NE": 0.533326,
+        "seed20_SW": 0.562089,
+        "seed20_SE": 0.508166,
+        "seed30_NW": 0.529187,
+        "seed30_NE": 0.504087,
+        "seed30_SW": 0.502796,
+        "seed30_SE": 0.541128
+      }
+    },
+    {
+      "index": 35,
+      "name": "sub_ingenious_heatflow_4km",
+      "domain": "subsurface",
+      "mean_symmetric_auc": 0.514681,
+      "max_fold_symmetric_auc": 0.543229,
+      "passes_ceiling_0p90": true,
+      "per_fold_auc": {
+        "seed20_NW": 0.5,
+        "seed20_NE": 0.51009,
+        "seed20_SW": 0.528356,
+        "seed20_SE": 0.523494,
+        "seed30_NW": 0.5,
+        "seed30_NE": 0.509994,
+        "seed30_SW": 0.502288,
+        "seed30_SE": 0.543229
+      }
+    },
+    {
+      "index": 36,
+      "name": "sub_hydrothermal_conduit_index",
+      "domain": "subsurface",
+      "mean_symmetric_auc": 0.527405,
+      "max_fold_symmetric_auc": 0.582558,
+      "passes_ceiling_0p90": true,
+      "per_fold_auc": {
+        "seed20_NW": 0.516306,
+        "seed20_NE": 0.52126,
+        "seed20_SW": 0.582558,
+        "seed20_SE": 0.536194,
+        "seed30_NW": 0.504689,
+        "seed30_NE": 0.518601,
+        "seed30_SW": 0.516115,
+        "seed30_SE": 0.523521
+      }
+    },
+    {
+      "index": 37,
+      "name": "sub_radon9_max",
+      "domain": "subsurface",
+      "mean_symmetric_auc": 0.531222,
+      "max_fold_symmetric_auc": 0.583969,
+      "passes_ceiling_0p90": true,
+      "per_fold_auc": {
+        "seed20_NW": 0.544048,
+        "seed20_NE": 0.544323,
+        "seed20_SW": 0.51431,
+        "seed20_SE": 0.530794,
+        "seed30_NW": 0.50702,
+        "seed30_NE": 0.520221,
+        "seed30_SW": 0.505087,
+        "seed30_SE": 0.583969
+      }
+    },
+    {
+      "index": 38,
+      "name": "sub_radon9_aniso",
+      "domain": "subsurface",
+      "mean_symmetric_auc": 0.518806,
+      "max_fold_symmetric_auc": 0.548863,
+      "passes_ceiling_0p90": true,
+      "per_fold_auc": {
+        "seed20_NW": 0.548863,
+        "seed20_NE": 0.530209,
+        "seed20_SW": 0.525013,
+        "seed20_SE": 0.512803,
+        "seed30_NW": 0.502205,
+        "seed30_NE": 0.500836,
+        "seed30_SW": 0.516266,
+        "seed30_SE": 0.514249
+      }
+    },
+    {
+      "index": 39,
+      "name": "sub_radon21_max",
+      "domain": "subsurface",
+      "mean_symmetric_auc": 0.533727,
+      "max_fold_symmetric_auc": 0.580877,
+      "passes_ceiling_0p90": true,
+      "per_fold_auc": {
+        "seed20_NW": 0.553388,
+        "seed20_NE": 0.55822,
+        "seed20_SW": 0.51829,
+        "seed20_SE": 0.530742,
+        "seed30_NW": 0.509543,
+        "seed30_NE": 0.515134,
+        "seed30_SW": 0.503622,
+        "seed30_SE": 0.580877
+      }
+    },
+    {
+      "index": 40,
+      "name": "sub_radon21_aniso",
+      "domain": "subsurface",
+      "mean_symmetric_auc": 0.523705,
+      "max_fold_symmetric_auc": 0.553226,
+      "passes_ceiling_0p90": true,
+      "per_fold_auc": {
+        "seed20_NW": 0.553226,
+        "seed20_NE": 0.55142,
+        "seed20_SW": 0.530452,
+        "seed20_SE": 0.505827,
+        "seed30_NW": 0.501801,
+        "seed30_NE": 0.515523,
+        "seed30_SW": 0.51162,
+        "seed30_SE": 0.519772
+      }
+    },
+    {
+      "index": 41,
+      "name": "sub_sgmc_bedrock_prox",
+      "domain": "subsurface",
+      "mean_symmetric_auc": 0.694708,
+      "max_fold_symmetric_auc": 0.778155,
+      "passes_ceiling_0p90": true,
+      "per_fold_auc": {
+        "seed20_NW": 0.778155,
+        "seed20_NE": 0.732885,
+        "seed20_SW": 0.620152,
+        "seed20_SE": 0.681657,
+        "seed30_NW": 0.729592,
+        "seed30_NE": 0.773823,
+        "seed30_SW": 0.626416,
+        "seed30_SE": 0.614985
+      }
+    },
+    {
+      "index": 42,
+      "name": "surf_det_elev_slope",
+      "domain": "surface_coupling",
+      "mean_symmetric_auc": 0.558714,
+      "max_fold_symmetric_auc": 0.646509,
+      "passes_ceiling_0p90": true,
+      "per_fold_auc": {
+        "seed20_NW": 0.646509,
+        "seed20_NE": 0.512005,
+        "seed20_SW": 0.574065,
+        "seed20_SE": 0.552765,
+        "seed30_NW": 0.608657,
+        "seed30_NE": 0.527579,
+        "seed30_SW": 0.547905,
+        "seed30_SE": 0.50023
+      }
+    },
+    {
+      "index": 43,
+      "name": "surf_det_elev_hp4",
+      "domain": "surface_coupling",
+      "mean_symmetric_auc": 0.581157,
+      "max_fold_symmetric_auc": 0.600453,
+      "passes_ceiling_0p90": true,
+      "per_fold_auc": {
+        "seed20_NW": 0.599497,
+        "seed20_NE": 0.589039,
+        "seed20_SW": 0.553196,
+        "seed20_SE": 0.571422,
+        "seed30_NW": 0.595603,
+        "seed30_NE": 0.600453,
+        "seed30_SW": 0.55513,
+        "seed30_SE": 0.58492
+      }
+    },
+    {
+      "index": 44,
+      "name": "surf_det_elev_hp14",
+      "domain": "surface_coupling",
+      "mean_symmetric_auc": 0.586291,
+      "max_fold_symmetric_auc": 0.656198,
+      "passes_ceiling_0p90": true,
+      "per_fold_auc": {
+        "seed20_NW": 0.503622,
+        "seed20_NE": 0.656198,
+        "seed20_SW": 0.531687,
+        "seed20_SE": 0.602156,
+        "seed30_NW": 0.588103,
+        "seed30_NE": 0.650265,
+        "seed30_SW": 0.532088,
+        "seed30_SE": 0.626209
+      }
+    },
+    {
+      "index": 45,
+      "name": "surf_hess_det_elev",
+      "domain": "surface_coupling",
+      "mean_symmetric_auc": 0.562016,
+      "max_fold_symmetric_auc": 0.589628,
+      "passes_ceiling_0p90": true,
+      "per_fold_auc": {
+        "seed20_NW": 0.589628,
+        "seed20_NE": 0.556115,
+        "seed20_SW": 0.558236,
+        "seed20_SE": 0.551001,
+        "seed30_NW": 0.555249,
+        "seed30_NE": 0.57245,
+        "seed30_SW": 0.553917,
+        "seed30_SE": 0.559536
+      }
+    },
+    {
+      "index": 46,
+      "name": "surf_hess_slope_crest",
+      "domain": "surface_coupling",
+      "mean_symmetric_auc": 0.514077,
+      "max_fold_symmetric_auc": 0.545074,
+      "passes_ceiling_0p90": true,
+      "per_fold_auc": {
+        "seed20_NW": 0.545074,
+        "seed20_NE": 0.512569,
+        "seed20_SW": 0.510599,
+        "seed20_SE": 0.516009,
+        "seed30_NW": 0.500162,
+        "seed30_NE": 0.518131,
+        "seed30_SW": 0.505047,
+        "seed30_SE": 0.505027
+      }
+    },
+    {
+      "index": 47,
+      "name": "surf_lidar_step_max",
+      "domain": "surface_coupling",
+      "mean_symmetric_auc": 0.566664,
+      "max_fold_symmetric_auc": 0.649248,
+      "passes_ceiling_0p90": true,
+      "per_fold_auc": {
+        "seed20_NW": 0.649248,
+        "seed20_NE": 0.55619,
+        "seed20_SW": 0.550651,
+        "seed20_SE": 0.573661,
+        "seed30_NW": 0.594942,
+        "seed30_NE": 0.529816,
+        "seed30_SW": 0.542812,
+        "seed30_SE": 0.535991
+      }
+    },
+    {
+      "index": 48,
+      "name": "surf_lidar_ex_max",
+      "domain": "surface_coupling",
+      "mean_symmetric_auc": 0.563717,
+      "max_fold_symmetric_auc": 0.638966,
+      "passes_ceiling_0p90": true,
+      "per_fold_auc": {
+        "seed20_NW": 0.638966,
+        "seed20_NE": 0.55243,
+        "seed20_SW": 0.540125,
+        "seed20_SE": 0.587246,
+        "seed30_NW": 0.58692,
+        "seed30_NE": 0.527299,
+        "seed30_SW": 0.530623,
+        "seed30_SE": 0.546129
+      }
+    },
+    {
+      "index": 49,
+      "name": "surf_lidar_scarp_polarity",
+      "domain": "surface_coupling",
+      "mean_symmetric_auc": 0.579756,
+      "max_fold_symmetric_auc": 0.636095,
+      "passes_ceiling_0p90": true,
+      "per_fold_auc": {
+        "seed20_NW": 0.636095,
+        "seed20_NE": 0.577488,
+        "seed20_SW": 0.570713,
+        "seed20_SE": 0.577434,
+        "seed30_NW": 0.5963,
+        "seed30_NE": 0.549187,
+        "seed30_SW": 0.570347,
+        "seed30_SE": 0.560481
+      }
+    },
+    {
+      "index": 50,
+      "name": "surf_lidar_coherent_step",
+      "domain": "surface_coupling",
+      "mean_symmetric_auc": 0.559301,
+      "max_fold_symmetric_auc": 0.628571,
+      "passes_ceiling_0p90": true,
+      "per_fold_auc": {
+        "seed20_NW": 0.628571,
+        "seed20_NE": 0.55313,
+        "seed20_SW": 0.549609,
+        "seed20_SE": 0.562203,
+        "seed30_NW": 0.584971,
+        "seed30_NE": 0.526163,
+        "seed30_SW": 0.543109,
+        "seed30_SE": 0.526655
+      }
+    },
+    {
+      "index": 51,
+      "name": "surf_lidar_lapneg",
+      "domain": "surface_coupling",
+      "mean_symmetric_auc": 0.569584,
+      "max_fold_symmetric_auc": 0.65462,
+      "passes_ceiling_0p90": true,
+      "per_fold_auc": {
+        "seed20_NW": 0.65462,
+        "seed20_NE": 0.556581,
+        "seed20_SW": 0.546363,
+        "seed20_SE": 0.580127,
+        "seed30_NW": 0.605653,
+        "seed30_NE": 0.533068,
+        "seed30_SW": 0.54266,
+        "seed30_SE": 0.5376
+      }
+    },
+    {
+      "index": 52,
+      "name": "surf_radon9_scarp_max",
+      "domain": "surface_coupling",
+      "mean_symmetric_auc": 0.553526,
+      "max_fold_symmetric_auc": 0.66288,
+      "passes_ceiling_0p90": true,
+      "per_fold_auc": {
+        "seed20_NW": 0.66288,
+        "seed20_NE": 0.510733,
+        "seed20_SW": 0.565565,
+        "seed20_SE": 0.547931,
+        "seed30_NW": 0.589128,
+        "seed30_NE": 0.504596,
+        "seed30_SW": 0.546833,
+        "seed30_SE": 0.500545
+      }
+    },
+    {
+      "index": 53,
+      "name": "surf_radon9_scarp_aniso",
+      "domain": "surface_coupling",
+      "mean_symmetric_auc": 0.55584,
+      "max_fold_symmetric_auc": 0.637688,
+      "passes_ceiling_0p90": true,
+      "per_fold_auc": {
+        "seed20_NW": 0.637688,
+        "seed20_NE": 0.523606,
+        "seed20_SW": 0.561893,
+        "seed20_SE": 0.563309,
+        "seed30_NW": 0.573655,
+        "seed30_NE": 0.512358,
+        "seed30_SW": 0.552881,
+        "seed30_SE": 0.521328
+      }
+    },
+    {
+      "index": 54,
+      "name": "surf_radon21_scarp_max",
+      "domain": "surface_coupling",
+      "mean_symmetric_auc": 0.556163,
+      "max_fold_symmetric_auc": 0.672967,
+      "passes_ceiling_0p90": true,
+      "per_fold_auc": {
+        "seed20_NW": 0.672967,
+        "seed20_NE": 0.51055,
+        "seed20_SW": 0.570307,
+        "seed20_SE": 0.542716,
+        "seed30_NW": 0.595192,
+        "seed30_NE": 0.502151,
+        "seed30_SW": 0.546341,
+        "seed30_SE": 0.50908
+      }
+    },
+    {
+      "index": 55,
+      "name": "surf_radon21_scarp_aniso",
+      "domain": "surface_coupling",
+      "mean_symmetric_auc": 0.560963,
+      "max_fold_symmetric_auc": 0.64719,
+      "passes_ceiling_0p90": true,
+      "per_fold_auc": {
+        "seed20_NW": 0.64719,
+        "seed20_NE": 0.530552,
+        "seed20_SW": 0.573806,
+        "seed20_SE": 0.563099,
+        "seed30_NW": 0.582081,
+        "seed30_NE": 0.519043,
+        "seed30_SW": 0.557078,
+        "seed30_SE": 0.514858
+      }
+    },
+    {
+      "index": 56,
+      "name": "surf_radon35_scarp_aniso",
+      "domain": "surface_coupling",
+      "mean_symmetric_auc": 0.562593,
+      "max_fold_symmetric_auc": 0.645284,
+      "passes_ceiling_0p90": true,
+      "per_fold_auc": {
+        "seed20_NW": 0.645284,
+        "seed20_NE": 0.536684,
+        "seed20_SW": 0.57087,
+        "seed20_SE": 0.560585,
+        "seed30_NW": 0.595936,
+        "seed30_NE": 0.52026,
+        "seed30_SW": 0.563666,
+        "seed30_SE": 0.50746
+      }
+    },
+    {
+      "index": 57,
+      "name": "surf_cross_physics_strike_lock",
+      "domain": "surface_coupling",
+      "mean_symmetric_auc": 0.513041,
+      "max_fold_symmetric_auc": 0.524358,
+      "passes_ceiling_0p90": true,
+      "per_fold_auc": {
+        "seed20_NW": 0.500937,
+        "seed20_NE": 0.521192,
+        "seed20_SW": 0.509478,
+        "seed20_SE": 0.500377,
+        "seed30_NW": 0.524358,
+        "seed30_NE": 0.524102,
+        "seed30_SW": 0.511624,
+        "seed30_SE": 0.512263
+      }
+    },
+    {
+      "index": 58,
+      "name": "surf_cross_strike_throw_600m",
+      "domain": "surface_coupling",
+      "mean_symmetric_auc": 0.568039,
+      "max_fold_symmetric_auc": 0.640007,
+      "passes_ceiling_0p90": true,
+      "per_fold_auc": {
+        "seed20_NW": 0.640007,
+        "seed20_NE": 0.535772,
+        "seed20_SW": 0.576565,
+        "seed20_SE": 0.556234,
+        "seed30_NW": 0.610018,
+        "seed30_NE": 0.570161,
+        "seed30_SW": 0.542664,
+        "seed30_SE": 0.512894
+      }
+    },
+    {
+      "index": 59,
+      "name": "surf_hangingwall_downdip_grav_mt",
+      "domain": "surface_coupling",
+      "mean_symmetric_auc": 0.566789,
+      "max_fold_symmetric_auc": 0.613049,
+      "passes_ceiling_0p90": true,
+      "per_fold_auc": {
+        "seed20_NW": 0.567485,
+        "seed20_NE": 0.530735,
+        "seed20_SW": 0.501732,
+        "seed20_SE": 0.600678,
+        "seed30_NW": 0.611897,
+        "seed30_NE": 0.59333,
+        "seed30_SW": 0.515409,
+        "seed30_SE": 0.613049
+      }
+    },
+    {
+      "index": 60,
+      "name": "surf_concealed_basin_growth_wedge",
+      "domain": "surface_coupling",
+      "mean_symmetric_auc": 0.540479,
+      "max_fold_symmetric_auc": 0.621307,
+      "passes_ceiling_0p90": true,
+      "per_fold_auc": {
+        "seed20_NW": 0.521097,
+        "seed20_NE": 0.5057,
+        "seed20_SW": 0.50875,
+        "seed20_SE": 0.561964,
+        "seed30_NW": 0.517825,
+        "seed30_NE": 0.565885,
+        "seed30_SW": 0.521303,
+        "seed30_SE": 0.621307
+      }
+    }
+  ]
+}

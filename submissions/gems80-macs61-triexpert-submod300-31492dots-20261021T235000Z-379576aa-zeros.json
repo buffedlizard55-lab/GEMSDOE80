@@ -1,0 +1,123 @@
+{
+  "file": "gems80-macs61-triexpert-submod300-31492dots-20261021T235000Z-379576aa-zeros.tif",
+  "sha256": "7bc62f5837739efb6a98aebc34cb908d153840d7f9a75f306c5636ec2e0d8853",
+  "bytes": 128473,
+  "submission_name": "gems80-macs61-triexpert-submod300-31492dots-20261021T235000Z-379576aa-zeros",
+  "note": "GEMS80 MACS-61 tri-expert log-odds LOQO (Radon+1mLiDAR+subsurf+GDR/HF) + 3.2px submod300: 31492 off-cat dots [0,1]",
+  "note_chars": 114,
+  "validator": {
+    "file": "/home/user/GEMSDOE80/docs/submissions/gems80-macs61-triexpert-submod300-31492dots-20261021T235000Z-379576aa-zeros.tif",
+    "bytes": 128473,
+    "sha256": "7bc62f5837739efb6a98aebc34cb908d153840d7f9a75f306c5636ec2e0d8853",
+    "meta": {
+      "crs": "EPSG:32611",
+      "shape": [
+        3730,
+        3292
+      ],
+      "dtype": "float32",
+      "count": 1,
+      "nodata": null,
+      "transform": [
+        100.0,
+        0.0,
+        243350.0,
+        0.0,
+        -100.0,
+        4508550.0
+      ],
+      "profile_compress": "deflate"
+    },
+    "band_description": [
+      null
+    ],
+    "n_finite": 12279160,
+    "n_nan": 0,
+    "n_infinite": 0,
+    "min": 0.0,
+    "max": 1.0,
+    "mean": 0.002564670518040657,
+    "emitted_positive_pixels": 31492,
+    "checks": {
+      "single_band": true,
+      "dtype_float32": true,
+      "dimensions_3730x3292": true,
+      "crs_epsg_32611": true,
+      "transform_matches_sample_submission": true,
+      "no_nan_anywhere": true,
+      "no_inf_anywhere": true,
+      "no_sentinel_values": true,
+      "range_0_1_guaranteed": true,
+      "min_ge_0": true,
+      "max_le_1": true,
+      "in_footprint_all_finite": true,
+      "in_footprint_range_0_1": true,
+      "outside_footprint_zero": true,
+      "zero_dots_on_mapped_catalogue": true
+    },
+    "all_checks_passed": true,
+    "validation_class": "local format/range preflight; not organizer acceptance or uniqueness clearance",
+    "on_catalogue_positive_pixels": 0,
+    "in_footprint_positive_pixels": 31492,
+    "footprint_fraction": 0.006094392643999185
+  },
+  "template_report": {
+    "path": "/home/user/GEMSDOE80/docs/submissions/gems80-macs61-triexpert-submod300-31492dots-20261021T235000Z-379576aa-zeros.tif",
+    "bytes": 128473,
+    "sha256": "7bc62f5837739efb6a98aebc34cb908d153840d7f9a75f306c5636ec2e0d8853",
+    "bands": 1,
+    "dtype": "float32",
+    "crs": "EPSG:32611",
+    "width": 3292,
+    "height": 3730,
+    "bounds": [
+      243350.0,
+      4135550.0,
+      572550.0,
+      4508550.0
+    ],
+    "ref_bounds": [
+      243350.0,
+      4135550.0,
+      572550.0,
+      4508550.0
+    ],
+    "transform": [
+      100.0,
+      0.0,
+      243350.0,
+      0.0,
+      -100.0,
+      4508550.0
+    ],
+    "nodata": null,
+    "blocksize": [
+      256,
+      256
+    ],
+    "fixture_grid": false,
+    "has_validity_mask": false,
+    "nan_pixels": 0,
+    "infinity_pixels": 0,
+    "n_nan": 0,
+    "min": 0.0,
+    "max": 1.0,
+    "mean": 0.002564670518040657,
+    "n_nonzero": 31492,
+    "mass": 31492.0,
+    "mass_outside_footprint": 0,
+    "problems": [],
+    "ok": true,
+    "validation_class": "local on-disk template/range check; not organizer upload acceptance"
+  },
+  "zip_file": "gems80-macs61-triexpert-submod300-31492dots-20261021T235000Z-379576aa-zeros.zip",
+  "zip_sha256": "b25361699d13eb90ab907ab3ad21053bf7c12c85384fffc6f5d45fce791fcbbc",
+  "approved_for_weekly_slot": false,
+  "promoted": false,
+  "submission_slots_used": 0,
+  "status": "locally validated within separately recorded inventory scope; not organizer acceptance or slot approval",
+  "metadata": {
+    "lane": "G80-MACS-EDTI",
+    "experiments_used": 3
+  }
+}
