@@ -60,3 +60,20 @@ Official links:
 - https://gbcge.org/current-projects/ingenious/
 - https://epsg.io/32611
 - https://en.wikipedia.org/wiki/Tversky_index
+
+## Next candidates — NOT RUN (budget 3/3 exhausted; do not spend a slot on these without a fresh holdout win)
+
+Ranked by expected DTI gain per implementation cost. All use only `training_features.tif`
+bands already in this repo (no new external data needed, so all are viable without downloads).
+Each must first beat H80-C's HOLDOUT-DTI 0.0507 on the same hide-and-recover split and pass
+the leakage canary (per-feature AUC <= 0.90) and lane check (Spearman <= 0.90, 3 px overlap <= 0.70).
+
+| Rank | ID | Layers | Signature | Why off-catalogue | Non-fault mimic | Differs from H80-A/B/C | Cost |
+|------|----|--------|-----------|-------------------|-----------------|------------------------|------|
+| 1 | H80-F shear zero-crossing | shear rate (b7), dilatation (b8), tilt/tc (b6) | catalogue-residual of \|grad(shear)\| gated to shear sign-change lines, x tc | Transtensional stepovers localise where shear changes sign, not on mapped traces | Volcanic/intrusive shear aureoles | A/B/C use dilatation/2nd-invariant gradients only; shear sign was never used | low |
+| 2 | H80-G coherence of residual field | H80-C residual surface, RTP (b2) | structure-tensor coherence (anisotropy) of the residual; emit only coherent linear segments, NMS sep=3 | Real faults are line-coherent; interpolation seams are grid-aligned and isotropic | Survey line artefacts (400 m line spacing, Area 2) | C emits point maxima; G requires line coherence before emission | medium |
+| 3 | H80-H seismicity-strain discordance | earthquake density (b16), dilatation (b8) | residual of eq-density after regressing out dilatation + catalogue distance | Blind seismogenic strands active but unmapped | Induced/volcanic clusters | H80-D sketched eq residual vs catalogue only; H adds strain regression | low |
+
+H80-D (eq-density residual) and H80-E (basement-step) above remain unrun for the same reason.
+A 1 m DEM scarp candidate is **not viable from this sandbox**: `1m_DEM_links.csv` requires a
+DrivenData login (sources.md A7), so it is named but not proposed until that file is placed in `data/`.

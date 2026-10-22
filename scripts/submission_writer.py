@@ -86,7 +86,8 @@ def write_pair(mask: np.ndarray, template: Path, labels_path: Path, out_dir: Pat
             "transform": transform,
             "dtype": dtype,
             "count": count,
-            "nodata": None if nodata is None or (isinstance(nodata, float) and np.isnan(nodata)) else nodata,
+            # NaN nodata must not serialise as null (that hid the nan twin's tag, IR-28)
+            "nodata": ("NaN" if (isinstance(nodata, float) and np.isnan(nodata)) else nodata),
             "positive_px": int((np.isfinite(a) & (a > 0.5) & foot).sum()),
             "on_catalogue_px": int((np.isfinite(a) & (a > 0.5) & labels).sum()),
             "nan_inside_footprint": int((~np.isfinite(in_f)).sum()),

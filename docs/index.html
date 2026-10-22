@@ -57,7 +57,7 @@
     </p>
     <a class="btn" href="./downloads/gemsdoe80-h80c-strain-accom-resid-20261021T233457Z-zeros.tif" download>Download submission TIF (zeros — use this)</a>
     <a class="btn secondary" href="./downloads/gemsdoe80-h80c-strain-accom-resid-20261021T233457Z-zeros.zip">Download .zip (one GeoTIFF inside)</a>
-    <a class="btn secondary" href="./downloads/gemsdoe80-h80c-strain-accom-resid-20261021T233457Z-nan.tif">NaN-outside twin</a>
+    <a class="btn secondary" href="./downloads/gemsdoe80-h80c-strain-accom-resid-20261021T233457Z-nan.tif">NaN-outside twin — DO NOT SUBMIT</a>
     <a class="btn secondary" href="./executive-summary.html">Executive summary — how to submit</a>
   </section>
 
@@ -77,7 +77,7 @@
     <table>
       <tr><th style="width:44%">Check</th><th>Result</th></tr>
       <tr><td>Single-band float32 GeoTIFF</td><td>PASS</td></tr>
-      <tr><td>CRS / shape / transform vs official <code>sample_submission.tif</code></td><td>PASS — EPSG:32611, 3730×3292, (100, 0, 243350, 0, −100, 4508550)</td></tr>
+      <tr><td>CRS / shape / transform vs mirrored <code>sample_submission.tif</code> template pin</td><td>PASS — EPSG:32611, 3730×3292, (100, 0, 243350, 0, −100, 4508550). Grid is the consensus pin shared by owner repos, not an organizer download made in this sandbox (sources.md §B, IR-04)</td></tr>
       <tr><td>Values in [0, 1]</td><td>PASS — min 0.0, max 1.0, all 12,279,160 cells</td></tr>
       <tr><td>NaN inside footprint</td><td>PASS — 0</td></tr>
       <tr><td>On-catalogue positive pixels</td><td>PASS — 0</td></tr>
@@ -106,7 +106,7 @@
   <section>
     <h2>Why 0.2778 was high — and whether this file can beat it</h2>
     <p>GEMSDOE32’s H33-2-B2 is a <em>metric-geometry</em> edit of a dotted ridge: delete every dot within 2 px of the catalogue, keep ~37,654 unit pixels, all-finite zeros encoding, official grid. DTI rewards covering hidden truth with sparse mass; extra mass that does not raise a truth pixel’s max kernel credit is FP at cost 0.2. Off-catalogue placement is mandatory because the test labels are faults <em>not</em> in USGS/INGENIOUS.</p>
-    <p>The 0.2778 figure is <strong>not independently organizer-confirmed in this checkout</strong> (GEMSDOE32 labelled that file UNSCORED / projected 0.2747). The official public leaderboard, read 2026-10-21 from DrivenData, lists #1 <strong>xiaofanhu 0.4413</strong>, so higher scores exist. H80-C is a <em>different detector</em> (strain-transfer residual, not H19-5 ridge prune). Its HOLDOUT-DTI of 0.0507 is a catalogue-hide-and-recover proxy and is <strong>not</strong> a prediction of live DTI. Live performance is unknown until an organizer receipt exists.</p>
+    <p>The 0.2778 figure is <strong>not independently organizer-confirmed in this checkout</strong> (GEMSDOE32 labelled that file UNSCORED / projected 0.2747). The official public leaderboard, re-read 2026-10-22 from DrivenData, still lists #1 <strong>xiaofanhu 0.4413</strong> (0.3195 does not appear in the top rows read; treat it as superseded), so higher scores exist. H80-C is a <em>different detector</em> (strain-transfer residual, not H19-5 ridge prune). Its HOLDOUT-DTI of 0.0507 is a catalogue-hide-and-recover proxy and is <strong>not</strong> a prediction of live DTI. Live performance is unknown until an organizer receipt exists.</p>
   </section>
 
   <section>

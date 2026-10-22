@@ -35,7 +35,7 @@ Test labels are faults **not** in the public USGS / INGENIOUS catalogue.
 
 H33-2-B2 (GEMSDOE32) is a **metric-geometry** file: take a 0.2708 dotted ridge,
 delete every dot within 2 px of the catalogue, keep 37,654 unit pixels, write
-all-finite zeros on the official 3730×3292 grid. DTI is a covering budget —
+all-finite zeros on the mirrored-template 3730×3292 grid (consensus pin, not organizer-downloaded in this sandbox — sources.md §B). DTI is a covering budget —
 sparse off-catalogue mass beats a thick surface. The 0.2778 figure is
 **not ORGANIZER-CONFIRMED in this checkout** (GEMSDOE32 labelled that file
 UNSCORED / projected 0.2747). Official public leaderboard 2026-10-21:

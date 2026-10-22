@@ -49,14 +49,15 @@
     ],
     "dtype": "float32",
     "count": 1,
-    "nodata": null,
+    "nodata": "NaN",
     "positive_px": 28807,
     "on_catalogue_px": 0,
     "nan_inside_footprint": 0,
     "values_in_0_1_inside": true,
     "outside_compliant": true,
     "full_grid_in_0_1": true,
-    "format_valid": true
+    "format_valid": true,
+    "nodata_note": "rasterio reads nodata=NaN on the nan twin; earlier writer audit serialised this as null (IR-28). Zeros twin nodata is genuinely None."
   },
   "zip_sha256": "76fd40c5366d3fd409259ae9e0eb3f003484cb9de8312dad603bc637e39b7e86",
   "zip_path": "/home/user/GEMSDOE80/docs/downloads/gemsdoe80-h80c-strain-accom-resid-20261021T233457Z-zeros.zip",

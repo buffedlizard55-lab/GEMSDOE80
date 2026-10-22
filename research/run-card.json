@@ -360,13 +360,14 @@
         "hold_frac_pixels": 0.30027218469207057,
         "score": 0.050672521801957734,
         "ci95": [
-          0.041420523852271005,
-          0.04587145101005782
+          0.014221707066735548,
+          0.038298614142961866
         ],
         "TP_w": 1043.2108694626206,
         "FP_w": 28641.334655129373,
         "FN_w": 17269.789130537378,
-        "n_pred_after_visible_mask": 29041
+        "n_pred_after_visible_mask": 29041,
+        "ci95_method": "spatial-block range (min/max of 4 quadrants); supersedes earlier biased component-bootstrap [0.04142,0.04587] which did not cover pooled DTI - see irregularities IR-27"
       },
       "holdout_random": {
         "label": "HOLDOUT-DTI",
@@ -444,6 +445,7 @@
     "HOLDOUT-DTI uses a visible-only exclusion mask. The shipped TIF excludes the FULL catalogue (4 px), so it scores ~0 against withheld catalogue pixels by construction. That is expected: live test labels are off-catalogue.",
     "User-cited GEMSDOE32 score 0.2778 is not independently organizer-confirmed in this checkout (GEMSDOE32 itself labelled H33-2-B2 UNSCORED / projected 0.2747). Official public leaderboard #1 xiaofanhu 0.4413 was read 2026-10-21 from drivendata.org.",
     "sample_submission.tif mirror has 60,988 ones on catalogue traces (not 'total fault absence'); used only as CRS/shape/transform/footprint template.",
-    "No weekly DrivenData submission slot was spent."
+    "No weekly DrivenData submission slot was spent.",
+    "IR-27 (2026-10-22): all_experiments H80-C ci95 aligned to spatial-block range; earlier bootstrap CI was biased and inconsistent with top-level field."
   ]
 }

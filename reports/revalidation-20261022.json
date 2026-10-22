@@ -1,0 +1,28 @@
+{
+  "label": "SYNTHETIC-TEMPLATE FORMAT REVALIDATION (not organizer-confirmed, not HOLDOUT-DTI)",
+  "date": "2026-10-22",
+  "prediction": "docs/downloads/gemsdoe80-h80c-strain-accom-resid-20261021T233457Z-zeros.tif",
+  "sha256": "d9c4ce410af5c413195aa3a463c2e4c6c223e26c6c8cf3a25a8a95c4b7a2bcc5",
+  "template": "synthetic all-zero template rebuilt from the shipped file's own grid + nan-twin footprint (in /tmp, not retained)",
+  "format_valid": true,
+  "values_in_0_1": true,
+  "nan_inside_footprint": 0,
+  "positive_px": 28807,
+  "grid": {
+    "crs": "EPSG:32611",
+    "shape": [
+      3730,
+      3292
+    ],
+    "transform": [
+      100.0,
+      0.0,
+      243350.0,
+      0.0,
+      -100.0,
+      4508550.0
+    ],
+    "nodata_zeros_twin": null
+  },
+  "caveat": "CRS/shape/transform match is against the mirrored consensus pin, not an organizer-downloaded sample_submission.tif in this sandbox (IR-04/IR-30). Range/NaN/finiteness checks are template-independent and pass on the raw bytes."
+}
