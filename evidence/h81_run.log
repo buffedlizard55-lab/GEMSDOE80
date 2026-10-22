@@ -1,0 +1,67 @@
+[h81] grid (3730, 3292) footprint=5,167,373 catalogue=60,988
+[h81] conduit map built (171s)
+[h81] conduit canary: {'feature': 'h81_conduit_composite(cols18,19,20,22,23,48)', 'symmetric_auc': 0.50501, 'raw_auc': 0.50501, 'n_pos': 11321, 'pass_le_0.90': True}
+  [Holdout Seed 20] Stage-1 OOF + axial context complete in 168.2s
+  [Holdout Seed 20] Self-masked subfold dataset (193,040 rows) built in 22.7s
+  [Holdout Seed 20 Fold NW] Stage-2 OOF complete in 101.1s
+  [Holdout Seed 20 Fold NE] Stage-2 OOF complete in 94.7s
+  [Holdout Seed 20 Fold SW] Stage-2 OOF complete in 90.5s
+  [Holdout Seed 20 Fold SE] Stage-2 OOF complete in 89.5s
+  [Holdout Seed 30] Stage-1 OOF + axial context complete in 157.9s
+  [Holdout Seed 30] Self-masked subfold dataset (194,024 rows) built in 21.2s
+  [Holdout Seed 30 Fold NW] Stage-2 OOF complete in 87.3s
+  [Holdout Seed 30 Fold NE] Stage-2 OOF complete in 99.0s
+  [Holdout Seed 30 Fold SW] Stage-2 OOF complete in 96.9s
+/home/user/GEMSDOE80/.venv/lib/python3.11/site-packages/sklearn/neural_network/_multilayer_perceptron.py:785: ConvergenceWarning: Stochastic Optimizer: Maximum iterations (30) reached and the optimization hasn't converged yet.
+  warnings.warn(
+  [Holdout Seed 30 Fold SE] Stage-2 OOF complete in 95.5s
+[h81] seed20 CTRL_E80_2_puremeta_37654: HOLDOUT-DTI=0.18493 CI=[0.16608208307662817, 0.20457926384278813]
+[h81] seed20 H81_1_conduit_gated_37654: HOLDOUT-DTI=0.17990 CI=[0.1615862527529213, 0.20006113376790186]
+[h81] seed20 CTRL_E80_3_hero_hybrid_41600: HOLDOUT-DTI=0.15932 CI=[0.14073459913009473, 0.1780881149379754]
+[h81] seed20 GEMSDOE32_H33_fold_fair: HOLDOUT-DTI=0.09609 CI=[0.08277425407176112, 0.10951417479676943]
+[h81] seed30 CTRL_E80_2_puremeta_37654: HOLDOUT-DTI=0.19300 CI=[0.17226262640791745, 0.21340890319877773]
+[h81] seed30 H81_1_conduit_gated_37654: HOLDOUT-DTI=0.18815 CI=[0.16868774733246614, 0.20692725388888528]
+[h81] seed30 CTRL_E80_3_hero_hybrid_41600: HOLDOUT-DTI=0.16324 CI=[0.14467000874939134, 0.18097666188402375]
+[h81] seed30 GEMSDOE32_H33_fold_fair: HOLDOUT-DTI=0.09890 CI=[0.0852417325341047, 0.11306786057291696]
+[h81] POOLED CTRL_E80_2_puremeta_37654: HOLDOUT-DTI=0.18897 CI=[0.17185330773824506, 0.20430964315777314] K=22663
+[h81] POOLED H81_1_conduit_gated_37654: HOLDOUT-DTI=0.18403 CI=[0.16713627688871127, 0.19968268986043347] K=22663
+[h81] POOLED CTRL_E80_3_hero_hybrid_41600: HOLDOUT-DTI=0.16128 CI=[0.14564110209693676, 0.17668820288572934] K=22663
+[h81] POOLED GEMSDOE32_H33_fold_fair: HOLDOUT-DTI=0.09749 CI=[0.08424586882791113, 0.10943612673992578] K=22663
+[h81] paired vs H81-1: {
+ "CTRL_E80_2_puremeta_37654": {
+  "evidence_class": "HOLDOUT-DTI",
+  "evaluator_version": "gems57-pooled-hide-v2",
+  "delta": -0.004935675067059303,
+  "ci95": [
+   -0.008039358682996347,
+   -0.0019445059909397836
+  ],
+  "withheld_positive_pixels": 22663
+ },
+ "CTRL_E80_3_hero_hybrid_41600": {
+  "evidence_class": "HOLDOUT-DTI",
+  "evaluator_version": "gems57-pooled-hide-v2",
+  "delta": 0.022747580565542463,
+  "ci95": [
+   0.01516705932258928,
+   0.03080086871021182
+  ],
+  "withheld_positive_pixels": 22663
+ },
+ "GEMSDOE32_H33_fold_fair": {
+  "evidence_class": "HOLDOUT-DTI",
+  "evaluator_version": "gems57-pooled-hide-v2",
+  "delta": 0.08653919996938556,
+  "ci95": [
+   0.0733299607938726,
+   0.10089257631697747
+  ],
+  "withheld_positive_pixels": 22663
+ }
+}
+  [Full-Catalogue Fit] Complete in 362.1s
+[h81] decision lane=H81-2 pure self-masked meta transfer (no hybrid dilution) verdict=promote note_len=105
+[h81] final dots=37654 min_dcat=2.828
+[h81] wrote gems80-h81-puremeta-transfer-37654-20261022-zeros sha256=1f08541f6e804755e887e42073fac8aff4770dd0b3b2a65d0084ecd95558bd5a validator_pass=True
+[h81] done in 1799s -> evidence/h81_experiment.json
+EXIT:0
