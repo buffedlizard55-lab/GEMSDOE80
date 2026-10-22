@@ -11,6 +11,8 @@
 > - **Unconstrained Self-Masked Ablation (`E80-2`):** `HOLDOUT-DTI (gems57-pooled-hide-v2, K=22663 withheld positives, 95% CI [0.17216, 0.20466]) = 0.18937` (`+94.2%` over `H33` fold-fair).
 > - **Registry Uniqueness Gate (`132` Accessible Rasters / `126` Discriminating Priors):** **`PASS`** — Pre-placement surface `max |Spearman rho| = 0.48561 <= 0.90`; Post-placement dots `max |Spearman rho| = 0.18682 <= 0.90`; Worst discriminating 3-px dot overlap = **`0.68250 <= 0.70`** (`0.37111` vs `GEMSDOE32 H33`, `0.65144` vs `GEMSDOE76 H76-3`, `0.68250` vs `GEMSDOE77 H85-EDTI`; `binding_like_for_like_duplicate = false`).
 > - **Single-Feature Holdout Leakage Canary (`59` Features):** **`59/59 PASS`** — `max_symmetric_auc = 0.77604 <= 0.90` (`vis_updip_relay_coupler`, `0` violations).
+>
+> **Parallel-lane boundary:** the current primary is H80-DPVC. The older H80-C strain-accommodation lane was not selected or re-run here; see [`reports/lane-h80c-review-20261022.md`](reports/lane-h80c-review-20261022.md). No weekly slot selection was made by that review.
 
 ---
 
