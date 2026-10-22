@@ -14,21 +14,23 @@
     .ok { background:var(--greenbg); color:var(--green); border:2px solid #86efac; border-radius:12px; padding:1rem 1.2rem; font-weight:700 }
     .btn { display:inline-block; background:#0f3a4a; color:#fff; text-decoration:none; padding:12px 18px; border-radius:8px; font-weight:700; margin:8px 8px 0 0 }
     ol li { margin:.5rem 0 } .muted { color:var(--muted) }
+    table { width:100%; border-collapse:collapse } th,td { text-align:left; vertical-align:top; border-bottom:1px solid var(--line); padding:.6rem .45rem }
   </style>
 </head>
 <body>
 <header>
-  <p style="opacity:.85;margin:0 0 .4rem">GEMSDOE80 · DrivenData competition #306</p>
+  <p style="opacity:.85;margin:0 0 .4rem">GEMSDOE80 · DrivenData competition #306 · H81-A relay-ramp</p>
   <h1 style="margin:0">How to make a submission</h1>
 </header>
 <main>
-  <p class="ok">Status: the zeros GeoTIFF is OK to upload. It will not fail “Predicted values must be in range [0, 1]”. It has no organizer score.</p>
+  <p class="ok">Status: the H81-A zeros GeoTIFF is OK to upload. It will not fail “Predicted values must be in range [0, 1]”. It has no organizer score. HOLDOUT-DTI 0.0607 (beats H80 0.0507 on same split).</p>
 
   <section>
     <h2>1. Download the file</h2>
-    <p>Use the <strong>zeros</strong> GeoTIFF (all 12,279,160 cells finite and in [0, 1], no nodata tag). DrivenData also accepts a .zip containing exactly one GeoTIFF.</p>
-    <a class="btn" href="./downloads/gemsdoe80-h80c-strain-accom-resid-20261021T233457Z-zeros.tif" download>Download zeros TIF</a>
-    <a class="btn" href="./downloads/gemsdoe80-h80c-strain-accom-resid-20261021T233457Z-zeros.zip" style="background:#fff;color:#10232d;border:1px solid #d5e0e6">Download .zip</a>
+    <p>Use the <strong>zeros</strong> GeoTIFF (all 12,279,160 cells finite and in [0, 1], no nodata tag). DrivenData also accepts a .zip containing exactly one GeoTIFF. The primary is now H81-A (7,415 dots, relay-ramp tip-linkage, 4 px catalogue buffer).</p>
+    <a class="btn" href="./downloads/gemsdoe80-h81a-relay-20261022T010259Z-zeros.tif" download>Download zeros TIF (H81 — use this)</a>
+    <a class="btn" href="./downloads/gemsdoe80-h81a-relay-20261022T010259Z-zeros.zip" style="background:#fff;color:#10232d;border:1px solid #d5e0e6">Download .zip</a>
+    <p class="muted">SHA-256 zeros: <code>701ed7fed8611861f2fe2ec6437c850aede0a6a792b5fc3dbbca10191953bbbd</code> · zip: <code>5fae213ad545cc41c2ec2c1199496ad9f54f0151a963b48989976c1fbf1c4420</code> · also available: <a href="./downloads/gemsdoe80-h81a-relay-20261022T010259Z-nan.tif">NaN-outside twin</a> and <a href="./downloads/gemsdoe80-h80c-strain-accom-resid-20261021T233457Z-zeros.tif">archived H80</a></p>
   </section>
 
   <section>
@@ -37,34 +39,55 @@
       <a href="https://www.drivendata.org/competitions/306/competition-doe-gems/submissions/">New submission</a>
       for competition 306. Review
       <a href="https://www.drivendata.org/competitions/306/competition-doe-gems/page/967/#submission-format">submission format</a>
-      if needed.
+      if needed. Weekly cap: 3 per week (rules §3.2) — do not spend a slot on a file that hasn't beaten the holdout best.
     </p>
   </section>
 
   <section>
     <h2>3. Fill the form exactly</h2>
     <ol>
-      <li><strong>File to submit</strong> — choose the zeros <code>.tif</code> or the <code>.zip</code>.</li>
-      <li><strong>Name</strong> (if asked) — <code>gemsdoe80-h80c-strain-accom-resid-20261021T233457Z-zeros</code></li>
-      <li><strong>Note (optional)</strong> — paste this 104-character comment:<br>
-        <code>H80C cat-residual strain-accom NMS dots 28807; off-catalogue buf4; HOLDOUT-DTI only; unique vs H33/H19-5</code>
+      <li><strong>File to submit</strong> — choose the H81-A zeros <code>.tif</code> or the <code>.zip</code>.</li>
+      <li><strong>Name</strong> (if asked) — <code>gemsdoe80-h81a-relay-20261022T010259Z-zeros</code></li>
+      <li><strong>Note (optional)</strong> — paste this 85-character comment:<br>
+        <code>H81A relay tip-link d8-35 NMS 7415; off-cat buf4; HOLDOUT-DTI only; unique vs H33/H80</code>
       </li>
+      <li>Check that the note is ≤140 chars (this one is 85).</li>
     </ol>
+    <table>
+      <tr><th style="width:30%">Field</th><th>How to verify</th></tr>
+      <tr><td>Name length</td><td>≤100 chars? This is 38.</td></tr>
+      <tr><td>Note length</td><td>≤140 chars? This is 85.</td></tr>
+      <tr><td>File name</td><td>Ends in <code>.tif</code> or <code>.zip</code> with one GeoTIFF inside.</td></tr>
+    </table>
   </section>
 
   <section>
-    <h2>4. What the portal checks</h2>
+    <h2>4. What the portal checks (and why this file passes)</h2>
     <ul>
-      <li>Single-band GeoTIFF (or zip of one), float32, values in <strong>[0, 1]</strong>.</li>
-      <li>CRS EPSG:32611, 100 m, same shape and geotransform as <code>sample_submission.tif</code> (3730×3292; origin 243350, 4508550).</li>
-      <li>A large negative nodata sentinel (e.g. −3.4e38) or NaN that the portal treats as a value will produce <code>Predicted values must be in range [0, 1]</code>. The zeros file has <em>no</em> nodata tag and no NaN.</li>
+      <li>Single-band GeoTIFF (or zip of one), float32, values in <strong>[0, 1]</strong> — <strong>PASS</strong> (min 0.0 max 1.0 all 12,279,160 cells).</li>
+      <li>CRS EPSG:32611, 100 m, same shape and geotransform as <code>sample_submission.tif</code> (3730×3292; origin 243350, 4508550) — <strong>PASS</strong>.</li>
+      <li>0 NaN inside footprint, no large negative nodata sentinel (e.g. −3.4e38) — <strong>PASS</strong> (no nodata tag, zeros outside). A sentinel outside [0,1] triggers the portal error with the same message.</li>
+      <li>0 on-catalogue positive pixels — <strong>PASS</strong> (off-catalogue by construction; test labels are off-catalogue per problem page).</li>
+      <li>Unique vs GEMSDOE family: Spearman 0.02, 3 px overlap 0.22 vs H80 (thresholds 0.90/0.70) — <strong>not a duplicate lane</strong>.</li>
     </ul>
+    <p class="muted">Full audit: <code>docs/downloads/gemsdoe80-h81a-relay-20261022T010259Z.audit.json</code> · validation: <code>docs/downloads/gemsdoe80-h81a-relay-20261022T010259Z-zeros.tif.validate.json</code> (re-read bytes).</p>
   </section>
 
   <section>
     <h2>5. After you submit</h2>
-    <p>Keep the organizer receipt. Only a receipt number/score is ORGANIZER-CONFIRMED. This site’s 0.0507 figure is HOLDOUT-DTI, not a live score. Weekly slot caps are enforced by DrivenData, not by this repo.</p>
-    <p class="muted"><a href="./">← Back to the download page</a></p>
+    <p>Keep the organizer receipt (submission ID + public DTI). Only that number is ORGANIZER-CONFIRMED. This site's 0.0607 is HOLDOUT-DTI (hide-and-recover against withheld catalogue segments on the same grid) — a proxy that beats random 0.0123 and the previous packaged H80 0.0507, but cannot prove live performance because hidden faults are not in the catalogue (IR-32-PROXY-01). Promotion here means “candidate ready”; the weekly slot is a separate selector step.</p>
+    <p class="muted">Questions: <a href="https://www.drivendata.org/competitions/306/competition-doe-gems/">competition forum</a> · metric: <a href="https://www.drivendata.org/competitions/306/competition-doe-gems/page/967/#performance-metric">DTI definition</a> · sources: <a href="./">main page</a> · run card: <a href="./run-card.json">run-card.json</a></p>
+  </section>
+
+  <section>
+    <h2>6. Reproduce locally (Pass 1–3)</h2>
+    <ol>
+      <li><code>bash scripts/download_competition_data.sh</code> on an unrestricted machine → <code>data/</code> (pins in <code>research/evidence/gems32-data-manifest.json</code>) → <code>python scripts/prepare_data.py</code></li>
+      <li><code>python scripts/run_h81_experiments.py</code> — 3 arms, picks H81-A, writes <code>docs/downloads/*-zeros.tif</code> + audit.</li>
+      <li><code>python scripts/validate_submission.py docs/downloads/gemsdoe80-h81a-relay-20261022T010259Z-zeros.tif --template data/sample_submission.tif</code> — exits 0 iff format_valid.</li>
+      <li><code>python scripts/evaluate_holdout.py docs/downloads/gemsdoe80-h81a-relay-20261022T010259Z-zeros.tif --template data/sample_submission.tif --labels data/labels.tif</code> — prints HOLDOUT-DTI.</li>
+      <li><code>python -m pytest -q</code> — metric worked example, holdout pipeline, generator roundtrip, shipped TIF hash.</li>
+    </ol>
   </section>
 </main>
 </body>

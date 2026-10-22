@@ -1,4 +1,4 @@
-"""The packaged zeros TIF must exist, hash-match, and sit on the official grid."""
+"""The packaged zeros TIF (primary H81-A) must exist, hash-match, and sit on the official grid."""
 from __future__ import annotations
 
 import hashlib
@@ -6,15 +6,19 @@ import unittest
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-TIF = ROOT / "docs" / "downloads" / "gemsdoe80-h80c-strain-accom-resid-20261021T233457Z-zeros.tif"
-EXPECTED_SHA = "d9c4ce410af5c413195aa3a463c2e4c6c223e26c6c8cf3a25a8a95c4b7a2bcc5"
+TIF = ROOT / "docs" / "downloads" / "gemsdoe80-h81a-relay-20261022T010259Z-zeros.tif"
+EXPECTED_SHA = "701ed7fed8611861f2fe2ec6437c850aede0a6a792b5fc3dbbca10191953bbbd"
+ARCHIVED = ROOT / "docs" / "downloads" / "gemsdoe80-h80c-strain-accom-resid-20261021T233457Z-zeros.tif"
 
 
 class ShippedTifTests(unittest.TestCase):
-    def test_file_exists_and_hashes(self):
-        self.assertTrue(TIF.is_file(), f"missing {TIF}")
+    def test_primary_file_exists_and_hashes(self):
+        self.assertTrue(TIF.is_file(), f"missing primary {TIF}")
         h = hashlib.sha256(TIF.read_bytes()).hexdigest()
         self.assertEqual(h, EXPECTED_SHA)
+
+    def test_archived_still_present(self):
+        self.assertTrue(ARCHIVED.is_file(), f"missing archived {ARCHIVED}")
 
     def test_grid_when_rasterio_available(self):
         try:
@@ -32,7 +36,16 @@ class ShippedTifTests(unittest.TestCase):
             self.assertTrue(np.isfinite(a).all())
             self.assertGreaterEqual(float(a.min()), 0.0)
             self.assertLessEqual(float(a.max()), 1.0)
-            self.assertEqual(int((a > 0.5).sum()), 28807)
+            self.assertEqual(int((a > 0.5).sum()), 7415)
+            # must be off-catalogue
+            import rasterio as rio2
+            with rio2.open(ROOT / "data" / "labels.tif") as ls:
+                lab = ls.read(1)
+            # footprint from template
+            with rio2.open(ROOT / "data" / "sample_submission.tif") as tmpl:
+                foot = np.isfinite(tmpl.read(1))
+            cats = (lab >= 1) & foot
+            self.assertEqual(int(((a > 0.5) & cats).sum()), 0)
 
 
 if __name__ == "__main__":

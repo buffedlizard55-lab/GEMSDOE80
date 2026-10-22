@@ -1,0 +1,167 @@
+{
+  "format_valid": true,
+  "download_ready": true,
+  "organizer_confirmed": false,
+  "prediction": "docs/downloads/gemsdoe80-h81a-relay-20261022T010259Z-zeros.tif",
+  "template": "data/sample_submission.tif",
+  "checks": {
+    "driver": "GTiff",
+    "band_count": 1,
+    "template_band_count": 1,
+    "shape_matches": true,
+    "crs_matches": true,
+    "transform_matches": true,
+    "template_has_crs": true,
+    "prediction_dtype": [
+      "float32"
+    ],
+    "finite_values": true,
+    "no_nan_or_infinite_inside_footprint": true,
+    "footprint_overlaps_template": true
+  },
+  "errors": [],
+  "value_range": [
+    0.0,
+    1.0
+  ],
+  "nan_inside_footprint": 0,
+  "crs": "EPSG:32611",
+  "shape": [
+    3730,
+    3292
+  ],
+  "transform": [
+    100.0,
+    0.0,
+    243350.0,
+    0.0,
+    -100.0,
+    4508550.0
+  ],
+  "sha256": "701ed7fed8611861f2fe2ec6437c850aede0a6a792b5fc3dbbca10191953bbbd",
+  "holdout": {
+    "available": true,
+    "evaluator_version": "GEMS distance-weighted Tversky alpha=0.2 beta=0.8 R=300m",
+    "withheld_positive_count": 21439,
+    "score": 0.0,
+    "ci95": [
+      0.0,
+      0.0
+    ],
+    "TP_w": 0.0,
+    "FP_w": 7415.0,
+    "FN_w": 21439.0,
+    "status": "COMPUTED (single-image scalar; CI approximate)"
+  },
+  "leakage_canary": {
+    "available": true,
+    "per_band_auc": [
+      {
+        "band": 1,
+        "description": "Magnetic anomaly - deviation from expected Earth's magnetic field",
+        "auc": NaN
+      },
+      {
+        "band": 2,
+        "description": "Reduced to pole magnetic data - magnetic anomaly corrected for latitude effects",
+        "auc": NaN
+      },
+      {
+        "band": 3,
+        "description": "Total magnetic intensity horizontal gradient - rate of change in horizontal direction",
+        "auc": NaN
+      },
+      {
+        "band": 4,
+        "description": "Geodetic second invariant - measure of strain rate tensor magnitude",
+        "auc": NaN
+      },
+      {
+        "band": 5,
+        "description": "Isostatic gravity anomaly slope - gradient of gravity after isostatic correction",
+        "auc": NaN
+      },
+      {
+        "band": 6,
+        "description": "Tilt angle or total curvature - magnetic field derivative for edge detection",
+        "auc": NaN
+      },
+      {
+        "band": 7,
+        "description": "Geodetic shear rate - rate of angular deformation from GPS/InSAR",
+        "auc": NaN
+      },
+      {
+        "band": 8,
+        "description": "Geodetic dilatation rate - rate of volumetric strain (expansion/contraction)",
+        "auc": NaN
+      },
+      {
+        "band": 9,
+        "description": "Total magnetic intensity vertical gradient - rate of change in vertical direction",
+        "auc": NaN
+      },
+      {
+        "band": 10,
+        "description": "Distance to earthquake (n=100km radius, a=15\u00b0 azimuth parameters)",
+        "auc": NaN
+      },
+      {
+        "band": 11,
+        "description": "Isostatic gravity anomaly vertical gradient - vertical rate of change",
+        "auc": NaN
+      },
+      {
+        "band": 12,
+        "description": "Detrended elevation - topography with regional trends removed",
+        "auc": NaN
+      },
+      {
+        "band": 13,
+        "description": "Isostatic gravity anomaly - gravity after compensating for topographic mass",
+        "auc": NaN
+      },
+      {
+        "band": 14,
+        "description": "Total magnetic intensity - total strength of magnetic field",
+        "auc": NaN
+      },
+      {
+        "band": 15,
+        "description": "Depth to basement surface - thickness of sedimentary cover",
+        "auc": NaN
+      },
+      {
+        "band": 16,
+        "description": "Earthquake intensity or density (n=100km radius, a=15\u00b0 parameters)",
+        "auc": NaN
+      },
+      {
+        "band": 17,
+        "description": "Conductivity surface - electrical conductivity of subsurface",
+        "auc": NaN
+      },
+      {
+        "band": 18,
+        "description": "Isostatic gravity anomaly horizontal gradient - horizontal rate of change",
+        "auc": NaN
+      },
+      {
+        "band": 19,
+        "description": "Detrended elevation slope - gradient of elevation after detrending",
+        "auc": NaN
+      }
+    ],
+    "max_auc": NaN,
+    "leakage_flag": false,
+    "status": "COMPUTED",
+    "note": "AUC > 0.90 on a single feature means leakage until proven otherwise"
+  },
+  "lane_check": {
+    "available": false,
+    "note": "no registry raster provided with public competition data"
+  },
+  "values_in_0_1": true,
+  "missing_inside_footprint": 0,
+  "submit_format_ok": true
+}

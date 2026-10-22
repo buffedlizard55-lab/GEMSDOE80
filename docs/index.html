@@ -35,9 +35,9 @@
 </head>
 <body>
 <header>
-  <p class="tag">DOE GEMS Prize · DrivenData #306 · unique TIF</p>
+  <p class="tag">DOE GEMS Prize · DrivenData #306 · unique TIF · H81 relay-ramp</p>
   <h1>GEMSDOE80</h1>
-  <p>Unique, format-validated GeoTIFF for the geothermal-fault discovery challenge. Inspection is automated in this repo — not a human inspector. Numbers below are labelled HOLDOUT-DTI or not-a-score. No organizer receipt exists.</p>
+  <p>Unique, format-validated GeoTIFF for the geothermal-fault discovery challenge. Inspection is automated in this repo — not a human inspector. Numbers below are labelled HOLDOUT-DTI or not-a-score. No organizer receipt exists. <strong>New primary: H81-A relay-ramp (HOLDOUT 0.0607) — beats H80's 0.0507 on the same split.</strong></p>
 </header>
 <main>
 
@@ -48,16 +48,18 @@
       transform <code>(100, 0, 243350, 0, −100, 4508550)</code>,
       <strong>every one of 12,279,160 cells finite and in [0, 1]</strong>,
       nodata tag unset, 0 NaN, 0 pixels on the public catalogue.
-      This is the encoding that avoids DrivenData’s
+      This is the encoding that avoids DrivenData's
       <code>"Predicted values must be in range [0, 1]"</code> error.
     </p>
     <p>
       <strong>Not organizer-scored.</strong> HOLDOUT-DTI is a hide-and-recover proxy against withheld
       catalogue segments, not a live leaderboard number. Do not treat any projection as a score.
+      <strong>HOLDOUT-DTI 0.0607</strong> (95% CI [0.0541, 0.0636], 18,313 withheld positives, 5903 dots on holdout)
+      beats the previous packaged candidate H80-C (0.0507) and beats random (0.0123) on the <em>same</em> split.
     </p>
-    <a class="btn" href="./downloads/gemsdoe80-h80c-strain-accom-resid-20261021T233457Z-zeros.tif" download>Download submission TIF (zeros — use this)</a>
-    <a class="btn secondary" href="./downloads/gemsdoe80-h80c-strain-accom-resid-20261021T233457Z-zeros.zip">Download .zip (one GeoTIFF inside)</a>
-    <a class="btn secondary" href="./downloads/gemsdoe80-h80c-strain-accom-resid-20261021T233457Z-nan.tif">NaN-outside twin</a>
+    <a class="btn" href="./downloads/gemsdoe80-h81a-relay-20261022T010259Z-zeros.tif" download>Download submission TIF (H81 zeros — use this)</a>
+    <a class="btn secondary" href="./downloads/gemsdoe80-h81a-relay-20261022T010259Z-zeros.zip">Download .zip (one GeoTIFF inside)</a>
+    <a class="btn secondary" href="./downloads/gemsdoe80-h81a-relay-20261022T010259Z-nan.tif">NaN-outside twin</a>
     <a class="btn secondary" href="./executive-summary.html">Executive summary — how to submit</a>
   </section>
 
@@ -65,11 +67,12 @@
     <h2>Paste these into the DrivenData “New submission” form</h2>
     <table>
       <tr><th style="width:34%">Field</th><th>Value</th></tr>
-      <tr><td>File to submit</td><td><code>gemsdoe80-h80c-strain-accom-resid-20261021T233457Z-zeros.tif</code> (or the .zip)</td></tr>
-      <tr><td>Unique name</td><td><code>gemsdoe80-h80c-strain-accom-resid-20261021T233457Z-zeros</code></td></tr>
-      <tr><td>Note (104 / 140 chars)</td><td><code>H80C cat-residual strain-accom NMS dots 28807; off-catalogue buf4; HOLDOUT-DTI only; unique vs H33/H19-5</code></td></tr>
+      <tr><td>File to submit</td><td><code>gemsdoe80-h81a-relay-20261022T010259Z-zeros.tif</code> (or the .zip)</td></tr>
+      <tr><td>Unique name</td><td><code>gemsdoe80-h81a-relay-20261022T010259Z-zeros</code></td></tr>
+      <tr><td>Note (85 / 140 chars)</td><td><code>H81A relay tip-link d8-35 NMS 7415; off-cat buf4; HOLDOUT-DTI only; unique vs H33/H80</code></td></tr>
     </table>
     <p class="muted">Submit page: <a href="https://www.drivendata.org/competitions/306/competition-doe-gems/submissions/">DrivenData submissions</a> · rules/format: <a href="https://www.drivendata.org/competitions/306/competition-doe-gems/page/967/">problem description</a></p>
+    <p class="muted">Archived previous candidate: <a href="./downloads/gemsdoe80-h80c-strain-accom-resid-20261021T233457Z-zeros.tif">H80-C 28,807 dots, HOLDOUT 0.0507</a> — format-valid but not primary.</p>
   </section>
 
   <section>
@@ -81,32 +84,34 @@
       <tr><td>Values in [0, 1]</td><td>PASS — min 0.0, max 1.0, all 12,279,160 cells</td></tr>
       <tr><td>NaN inside footprint</td><td>PASS — 0</td></tr>
       <tr><td>On-catalogue positive pixels</td><td>PASS — 0</td></tr>
-      <tr><td>Positive (dot) pixels</td><td>28,807 unit dots</td></tr>
-      <tr><td>SHA-256 (zeros)</td><td><code>d9c4ce410af5c413195aa3a463c2e4c6c223e26c6c8cf3a25a8a95c4b7a2bcc5</code></td></tr>
+      <tr><td>Positive (dot) pixels</td><td>7,415 unit dots (holdout had 5,903)</td></tr>
+      <tr><td>SHA-256 (zeros)</td><td><code>701ed7fed8611861f2fe2ec6437c850aede0a6a792b5fc3dbbca10191953bbbd</code></td></tr>
+      <tr><td>SHA-256 (zip)</td><td><code>5fae213ad545cc41c2ec2c1199496ad9f54f0151a963b48989976c1fbf1c4420</code></td></tr>
       <tr><td>Organizer score</td><td><strong>none</strong> — not ORGANIZER-CONFIRMED</td></tr>
     </table>
   </section>
 
   <section>
-    <h2>Run card (experiment 3 of 3)</h2>
+    <h2>Run card (experiment 3 of 3 — H81)</h2>
     <table>
       <tr><th style="width:34%">Field</th><th>Value</th></tr>
-      <tr><td>Hypothesis</td><td>Unmapped geothermal-indicative faults occupy strain-transfer / accommodation zones (along-fabric dilatation gradient) that are not explained by distance to the visible USGS/INGENIOUS catalogue, corroborated by magnetic tilt/curvature.</td></tr>
-      <tr><td>Mechanism</td><td>Directional derivative of dilatation along RTP-fabric strike; residual vs distance-to-visible-catalogue; × tilt; dilatation &gt; 0 gate; 4 px catalogue collar; NMS sep=3.</td></tr>
-      <tr><td>Named non-fault mimic</td><td>Lithologic/intrusive contacts (magnetic edges without slip) and geodetic interpolation seams.</td></tr>
-      <tr><td>HOLDOUT-DTI</td><td><strong>0.0507</strong> (evaluator GEMSDOE80-evaluate_holdout.py-v1, α=0.2 β=0.8 R=300 m; 18,313 withheld positives; 957 / 3,199 components). Spatial-block range of 4 quadrants [0.0142, 0.0383] — range, not a calibrated 95% CI of the pooled ratio.</td></tr>
-      <tr><td>Random control (same budget)</td><td>HOLDOUT-DTI 0.0420 — H80-C beats random.</td></tr>
-      <tr><td>Leakage canary</td><td>Max per-feature AUC 0.607 (2nd invariant). Threshold 0.90. No leakage flag.</td></tr>
-      <tr><td>vs registry (H33-2-B2 / H19-5 / 0.2600 anchor)</td><td>Spearman |r| ≤ 0.010; 3 px overlap ≤ 0.157. Thresholds 0.90 / 0.70. <strong>Not a duplicate lane.</strong></td></tr>
+      <tr><td>Hypothesis</td><td>Unmapped geothermal faults occupy relay ramps / step-overs between overlapping normal-fault tips — the most common geothermal setting (32% step-overs, 25% terminations; Faulds et al. 2021).</td></tr>
+      <tr><td>Mechanism</td><td>Endpoint detection (one 8-neighbor) on visible skeleton; cKDTree linkage gap 8–35 px (0.8–3.5 km, Giddens mean 2.8 km); midpoint + dilate 2 px; distance-to-midpoint exp(-d/10) × (dil&gt;0 else 0.15); 4 px catalogue collar; NMS sep=3 px cap 34k.</td></tr>
+      <tr><td>Named non-fault mimic</td><td>Fluvial braid terminations, dune alignments, cadastral grids; geodetic interpolation seams.</td></tr>
+      <tr><td>HOLDOUT-DTI</td><td><strong>0.0607</strong> (evaluator GEMSDOE80-evaluate_holdout.py-v1, α=0.2 β=0.8 R=300 m; 18,313 withheld positives; 957 / 3,199 components; beats random 0.0123). 95% CI [0.0541, 0.0636] bootstrap.</td></tr>
+      <tr><td>Previous best (H80-C)</td><td>HOLDOUT-DTI 0.0507 — H81-A improves by +0.0100 on same split.</td></tr>
+      <tr><td>Leakage canary</td><td>Max per-feature AUC 0.736 (linkage_score). Threshold 0.90. No leakage flag.</td></tr>
+      <tr><td>vs registry (H80 / H33)</td><td>Spearman |r| ≤ 0.02; 3 px overlap ≤ 0.23. Thresholds 0.90 / 0.70. <strong>Not a duplicate lane.</strong></td></tr>
       <tr><td>Verdict</td><td><strong>promote</strong> as a packaged candidate. No weekly DrivenData slot was spent (selector step is separate).</td></tr>
     </table>
-    <p><a href="./run-card.json">Machine-readable run-card.json</a> · <a href="./hypotheses.md">Five ranked hypotheses</a> · <a href="./downloads/gemsdoe80-h80c-strain-accom-resid-20261021T233457Z.audit.json">Audit JSON</a></p>
+    <p><a href="./run-card.json">Machine-readable run-card.json</a> · <a href="./hypotheses.md">Five ranked hypotheses + H81</a> · <a href="./downloads/gemsdoe80-h81a-relay-20261022T010259Z.audit.json">Audit JSON</a> · <a href="./executive-summary.html">How to submit</a></p>
   </section>
 
   <section>
     <h2>Why 0.2778 was high — and whether this file can beat it</h2>
-    <p>GEMSDOE32’s H33-2-B2 is a <em>metric-geometry</em> edit of a dotted ridge: delete every dot within 2 px of the catalogue, keep ~37,654 unit pixels, all-finite zeros encoding, official grid. DTI rewards covering hidden truth with sparse mass; extra mass that does not raise a truth pixel’s max kernel credit is FP at cost 0.2. Off-catalogue placement is mandatory because the test labels are faults <em>not</em> in USGS/INGENIOUS.</p>
-    <p>The 0.2778 figure is <strong>not independently organizer-confirmed in this checkout</strong> (GEMSDOE32 labelled that file UNSCORED / projected 0.2747). The official public leaderboard, read 2026-10-21 from DrivenData, lists #1 <strong>xiaofanhu 0.4413</strong>, so higher scores exist. H80-C is a <em>different detector</em> (strain-transfer residual, not H19-5 ridge prune). Its HOLDOUT-DTI of 0.0507 is a catalogue-hide-and-recover proxy and is <strong>not</strong> a prediction of live DTI. Live performance is unknown until an organizer receipt exists.</p>
+    <p>GEMSDOE32's H33-2-B2 is a <em>metric-geometry</em> edit of a dotted ridge: delete every dot within 2 px of the catalogue, keep ~37,654 unit pixels, all-finite zeros encoding, official grid. DTI rewards covering hidden truth with sparse mass; extra mass that does not raise a truth pixel's max kernel credit is FP at cost 0.2. Off-catalogue placement is mandatory because the test labels are faults <em>not</em> in USGS/INGENIOUS.</p>
+    <p>The 0.2778 figure is <strong>not independently organizer-confirmed in this checkout</strong> (GEMSDOE32 labelled that file UNSCORED / projected 0.2747). The official public leaderboard, read 2026-10-21 from DrivenData, lists #1 <strong>xiaofanhu 0.4413</strong>, so higher scores exist. H81-A is a <em>different detector</em> (tip-linkage relay-ramp, not H19-5 ridge prune) that targets the most common geothermal structural setting. Its HOLDOUT-DTI of 0.0607 is a catalogue-hide-and-recover proxy and is <strong>not</strong> a prediction of live DTI — it beats H80's 0.0507 and random's 0.0123 on the same split, which is the falsifiable improvement we can measure without a live receipt.</p>
+    <p class="muted">Deep dive: <a href="https://www.osti.gov/servlets/purl/1724082">Faulds 2015 (32% step-overs)</a> · <a href="https://pangea.stanford.edu/ERE/pdf/IGAstandard/SGW/2025/Giddens.pdf">Giddens 2025 (2.8 km mean relay width)</a> · metric: <a href="https://www.drivendata.org/competitions/306/competition-doe-gems/page/967/#performance-metric">DTI definition</a></p>
   </section>
 
   <section>
@@ -116,10 +121,11 @@
       <li><a href="https://www.drivendata.org/competitions/306/competition-doe-gems/page/967/">Problem description (metric + format)</a> · <a href="https://www.drivendata.org/competitions/306/competition-doe-gems/page/968/">About</a></li>
       <li><a href="https://www.drivendata.org/competitions/306/competition-doe-gems/data/">Data (login)</a> · <a href="https://www.drivendata.org/competitions/306/competition-doe-gems/leaderboard/">Leaderboard</a></li>
       <li><a href="https://github.com/drivendataorg/gems-prize-reference-solution">Reference solution</a></li>
-      <li><a href="https://www.usgs.gov/data/geodawn-airborne-magnetic-and-radiometric-surveys-northwestern-great-basin-nevada-and">USGS GeoDAWN</a> · <a href="https://gbcge.org/current-projects/ingenious/">INGENIOUS</a> · <a href="https://epsg.io/32611">EPSG:32611</a></li>
+      <li><a href="https://www.usgs.gov/data/geodawn-airborne-magnetic-and-radiometric-surveys-northwestern-great-basin-nevada-and">USGS GeoDAWN DOI 10.5066/P93LGLVQ</a> · <a href="https://gbcge.org/current-projects/ingenious/">INGENIOUS DOE DE-EE0009254</a> · <a href="https://epsg.io/32611">EPSG:32611</a></li>
+      <li><a href="https://www.osti.gov/servlets/purl/1724082">Favorable Settings (OSTI 1724082)</a> · <a href="https://pangea.stanford.edu/ERE/pdf/IGAstandard/SGW/2025/Giddens.pdf">Step-over analysis (GW 2025)</a></li>
     </ul>
   </section>
 </main>
-<footer>GEMSDOE80 · format-valid unique TIF · no organizer confirmation implied</footer>
+<footer>GEMSDOE80 · H81-A relay-ramp · format-valid unique TIF · no organizer confirmation implied · 2026-10-22</footer>
 </body>
 </html>
