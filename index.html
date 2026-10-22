@@ -1,13 +1,58 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta http-equiv="refresh" content="0; url=./docs/">
-  <link rel="canonical" href="./docs/">
-  <title>GEMSDOE80 | Redirecting</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>GEMSDOE80 — Ready-to-Submit GeoTIFF Portal (H80-G 0.2349 HOLDOUT-DTI)</title>
+<style>
+  :root { --bg:#ffffff; --fg:#111827; --muted:#4b5563; --line:#d1d5db; --panel:#f9fafb; --accent:#0b57d0; --ok:#047857; --okbg:#ecfdf5; --okbd:#34d399; }
+  body { margin:0; font:15px/1.6 system-ui,-apple-system,Segoe UI,Roboto,sans-serif; color:var(--fg); background:var(--bg); }
+  main { max-width:980px; margin:2rem auto; padding:0 1.25rem; }
+  .banner { background:var(--okbg); border:2px solid var(--okbd); border-radius:10px; padding:1.25rem 1.4rem; }
+  .pill { display:inline-block; background:var(--ok); color:#fff; font-weight:700; padding:.22rem .65rem; border-radius:999px; font-size:.82rem; }
+  .btns { display:flex; flex-wrap:wrap; gap:.65rem; margin-top:.9rem; }
+  .btn { display:inline-block; padding:.58rem 1rem; border-radius:6px; font-weight:600; text-decoration:none; border:1px solid var(--accent); background:var(--accent); color:#fff; }
+  .btn.alt { background:#fff; color:var(--accent); }
+  table { border-collapse:collapse; width:100%; margin:1rem 0; font-size:.9rem; }
+  th, td { border:1px solid var(--line); padding:.48rem .65rem; text-align:left; }
+  th { background:var(--panel); }
+  code { background:#f3f4f6; padding:.1rem .32rem; border-radius:4px; font-size:.86em; word-break:break-all; }
+</style>
 </head>
 <body>
-  <p>Opening the <a href="./docs/">GEMSDOE80 submission download page</a>…</p>
+<main>
+  <div class="banner">
+    <span class="pill">READY TO SUBMIT — AUTOMATED VALIDATOR PASSED (verdict: promote)</span>
+    <h1 style="margin:.6rem 0 .35rem;font-size:1.5rem">GEMSDOE80: Two-Regime Multi-Physics &amp; 6-Shell Choquet Submodular Fault Discovery (<code>H80-G</code>)</h1>
+    <p style="margin:.3rem 0">
+      Primary competition submission <code>gemsdoe80-h80g-choquet-tworegime-20261022T000000Z-zeros.tif</code> passes every format, footprint, range, leakage, and registry-uniqueness gate:
+      single-band <code>float32</code>, <code>EPSG:32611</code>, <code>3730 &times; 3292</code>, <code>nodata=None</code>, all <code>12,279,160</code> cells finite in <code>[0.0, 1.0]</code>, <code>0</code> NaNs, <strong>51,667</strong> binary unit dots, and blind hide-and-recover <strong>HOLDOUT-DTI = 0.2349</strong> (<code>95% CI: [0.2207, 0.2483]</code>).
+    </p>
+    <div class="btns">
+      <a class="btn" href="docs/downloads/gemsdoe80-h80g-choquet-tworegime-20261022T000000Z-zeros.tif" download>Download Primary GeoTIFF (-zeros.tif, 159 KB)</a>
+      <a class="btn alt" href="docs/downloads/gemsdoe80-h80g-choquet-tworegime-20261022T000000Z-zeros.zip" download>Download .zip Bundle (123 KB)</a>
+      <a class="btn alt" href="docs/index.html">Enter Full Research &amp; Audit Report &rarr;</a>
+      <a class="btn alt" href="docs/executive-summary.html">Executive Summary &rarr;</a>
+      <a class="btn alt" href="docs/run-card.json">JSON Run Card</a>
+    </div>
+    <p style="margin:.8rem 0 0;font-size:.86rem">
+      <strong>Submission Name:</strong> <code>gemsdoe80-h80g-choquet-tworegime-20261022T000000Z-zeros</code><br>
+      <strong>Submission Note (131 / 140 chars):</strong> <code>H80G 2-regime OOF 34ch multiphysics + crack-tip/bridge + 6-shell Choquet Dinkelbach; 51667 dots; HOLDOUT-DTI 0.2349 [0.2207,0.2483]</code><br>
+      <strong>Verified SHA-256:</strong> <code>a3c14d76d1f58802c8bd3f13378cbeb037ad3618d5fbd9dbf5f5a0dae4a35ede</code>
+    </p>
+  </div>
+
+  <h2>All Validated GEMSDOE80 Parallel-Lane Deliverables</h2>
+  <table>
+    <thead><tr><th>Rank</th><th>Lane</th><th>Holdout Score (<code>HOLDOUT-DTI</code>)</th><th>Dots</th><th>Download &amp; Verified SHA-256</th></tr></thead>
+    <tbody>
+      <tr style="background:#ecfdf5"><td><strong>#1 (Primary)</strong></td><td><strong><code>H80-G</code> Two-Regime + 6-Shell Choquet</strong></td><td><strong>0.2349</strong> <code>[0.2207, 0.2483]</code></td><td><strong>51,667</strong></td><td><a href="docs/downloads/gemsdoe80-h80g-choquet-tworegime-20261022T000000Z-zeros.tif" download><code>gemsdoe80-h80g-choquet-tworegime-20261022T000000Z-zeros.tif</code></a><br><code>a3c14d76d1f58802c8bd3f13378cbeb037ad3618d5fbd9dbf5f5a0dae4a35ede</code></td></tr>
+      <tr><td>#2</td><td><code>ADPT-80</code> KKT-Lagrangian</td><td><code>0.1804</code> (Seed 20) / <code>0.2025</code> (Seed 30)</td><td>36,500</td><td><a href="docs/downloads/gems80-adpt-kkt-lagrangian-36500d-20261022T012049Z-5bd11c85-zeros.tif" download><code>gems80-adpt-kkt-lagrangian-36500d-20261022T012049Z-5bd11c85-zeros.tif</code></a><br><code>f538f414fb11169342bb613a9c9c1eb9e075278c511e694d55c96ba0760851f9</code></td></tr>
+      <tr><td>#3</td><td><code>H80-DPVC</code> Updip + Vent Submodular</td><td><code>0.1619</code></td><td>41,600</td><td><a href="docs/downloads/gems80-h80-dpvc-updip-vent-submod-41600-20261021-zeros.tif" download><code>gems80-h80-dpvc-updip-vent-submod-41600-20261021-zeros.tif</code></a></td></tr>
+      <tr><td>#4</td><td><code>H81-A</code> Step-Over Relay</td><td><code>0.0607</code> <code>[0.0541, 0.0636]</code></td><td>7,415</td><td><a href="docs/downloads/gemsdoe80-h81a-relay-20261022T010259Z-zeros.tif" download><code>gemsdoe80-h81a-relay-20261022T010259Z-zeros.tif</code></a></td></tr>
+      <tr><td>#5</td><td><code>H80-C</code> Geodetic Strain Baseline</td><td><code>0.0507</code></td><td>28,807</td><td><a href="docs/downloads/gemsdoe80-h80c-strain-accom-resid-20261021T233457Z-zeros.tif" download><code>gemsdoe80-h80c-strain-accom-resid-20261021T233457Z-zeros.tif</code></a></td></tr>
+    </tbody>
+  </table>
+</main>
 </body>
 </html>

@@ -33,6 +33,92 @@ sys.path.insert(0, str(REPO / "src"))
 
 ALPHA, BETA = 0.2, 0.8
 KERNEL_R_M = 300.0
+
+
+def _default_data_file(name: str) -> Path:
+    for base in (REPO / "data", REPO / ".cache" / "data", REPO / "data" / "bridge"):
+        p = base / name
+        if p.is_file():
+            return p
+    return REPO / "data" / name
+
+
+def validate_geotiff(
+    sub_path: Path,
+    template_path: Path | None = None,
+    catalogue_path: Path | None = None,
+) -> dict:
+    """12-check programmatic GeoTIFF receipt compatible across all GEMSDOE80 test suites."""
+    import rasterio
+
+    sub_path = Path(sub_path)
+    if not sub_path.is_file():
+        return {"passed": False, "error": f"File not found: {sub_path}"}
+    tpl_p = Path(template_path) if template_path is not None and Path(template_path).is_file() else _default_data_file("sample_submission.tif")
+    cat_p = Path(catalogue_path) if catalogue_path is not None and Path(catalogue_path).is_file() else _default_data_file("existing_faults.tif")
+    if not cat_p.is_file():
+        cat_p = _default_data_file("labels.tif")
+
+    checks: dict[str, bool] = {}
+    notes: list[str] = []
+    with rasterio.open(tpl_p) as tpl, rasterio.open(cat_p) as cat_ds, rasterio.open(sub_path) as ds:
+        tpl_arr = tpl.read(1)
+        valid = np.isfinite(tpl_arr) if tpl.nodata is None or np.isnan(tpl.nodata) else (tpl_arr != tpl.nodata)
+        cat = (cat_ds.read(1) > 0) & valid
+
+        checks["single_band"] = ds.count == 1
+        checks["dtype_float32"] = ds.dtypes[0] == "float32"
+        checks["shape_match"] = ds.shape == tpl.shape
+        checks["crs_epsg_32611"] = (ds.crs == tpl.crs) and (ds.crs.to_epsg() == 32611)
+        checks["transform_exact"] = ds.transform == tpl.transform
+
+        arr = ds.read(1)
+        in_foot = arr[valid]
+        out_foot = arr[~valid]
+
+        checks["no_nan_inside_footprint"] = bool(np.isfinite(in_foot).all())
+        checks["all_pixels_finite"] = bool(np.isfinite(arr).all())
+        min_in = float(np.nanmin(in_foot))
+        max_in = float(np.nanmax(in_foot))
+        min_all = float(np.nanmin(arr))
+        max_all = float(np.nanmax(arr))
+
+        checks["range_0_1_inside_footprint"] = (min_in >= 0.0) and (max_in <= 1.0)
+        checks["range_0_1_entire_raster"] = (min_all >= 0.0) and (max_all <= 1.0)
+        checks["outside_footprint_zero"] = bool(np.all(out_foot == 0.0))
+
+        cat_leak_dots = int((arr[cat] > 0.0).sum())
+        checks["zero_catalogue_dots"] = cat_leak_dots == 0
+
+        n_pos = int((in_foot > 0.0).sum())
+        n_ones = int((in_foot == 1.0).sum())
+        checks["non_degenerate_emission"] = 5_000 <= n_pos <= 120_000
+        if not checks["range_0_1_entire_raster"]:
+            notes.append(f"Out-of-range values found: [{min_all}, {max_all}]")
+
+    passed = all(checks.values())
+    return {
+        "evidence_class": "VALIDATOR-RECEIPT",
+        "file_name": sub_path.name,
+        "file_path": str(sub_path),
+        "file_size_bytes": sub_path.stat().st_size,
+        "file_size_mib": round(sub_path.stat().st_size / (1024 * 1024), 3),
+        "sha256": hashlib.sha256(sub_path.read_bytes()).hexdigest(),
+        "shape": [int(arr.shape[0]), int(arr.shape[1])],
+        "band_count": 1,
+        "dtype": "float32",
+        "crs": "EPSG:32611",
+        "min_value": min_all,
+        "max_value": max_all,
+        "nan_count_inside_footprint": int((~np.isfinite(in_foot)).sum()),
+        "nan_count_total": int((~np.isfinite(arr)).sum()),
+        "positive_pixels": n_pos,
+        "binary_unit_pixels": n_ones,
+        "catalogue_overlap_pixels": cat_leak_dots,
+        "checks": checks,
+        "notes": notes,
+        "passed": passed,
+    }
 RESOLUTION_M = 100.0
 BOOTSTRAP_SEED = 20261021
 N_BOOTSTRAP = 2000

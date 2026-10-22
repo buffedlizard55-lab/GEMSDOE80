@@ -97,3 +97,15 @@ Full original session prompt archived verbatim in [`docs/SESSION_PROMPT.md`](./d
 4. **Leakage Canary:** Per-feature holdout $\mathrm{AUC} > 0.90$ flags leakage (`max = 0.7886` across all 47 features; `0.5865` across all 19 raw GeoDAWN bands; `dist_known_fault_px` stripped & asserted absent).
 5. **Run Card & Format Guarantee:** Complete machine-readable Run Card published at [`research/run-card.json`](./research/run-card.json) and [`docs/run-card.json`](./docs/run-card.json).
 6. **Budget Discipline:** Strictly `3 / 3` pre-registered experiments executed well inside the 2-hour window; `0` live weekly DrivenData submission slots spent.
+
+---
+
+## 6. Preserved Parallel `GEMSDOE80` Lanes & Official Data Links
+
+All parallel `GEMSDOE80` lanes are preserved intact and verified pairwise unique against primary `H80-G` (`|ρ| <= 0.070`, `ov3px <= 0.527 <= 0.70`):
+- **Primary #1 (`H80-G`, 51,667 dots, `HOLDOUT-DTI = 0.2349`):** `docs/downloads/gemsdoe80-h80g-choquet-tworegime-20261022T000000Z-zeros.tif` (`a3c14d76d1f58802c8bd3f13378cbeb037ad3618d5fbd9dbf5f5a0dae4a35ede`)
+- **Lane #2 (`ADPT-80`, 36,500 dots, `HOLDOUT-DTI = 0.1804 / 0.2025`):** `docs/downloads/gems80-adpt-kkt-lagrangian-36500d-20261022T012049Z-5bd11c85-zeros.tif` (`f538f414fb11169342bb613a9c9c1eb9e075278c511e694d55c96ba0760851f9`)
+- **Lane #3 (`H80-DPVC`, 41,600 dots, `HOLDOUT-DTI = 0.1619`):** `docs/downloads/gems80-h80-dpvc-updip-vent-submod-41600-20261021-zeros.tif`
+- **Lane #4 (`H81-A`, 7,415 dots, `HOLDOUT-DTI = 0.0607`):** `docs/downloads/gemsdoe80-h81a-relay-20261022T010259Z-zeros.tif`
+- **Lane #5 (`H80-C`, 28,807 dots, `HOLDOUT-DTI = 0.0507`):** `docs/downloads/gemsdoe80-h80c-strain-accom-resid-20261021T233457Z-zeros.tif` (`d9c4ce410af5c413195aa3a463c2e4c6c223e26c6c8cf3a25a8a95c4b7a2bcc5`)
+- **Official Competition & Data Sources:** [DrivenData Reference Solution](https://github.com/drivendataorg/gems-prize-reference-solution) · [DOE GDR INGENIOUS Submission 1391](https://gdr.openei.org/submissions/1391) · [GeoDAWN DOI `10.5066/P93LGLVQ`](https://doi.org/10.5066/P93LGLVQ)

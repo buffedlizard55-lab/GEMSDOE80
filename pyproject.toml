@@ -1,0 +1,29 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "gems80"
+version = "0.1.0"
+description = "GEMSDOE80 Lane H80: Anisotropic Dip-Polarity Normal-Fault Tomography & Dinkelbach Submodular Trace Allocation"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "numpy>=2.0",
+    "scipy>=1.13",
+    "scikit-learn>=1.5",
+    "scikit-image>=0.24",
+    "lightgbm>=4.5",
+    "rasterio>=1.4",
+    "pandas>=2.2",
+    "pyproj>=3.6",
+    "matplotlib>=3.9",
+    "pytest>=8.0",
+]
+
+[tool.setuptools.packages.find]
+where = ["src", "vendor"]
+
+[tool.pytest.ini_options]
+pythonpath = ["src", "vendor", "scripts"]
+testpaths = ["tests"]

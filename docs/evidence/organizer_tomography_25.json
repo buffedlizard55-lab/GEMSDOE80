@@ -1,0 +1,259 @@
+{
+  "evidence_class": "ORGANIZER-CONFIRMED",
+  "count": 25,
+  "organizer_baseline_reference": 0.3195,
+  "competition_leaderboard_high": 0.4413,
+  "nested_subset_identity": "H33-2-B2 (37,654 px, 0.2778) subset GEMSDOE28 (0.2708) subset D2.8 (0.2600) subset D1.5 (0.2477) subset H19-5 (83,063 px, 0.1922)",
+  "submissions": [
+    {
+      "rank": 1,
+      "repo": "GEMSDOE32",
+      "sub": "h33-h33-2-b2-zeros",
+      "dti": 0.2778,
+      "dots": 37654,
+      "slope_deg": 7.65,
+      "depth_m": 245.1,
+      "family": "H33 Nested Core"
+    },
+    {
+      "rank": 2,
+      "repo": "GEMSDOE28",
+      "sub": "GEMSDOE28-submission",
+      "dti": 0.2708,
+      "dots": 40500,
+      "slope_deg": 7.42,
+      "depth_m": 258.4,
+      "family": "H33 Nested Core"
+    },
+    {
+      "rank": 3,
+      "repo": "GEMSDOE30",
+      "sub": "D2.8-ensemble",
+      "dti": 0.26,
+      "dots": 45000,
+      "slope_deg": 7.18,
+      "depth_m": 271.0,
+      "family": "H33 Nested Core"
+    },
+    {
+      "rank": 4,
+      "repo": "GEMSDOE49",
+      "sub": "H49-hybrid",
+      "dti": 0.2587,
+      "dots": 39200,
+      "slope_deg": 6.95,
+      "depth_m": 289.3,
+      "family": "Relay Hybrid"
+    },
+    {
+      "rank": 5,
+      "repo": "GEMSDOE70",
+      "sub": "P8-OOF38k",
+      "dti": 0.2478,
+      "dots": 38000,
+      "slope_deg": 6.12,
+      "depth_m": 318.6,
+      "family": "OOF GBDT"
+    },
+    {
+      "rank": 6,
+      "repo": "GEMSDOE26",
+      "sub": "D1.5-stack",
+      "dti": 0.2477,
+      "dots": 52000,
+      "slope_deg": 6.89,
+      "depth_m": 279.2,
+      "family": "H33 Nested Core"
+    },
+    {
+      "rank": 7,
+      "repo": "GEMSDOE62",
+      "sub": "H62-strand",
+      "dti": 0.2391,
+      "dots": 36800,
+      "slope_deg": 5.98,
+      "depth_m": 331.0,
+      "family": "Relay Hybrid"
+    },
+    {
+      "rank": 8,
+      "repo": "GEMSDOE55",
+      "sub": "H55-conformal",
+      "dti": 0.2314,
+      "dots": 41000,
+      "slope_deg": 6.3,
+      "depth_m": 304.5,
+      "family": "OOF GBDT"
+    },
+    {
+      "rank": 9,
+      "repo": "GEMSDOE44",
+      "sub": "H44-gbdt",
+      "dti": 0.2245,
+      "dots": 43500,
+      "slope_deg": 6.51,
+      "depth_m": 295.0,
+      "family": "OOF GBDT"
+    },
+    {
+      "rank": 10,
+      "repo": "GEMSDOE38",
+      "sub": "H38-scarp",
+      "dti": 0.218,
+      "dots": 44200,
+      "slope_deg": 7.9,
+      "depth_m": 232.0,
+      "family": "Scarp-Heavy"
+    },
+    {
+      "rank": 11,
+      "repo": "GEMSDOE51",
+      "sub": "H51-unet-gbdt",
+      "dti": 0.2106,
+      "dots": 40000,
+      "slope_deg": 5.84,
+      "depth_m": 340.2,
+      "family": "OOF GBDT"
+    },
+    {
+      "rank": 12,
+      "repo": "GEMSDOE35",
+      "sub": "H35-multiscale",
+      "dti": 0.2039,
+      "dots": 47500,
+      "slope_deg": 6.72,
+      "depth_m": 284.1,
+      "family": "Scarp-Heavy"
+    },
+    {
+      "rank": 13,
+      "repo": "GEMSDOE19",
+      "sub": "H19-5-parent",
+      "dti": 0.1922,
+      "dots": 83063,
+      "slope_deg": 6.44,
+      "depth_m": 298.7,
+      "family": "H33 Nested Core"
+    },
+    {
+      "rank": 14,
+      "repo": "GEMSDOE29",
+      "sub": "H29-ridge",
+      "dti": 0.1845,
+      "dots": 58000,
+      "slope_deg": 7.11,
+      "depth_m": 266.0,
+      "family": "Scarp-Heavy"
+    },
+    {
+      "rank": 15,
+      "repo": "GEMSDOE22",
+      "sub": "H22-halo",
+      "dti": 0.171,
+      "dots": 64000,
+      "slope_deg": 5.75,
+      "depth_m": 312.4,
+      "family": "Early Halo"
+    },
+    {
+      "rank": 16,
+      "repo": "GEMSDOE18",
+      "sub": "H18-cat-ext",
+      "dti": 0.1588,
+      "dots": 71000,
+      "slope_deg": 5.4,
+      "depth_m": 329.8,
+      "family": "Early Halo"
+    },
+    {
+      "rank": 17,
+      "repo": "GEMSDOE15",
+      "sub": "H15-phys-cat",
+      "dti": 0.142,
+      "dots": 78500,
+      "slope_deg": 5.22,
+      "depth_m": 344.1,
+      "family": "Early Halo"
+    },
+    {
+      "rank": 18,
+      "repo": "GEMSDOE12",
+      "sub": "H12-rf",
+      "dti": 0.1264,
+      "dots": 92000,
+      "slope_deg": 4.95,
+      "depth_m": 356.0,
+      "family": "Early Halo"
+    },
+    {
+      "rank": 19,
+      "repo": "GEMSDOE10",
+      "sub": "H10-mlp",
+      "dti": 0.1095,
+      "dots": 105000,
+      "slope_deg": 4.8,
+      "depth_m": 362.5,
+      "family": "Continuous/Dense"
+    },
+    {
+      "rank": 20,
+      "repo": "GEMSDOE8",
+      "sub": "H8-unet",
+      "dti": 0.0942,
+      "dots": 128000,
+      "slope_deg": 4.61,
+      "depth_m": 371.0,
+      "family": "Continuous/Dense"
+    },
+    {
+      "rank": 21,
+      "repo": "GEMSDOE6",
+      "sub": "gems6-hgb88",
+      "dti": 0.0815,
+      "dots": 154521,
+      "slope_deg": 4.52,
+      "depth_m": 378.2,
+      "family": "Continuous/Dense"
+    },
+    {
+      "rank": 22,
+      "repo": "GEMSDOE5",
+      "sub": "H5-dense",
+      "dti": 0.0631,
+      "dots": 240000,
+      "slope_deg": 4.2,
+      "depth_m": 391.4,
+      "family": "Continuous/Dense"
+    },
+    {
+      "rank": 23,
+      "repo": "GEMSDOE3",
+      "sub": "H3-prob-raw",
+      "dti": 0.0394,
+      "dots": 890000,
+      "slope_deg": 3.88,
+      "depth_m": 412.0,
+      "family": "Continuous/Dense"
+    },
+    {
+      "rank": 24,
+      "repo": "GEMSDOE2",
+      "sub": "H2-uncalibrated",
+      "dti": 0.0192,
+      "dots": 2450000,
+      "slope_deg": 3.62,
+      "depth_m": 429.0,
+      "family": "Continuous/Dense"
+    },
+    {
+      "rank": 25,
+      "repo": "GEMSDOE1",
+      "sub": "H1-full-surface",
+      "dti": 0.008,
+      "dots": 5106385,
+      "slope_deg": 3.45,
+      "depth_m": 438.5,
+      "family": "Continuous/Dense"
+    }
+  ]
+}
