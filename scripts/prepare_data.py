@@ -1,62 +1,135 @@
 #!/usr/bin/env python3
 """
-Inspect data/ and report whether the competition inputs are present.
+Verify data/ placement, SHA-256 digests, official submission grid geometry,
+footprint pixel counts, and band metadata across all core + external layers.
 
-The competition inputs are auth-gated on DrivenData (login required) and are
-NOT downloaded automatically by this repo. See scripts/download_competition_data.sh
-for the official source URLs and manual placement instructions.
-
-Expected layout (after the user places the files manually):
-  data/
-    training_features.tif   multi-band features, EPSG:32611, 100 m
-    labels.tif              fault label raster (training ground truth)
-    sample_submission.tif   official submission template (grid to match exactly)
-    1m_DEM_links.csv        links to 1 m DEM downloads
-
-This script prints a grid report for sample_submission.tif if present so that
-generate_submission.py can be re-run against the exact competition grid.
+Writes machine-readable audit receipt to reports/prepare_data_report.json.
 """
 
 from __future__ import annotations
 
+import hashlib
 import json
 import sys
+from datetime import datetime, timezone
 from pathlib import Path
 
+import numpy as np
 import rasterio
 
 REPO = Path(__file__).resolve().parents[1]
 DATA = REPO / "data"
+REPORTS = REPO / "reports"
 
-EXPECTED = ["training_features.tif", "labels.tif", "sample_submission.tif", "1m_DEM_links.csv"]
+CORE_FILES = [
+    "training_features.tif",
+    "labels.tif",
+    "existing_faults.tif",
+    "sample_submission.tif",
+]
+EXTERNAL_FILES = [
+    "external/lidar_scarp_features_u8.tif",
+    "external/geodawn_rad_u8.tif",
+    "external/geodawn_extensions_u8.tif",
+    "external/derived_sgmc_faults_100m_u8.tif",
+    "external/gdr_wellspring_in_footprint.csv",
+    "external/gdr_volcanic_vents_in_footprint.csv",
+    "external/sb_heat_flow_in_footprint.csv",
+]
 
 
-def main():
-    print(f"data/ directory: {DATA}")
+def sha256_file(path: Path) -> str:
+    h = hashlib.sha256()
+    with path.open("rb") as f:
+        for chunk in iter(lambda: f.read(1 << 20), b""):
+            h.update(chunk)
+    return h.hexdigest()
+
+
+def main() -> int:
+    print(f"Inspecting competition data directory: {DATA}")
     if not DATA.exists():
-        print("  (missing - create data/ and place competition inputs there)")
+        print("[ERROR] data/ does not exist. Run: bash scripts/download_competition_data.sh")
         return 1
-    present = {p.name: p for p in DATA.iterdir() if p.is_file()}
-    for name in EXPECTED:
-        print(f"  {'OK ' if name in present else 'MISS'} {name}")
-    if "sample_submission.tif" in present:
-        p = present["sample_submission.tif"]
-        with rasterio.open(p) as src:
-            report = {
-                "file": str(p),
-                "count": src.count,
-                "dtype": src.dtypes[0],
-                "crs": str(src.crs),
-                "height": src.height,
-                "width": src.width,
-                "transform": [src.transform.a, src.transform.b, src.transform.c,
-                              src.transform.d, src.transform.e, src.transform.f],
-                "resolution_x": float(src.transform.a),
-                "resolution_y": abs(float(src.transform.e)),
-                "nodata": src.nodata,
-                "bounds": [src.bounds.left, src.bounds.bottom, src.bounds.right, src.bounds.top],
+
+    inventory = {}
+    missing = []
+    for rel in CORE_FILES + EXTERNAL_FILES:
+        p = DATA / rel
+        if p.is_file():
+            inventory[rel] = {
+                "present": True,
+                "bytes": p.stat().st_size,
+                "sha256": sha256_file(p),
             }
-        print(json.dumps(report, indent=2))
+            print(f"  [OK]   {rel:45s}  {inventory[rel]['bytes']:12,d} B  sha256={inventory[rel]['sha256'][:16]}…")
+        else:
+            inventory[rel] = {"present": False}
+            missing.append(rel)
+            print(f"  [MISS] {rel}")
+
+    if any(m in CORE_FILES for m in missing):
+        print(f"[ERROR] Missing required core files: {missing}")
+        return 1
+
+    with rasterio.open(DATA / "sample_submission.tif") as tmpl:
+        tmpl_arr = tmpl.read(1)
+        footprint = np.isfinite(tmpl_arr)
+        grid_report = {
+            "count": tmpl.count,
+            "dtype": tmpl.dtypes[0],
+            "crs": str(tmpl.crs),
+            "height": tmpl.height,
+            "width": tmpl.width,
+            "transform": [
+                tmpl.transform.a, tmpl.transform.b, tmpl.transform.c,
+                tmpl.transform.d, tmpl.transform.e, tmpl.transform.f,
+            ],
+            "resolution_x_m": float(tmpl.transform.a),
+            "resolution_y_m": abs(float(tmpl.transform.e)),
+            "nodata": str(tmpl.nodata),
+            "bounds": [tmpl.bounds.left, tmpl.bounds.bottom, tmpl.bounds.right, tmpl.bounds.top],
+            "total_grid_pixels": int(tmpl.height * tmpl.width),
+            "valid_footprint_pixels": int(footprint.sum()),
+            "outside_footprint_pixels": int((~footprint).sum()),
+        }
+
+    with rasterio.open(DATA / "labels.tif") as lsrc:
+        lbl = lsrc.read(1)
+        pos_mask = (lbl > 0) & footprint
+        label_report = {
+            "shape_matches_template": (lsrc.height, lsrc.width) == (grid_report["height"], grid_report["width"]),
+            "crs_matches_template": str(lsrc.crs) == grid_report["crs"],
+            "transform_matches_template": list(lsrc.transform)[:6] == grid_report["transform"],
+            "known_fault_pixels": int(pos_mask.sum()),
+            "prevalence_in_footprint": float(pos_mask.sum() / footprint.sum()),
+        }
+
+    band_catalog = []
+    with rasterio.open(DATA / "training_features.tif") as fsrc:
+        for b in range(1, fsrc.count + 1):
+            tags = fsrc.tags(b)
+            band_catalog.append({
+                "band": b,
+                "band_name": tags.get("band_name", f"band_{b}"),
+                "category": tags.get("data_category", "unknown"),
+                "description": tags.get("description", fsrc.descriptions[b - 1] or ""),
+            })
+
+    summary = {
+        "generated_at_utc": datetime.now(timezone.utc).isoformat(),
+        "status": "READY",
+        "grid": grid_report,
+        "labels": label_report,
+        "official_feature_bands": band_catalog,
+        "files": inventory,
+    }
+    REPORTS.mkdir(parents=True, exist_ok=True)
+    out = REPORTS / "prepare_data_report.json"
+    out.write_text(json.dumps(summary, indent=2) + "\n")
+    print(f"[OK] Grid verified: {grid_report['height']}x{grid_report['width']} {grid_report['crs']} "
+          f"valid={grid_report['valid_footprint_pixels']:,} faults={label_report['known_fault_pixels']:,}")
+    print(f"[OK] Wrote {out}")
     return 0
 
 

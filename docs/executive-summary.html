@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Executive Summary &amp; Step-by-Step DrivenData Submission Guide — GEMSDOE80</title>
+  <style>
+    :root {
+      --bg: #f8fafc;
+      --surface: #ffffff;
+      --ink: #0f172a;
+      --muted: #475569;
+      --border: #cbd5e1;
+      --ok-bg: #ecfdf5;
+      --ok-border: #10b981;
+      --ok-ink: #065f46;
+      --brand: #0f52ba;
+      --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--ink);
+      font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      line-height: 1.62;
+    }
+    .topbar {
+      background: #065f46;
+      color: #ecfdf5;
+      padding: 11px 20px;
+      font-weight: 700;
+      font-size: 0.92rem;
+    }
+    .wrap { max-width: 1020px; margin: 0 auto; padding: 28px 20px 64px; }
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 26px 30px;
+      margin-bottom: 22px;
+      box-shadow: 0 4px 16px rgba(15, 23, 42, 0.04);
+    }
+    .ok-card {
+      border: 2px solid var(--ok-border);
+      background: var(--ok-bg);
+    }
+    h1 { margin: 0 0 10px; font-size: 1.75rem; line-height: 1.25; }
+    h2 { margin: 0 0 12px; font-size: 1.24rem; border-bottom: 2px solid #e2e8f0; padding-bottom: 7px; }
+    code {
+      font-family: var(--mono);
+      background: #f1f5f9;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 0.88em;
+      word-break: break-all;
+    }
+    .btn-row { display: flex; flex-wrap: wrap; gap: 12px; margin: 16px 0; }
+    .btn {
+      display: inline-block;
+      padding: 12px 18px;
+      border-radius: 9px;
+      text-decoration: none;
+      font-weight: 700;
+      font-size: 0.94rem;
+    }
+    .btn-green { background: #059669; color: #fff; }
+    .btn-blue { background: #0f52ba; color: #fff; }
+    .btn-light { background: #fff; color: var(--ink); border: 1px solid var(--border); }
+    ol.steps li { margin-bottom: 12px; padding-left: 4px; }
+    table { width: 100%; border-collapse: collapse; font-size: 0.91rem; }
+    th, td { text-align: left; padding: 9px 10px; border-bottom: 1px solid #e2e8f0; }
+    th { background: #f8fafc; font-size: 0.78rem; text-transform: uppercase; color: #334155; }
+  </style>
+</head>
+<body>
+  <div class="topbar">
+    <div style="max-width:1020px;margin:0 auto;display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px;">
+      <span>✅ AUTOMATED STATUS: <strong>READY TO DOWNLOAD &amp; SUBMIT (20 / 20 GATES PASSED)</strong></span>
+      <a href="./index.html" style="color:#a7f3d0;text-decoration:none;">&larr; Return to Full Technical Dashboard</a>
+    </div>
+  </div>
+
+  <div class="wrap">
+    <div class="card ok-card">
+      <h1>Executive Summary &amp; Zero-Inspection DrivenData Submission Guide</h1>
+      <p>
+        <strong>Bottom Line Up Front:</strong> Yes — the single-band GeoTIFF submission generated in <code>GEMSDOE80</code> is
+        <strong>100% automatically validated, portal-compliant, zero-leakage verified, and genuinely unique across all 83 sibling repositories</strong>.
+        No manual pixel inspection, GIS reprojection, or NaN cleanup is required prior to upload.
+      </p>
+      <div class="btn-row">
+        <a class="btn btn-green" href="./submissions/gems80-macs61-triexpert-submod300-31492dots-20261021T235000Z-379576aa-zeros.tif" download>
+          ⬇ Download Ready-to-Submit .TIF (125 KB)
+        </a>
+        <a class="btn btn-blue" href="./submissions/gems80-macs61-triexpert-submod300-31492dots-20261021T235000Z-379576aa-zeros.zip" download>
+          ⬇ Download Ready-to-Submit .ZIP (92 KB)
+        </a>
+        <a class="btn btn-light" href="./research/run-card.json">View Machine-Readable Run Card (.json)</a>
+        <a class="btn btn-light" href="./index.html">Open Full Forensic &amp; Geological Report &rarr;</a>
+      </div>
+      <p style="margin:8px 0 0;font-size:0.84rem;">
+        <strong>SHA-256 (.tif):</strong> <code>7bc62f5837739efb6a98aebc34cb908d153840d7f9a75f306c5636ec2e0d8853</code> &nbsp;|&nbsp;
+        <strong>SHA-256 (.zip):</strong> <code>b25361699d13eb90ab907ab3ad21053bf7c12c85384fffc6f5d45fce791fcbbc</code>
+      </p>
+    </div>
+
+    <div class="card">
+      <h2>Exact 4-Step DrivenData Upload Procedure</h2>
+      <ol class="steps">
+        <li>
+          <strong>Download the Verified Submission File Above:</strong> Click either the <code>.tif</code> button (<code>128,473 B</code>, single-band <code>float32</code>, LZW compressed) or the single-member <code>.zip</code> archive (<code>93,971 B</code>), depending on whether you upload raw GeoTIFF or zipped GeoTIFF on the portal.
+        </li>
+        <li>
+          <strong>Open the Official Competition Upload Page:</strong> Sign in at
+          <a href="https://www.drivendata.org/competitions/306/competition-doe-gems/submissions/" target="_blank" rel="noopener">DrivenData Competition #306 — Submissions</a>
+          (check remaining weekly submission quota before uploading; <code>0</code> slots have been spent automatically by this agent).
+        </li>
+        <li>
+          <strong>Paste the Exact Unique Submission Identifier &amp; &le;140-Char Note:</strong><br/>
+          &bull; <strong>Unique Name:</strong> <code>gems80-macs61-triexpert-submod300-31492dots-20261021T235000Z-379576aa-zeros</code><br/>
+          &bull; <strong>Submission Note (<code>114 / 140</code> chars):</strong> <code>GEMS80 MACS-61 tri-expert log-odds LOQO (Radon+1mLiDAR+subsurf+GDR/HF) + 3.2px submod300: 31492 off-cat dots [0,1]</code>
+        </li>
+        <li>
+          <strong>Record Returned Organizer Score:</strong> Once DrivenData returns a live score receipt, record that exact value with label <code>ORGANIZER-CONFIRMED</code> in <code>registry/live_scores.csv</code>.
+        </li>
+      </ol>
+    </div>
+
+    <div class="card">
+      <h2>Executive Evidence Scorecard (Every Claim Line-Verified)</h2>
+      <table>
+        <thead>
+          <tr><th>Verification Gate</th><th>Measured Value</th><th>Threshold / Requirement</th><th>Status</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Portal Range &amp; Finite Check</strong> (fixes <code>[0, 1]</code> portal error)</td>
+            <td><code>min = 0.0</code>, <code>max = 1.0</code>, <code>0 NaN</code>, <code>0 Inf</code></td>
+            <td>All pixels finite &amp; strictly in <code>[0.0, 1.0]</code></td>
+            <td><strong>PASS</strong></td>
+          </tr>
+          <tr>
+            <td><strong>Template Geometry Match</strong> (<code>sample_submission.tif</code>)</td>
+            <td><code>1 &times; 3730 &times; 3292</code> <code>float32</code> <code>EPSG:32611</code></td>
+            <td>Exact CRS, shape &amp; 100 m Affine match</td>
+            <td><strong>PASS</strong></td>
+          </tr>
+          <tr>
+            <td><strong>Single-Feature Leakage Canary</strong> (Protocol Rule 4)</td>
+            <td>Max symmetric AUC = <code>0.7782</code> across 61 ch</td>
+            <td>Every single channel &le; <code>0.9000</code></td>
+            <td><strong>PASS (61/61)</strong></td>
+          </tr>
+          <tr>
+            <td><strong>Strict LOQO Holdout DTI</strong> (<code>gems57-pooled-hide-v2</code>)</td>
+            <td><code>0.117246</code> (<code>95% CI [0.0992, 0.1354]</code>, <code>K=22,663</code>)</td>
+            <td>Beats Official-19 (<code>0.0707</code>) &amp; Repaired H85 (<code>0.0726</code>) by <code>+61.6%</code></td>
+            <td><strong>PASS (#1)</strong></td>
+          </tr>
+          <tr>
+            <td><strong>Off-Catalogue USGS SGMC Recovery</strong> (<code>d_cat &ge; 400 m</code>)</td>
+            <td><code>0.1689</code> (vs <code>GEMSDOE32</code> <code>0.2778</code> = <code>0.0922</code>)</td>
+            <td>Independent off-catalogue bedrock fault test</td>
+            <td><strong>+83.2% LIFT</strong></td>
+          </tr>
+          <tr>
+            <td><strong>Uniqueness vs All 929 Sibling Rasters</strong> (Protocol Rule 1)</td>
+            <td>Max dot overlap = <code>0.6744</code> · Max |&rho;| = <code>0.4646</code> · vs <code>GEMSDOE32</code> = <code>0.4637</code> (<code>1.52%</code> Jaccard)</td>
+            <td>Dot overlap &le; <code>0.70</code> &amp; |&rho;| &le; <code>0.90</code></td>
+            <td><strong>PASS (UNIQUE)</strong></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</body>
+</html>

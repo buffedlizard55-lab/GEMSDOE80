@@ -1,4 +1,5 @@
 # Competition rasters and cached/generated research artifacts must not be committed.
+.cache/
 data/
 artifacts/
 __pycache__/

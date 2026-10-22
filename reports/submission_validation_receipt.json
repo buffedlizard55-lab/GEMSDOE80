@@ -1,0 +1,173 @@
+{
+  "validated_at_utc": "2026-10-22T02:22:31.234788+00:00",
+  "candidate": "docs/submissions/gems80-macs61-triexpert-submod300-31492dots-20261021T235000Z-379576aa-zeros.tif",
+  "sha256": "7bc62f5837739efb6a98aebc34cb908d153840d7f9a75f306c5636ec2e0d8853",
+  "bytes": 128473,
+  "format_valid": true,
+  "download_ready": true,
+  "portal_ready_without_manual_inspection": true,
+  "all_passed": true,
+  "n_checks_total": 20,
+  "n_checks_passed": 20,
+  "checks": {
+    "file_exists": true,
+    "single_band": true,
+    "dtype_float32": true,
+    "nodata_unset_or_clean": true,
+    "no_nan_anywhere": true,
+    "no_inf_anywhere": true,
+    "values_in_0_1": true,
+    "crs_matches": true,
+    "shape_matches": true,
+    "transform_matches": true,
+    "bounds_match": true,
+    "no_nan_or_infinite_inside_footprint": true,
+    "outside_footprint_zero": true,
+    "zero_predictions_on_mapped_catalogue": true,
+    "non_degenerate_positive_support": true,
+    "shared_gems57_validator_all_passed": true,
+    "zip_archive_valid_single_tif": true,
+    "sidecar_sha256_matches_bytes": true,
+    "submission_note_within_140_chars": true,
+    "promoted_in_run_card_with_uniqueness_and_canary": true
+  },
+  "details": {
+    "file_exists": {
+      "passed": true,
+      "observed": "docs/submissions/gems80-macs61-triexpert-submod300-31492dots-20261021T235000Z-379576aa-zeros.tif",
+      "expected": "existing .tif file"
+    },
+    "single_band": {
+      "passed": true,
+      "observed": 1,
+      "expected": 1
+    },
+    "dtype_float32": {
+      "passed": true,
+      "observed": "float32",
+      "expected": "float32"
+    },
+    "nodata_unset_or_clean": {
+      "passed": true,
+      "observed": null,
+      "expected": "valid"
+    },
+    "no_nan_anywhere": {
+      "passed": true,
+      "observed": 0,
+      "expected": 0
+    },
+    "no_inf_anywhere": {
+      "passed": true,
+      "observed": 0,
+      "expected": 0
+    },
+    "values_in_0_1": {
+      "passed": true,
+      "observed": [
+        0.0,
+        1.0
+      ],
+      "expected": "[0.0, 1.0]"
+    },
+    "crs_matches": {
+      "passed": true,
+      "observed": "EPSG:32611",
+      "expected": "EPSG:32611"
+    },
+    "shape_matches": {
+      "passed": true,
+      "observed": [
+        3730,
+        3292
+      ],
+      "expected": [
+        3730,
+        3292
+      ]
+    },
+    "transform_matches": {
+      "passed": true,
+      "observed": [
+        100.0,
+        0.0,
+        243350.0,
+        0.0,
+        -100.0,
+        4508550.0
+      ],
+      "expected": [
+        100.0,
+        0.0,
+        243350.0,
+        0.0,
+        -100.0,
+        4508550.0
+      ]
+    },
+    "bounds_match": {
+      "passed": true,
+      "observed": [
+        243350.0,
+        4135550.0,
+        572550.0,
+        4508550.0
+      ],
+      "expected": [
+        243350.0,
+        4135550.0,
+        572550.0,
+        4508550.0
+      ]
+    },
+    "no_nan_or_infinite_inside_footprint": {
+      "passed": true,
+      "observed": 0,
+      "expected": 0
+    },
+    "outside_footprint_zero": {
+      "passed": true,
+      "observed": 0.0,
+      "expected": 0.0
+    },
+    "zero_predictions_on_mapped_catalogue": {
+      "passed": true,
+      "observed": 0,
+      "expected": 0
+    },
+    "non_degenerate_positive_support": {
+      "passed": true,
+      "observed": 31492,
+      "expected": "5,000..65,000"
+    },
+    "shared_gems57_validator_all_passed": {
+      "passed": true,
+      "observed": true,
+      "expected": true
+    },
+    "zip_archive_valid_single_tif": {
+      "passed": true,
+      "observed": [
+        "gems80-macs61-triexpert-submod300-31492dots-20261021T235000Z-379576aa-zeros.tif"
+      ],
+      "expected": [
+        "gems80-macs61-triexpert-submod300-31492dots-20261021T235000Z-379576aa-zeros.tif"
+      ]
+    },
+    "sidecar_sha256_matches_bytes": {
+      "passed": true,
+      "observed": "7bc62f5837739efb6a98aebc34cb908d153840d7f9a75f306c5636ec2e0d8853",
+      "expected": "7bc62f5837739efb6a98aebc34cb908d153840d7f9a75f306c5636ec2e0d8853"
+    },
+    "submission_note_within_140_chars": {
+      "passed": true,
+      "observed": 114,
+      "expected": "1..140"
+    },
+    "promoted_in_run_card_with_uniqueness_and_canary": {
+      "passed": true,
+      "observed": true,
+      "expected": true
+    }
+  }
+}

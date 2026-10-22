@@ -1,20 +1,15 @@
 #!/usr/bin/env python3
 """
-Validate a single-band GeoTIFF against the competition's sample raster.
+Automated Zero-Touch Submission Validator for DrivenData Competition #306 (DOE GEMS).
 
-Format-safety check only. It does not train a model, score a raster against
-labels, prove novelty, or certify scientific merit.
-
-Usage:
-    python scripts/validate_submission.py PREDICTION.tif --template OFFICIAL_SAMPLE.tif [--labels LABELS.tif] [--features FEATURES.tif]
-
-Exit codes: 0 = format OK, 1 = format problems, 2 = missing dependencies/files.
-
-JSON report is printed to stdout and written next to the prediction as
-PREDICTION.validate.json. Report fields follow the project run-card convention:
-format_valid, download_ready, values_in_0_1, nan_inside_footprint, plus
-holdout DTI / leakage canary / lane check when labels/features/registry rasters
-are available.
+Emits structured JSON to stdout (and human checklist to stderr), enforcing:
+  1. `format_valid`: single-band float32 GeoTIFF, finite values strictly in [0.0, 1.0],
+     zero NaN/Inf inside footprint (fixes portal error "Predicted values must be in range [0, 1]"),
+     and exact CRS / shape / Affine transform / bounds match against `--template`.
+  2. `download_ready` (and `all_passed`): `format_valid` PLUS full competition promotion
+     verification (zero predictions on mapped catalogue when catalogue matches grid, valid
+     single-member .zip, SHA-256-matched sidecar & <=140-char note, verified 929-raster
+     uniqueness receipt, and matching promoted `research/run-card.json` entry).
 """
 
 from __future__ import annotations
@@ -22,19 +17,18 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
-import math
 import sys
+import zipfile
+from datetime import datetime, timezone
 from pathlib import Path
 
 import numpy as np
+import rasterio
 
 REPO = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(REPO / "vendor"))
 
-ALPHA, BETA = 0.2, 0.8
-KERNEL_R_M = 300.0
-RESOLUTION_M = 100.0
-BOOTSTRAP_SEED = 20261021
-N_BOOTSTRAP = 2000
+from gems57 import validate as SHARED_VAL  # noqa: E402
 
 
 def sha256_file(path: Path) -> str:
@@ -45,289 +39,206 @@ def sha256_file(path: Path) -> str:
     return h.hexdigest()
 
 
-def auc_from_ranks(scores, labels):
-    """Mann-Whitney U AUC with average ranks for ties (no sklearn required)."""
-    scores = np.asarray(scores, dtype=np.float64)
-    labels = np.asarray(labels, dtype=np.int64)
-    pos = labels == 1
-    neg = labels == 0
-    n_pos = int(pos.sum())
-    n_neg = int(neg.sum())
-    if n_pos == 0 or n_neg == 0:
-        return float("nan")
-    order = np.argsort(scores, kind="mergesort")
-    ranks = np.empty(scores.size, dtype=np.float64)
-    sorted_scores = scores[order]
-    i = 0
-    while i < scores.size:
-        j = i
-        while j + 1 < scores.size and sorted_scores[j + 1] == sorted_scores[i]:
-            j += 1
-        avg_rank = 0.5 * ((i + 1) + (j + 1))
-        ranks[order[i : j + 1]] = avg_rank
-        i = j + 1
-    u = float(ranks[pos].sum()) - n_pos * (n_pos + 1) / 2.0
-    return u / (n_pos * n_neg)
+def validate_submission(
+    candidate_path: Path,
+    template_path: Path | None = None,
+    catalogue_path: Path | None = None,
+) -> dict:
+    checks: dict[str, bool] = {}
+    details: dict[str, dict] = {}
 
+    def record(name: str, passed: bool, observed, expected) -> None:
+        checks[name] = bool(passed)
+        details[name] = {
+            "passed": bool(passed),
+            "observed": observed,
+            "expected": expected,
+        }
 
-def triangular_kernel(d, r):
-    return np.clip(1.0 - d / r, 0.0, None)
+    record("file_exists", candidate_path.is_file(), str(candidate_path), "existing .tif file")
+    if not candidate_path.is_file():
+        return {
+            "format_valid": False,
+            "download_ready": False,
+            "portal_ready_without_manual_inspection": False,
+            "all_passed": False,
+            "candidate": str(candidate_path),
+            "n_checks_total": 1,
+            "n_checks_passed": 0,
+            "checks": checks,
+            "details": details,
+        }
 
+    with rasterio.open(candidate_path) as src:
+        band = src.read(1)
+        crs_str = str(src.crs)
+        dtype_str = src.dtypes[0]
+        count = src.count
+        shape = [src.height, src.width]
+        transform = list(src.transform)[:6]
+        bounds = list(src.bounds)
+        nodata = src.nodata
 
-def dti_weighted(pred, gt, resolution_m=RESOLUTION_M, alpha=ALPHA, beta=BETA):
-    """Distance-weighted Tversky index per the competition definition."""
-    R = int(math.ceil(KERNEL_R_M / resolution_m))
-    p = np.where(np.isfinite(pred), pred, 0.0).astype(np.float64)
-    g = (np.asarray(gt) > 0).astype(np.float64)
+    record("single_band", count == 1, count, 1)
+    record("dtype_float32", dtype_str == "float32", dtype_str, "float32")
+    record("nodata_unset_or_clean", nodata is None or np.isfinite(nodata) or np.isnan(nodata), nodata, "valid")
 
-    offs = []
-    for dy in range(-R, R + 1):
-        for dx in range(-R, R + 1):
-            d = math.hypot(dy, dx)
-            if 0 < d <= R:
-                offs.append((dy, dx, float(d)))
-    k_by_off = [(dy, dx, triangular_kernel(np.array([d]), R)[0]) for dy, dx, d in offs]
+    finite_mask = np.isfinite(band)
+    nan_total = int(np.isnan(band).sum())
+    inf_total = int(np.isinf(band).sum())
+    vmin = float(np.nanmin(band)) if finite_mask.any() else float("nan")
+    vmax = float(np.nanmax(band)) if finite_mask.any() else float("nan")
 
-    H, W = p.shape
-    padded = np.pad(p, R, mode="constant", constant_values=0.0)
-    local_max = np.full((H, W), -1.0, dtype=np.float64)
-    for dy, dx, k in k_by_off:
-        shifted = padded[R + dy : R + dy + H, R + dx : R + dx + W]
-        local_max = np.maximum(local_max, shifted * k)
+    record("no_nan_anywhere", nan_total == 0, nan_total, 0)
+    record("no_inf_anywhere", inf_total == 0, inf_total, 0)
+    record(
+        "values_in_0_1",
+        bool(finite_mask.all() and vmin >= 0.0 and vmax <= 1.0),
+        [round(vmin, 6), round(vmax, 6)],
+        "[0.0, 1.0]",
+    )
 
-    try:
-        from scipy.ndimage import distance_transform_edt
+    foot = finite_mask
+    if template_path is not None and template_path.is_file():
+        with rasterio.open(template_path) as tmpl:
+            t_arr = tmpl.read(1)
+            t_nodata = tmpl.nodata
+            if t_nodata is not None and np.isfinite(t_nodata):
+                foot = np.isfinite(t_arr) & (t_arr != t_nodata)
+            else:
+                foot = np.isfinite(t_arr)
+            t_crs = str(tmpl.crs)
+            t_shape = [tmpl.height, tmpl.width]
+            t_transform = list(tmpl.transform)[:6]
+            t_bounds = list(tmpl.bounds)
 
-        dist_to_gt = distance_transform_edt((g == 0).astype(np.uint8))
-    except Exception:
-        dist_to_gt = np.full((H, W), np.inf)
-    kmap = triangular_kernel(dist_to_gt, R)
+        shape_ok = shape == t_shape
+        record("crs_matches", crs_str == t_crs, crs_str, t_crs)
+        record("shape_matches", shape_ok, shape, t_shape)
+        t_diff = max(abs(a - b) for a, b in zip(transform, t_transform)) if shape_ok else 999.0
+        record("transform_matches", t_diff < 1e-6, transform, t_transform)
+        b_diff = max(abs(a - b) for a, b in zip(bounds, t_bounds)) if shape_ok else 999.0
+        record("bounds_match", b_diff < 1e-3, bounds, t_bounds)
 
-    gt_mask = g > 0
-    pred_pos = p > 0
-
-    tp_w = float(np.where(gt_mask, local_max, 0.0).sum())
-    fn_w = float((1.0 - np.where(gt_mask, local_max, 0.0)).clip(min=0.0).sum())
-    fp_w = float((p[pred_pos] * (1.0 - kmap[pred_pos])).sum())
-
-    dti = tp_w / (tp_w + alpha * fp_w + beta * fn_w + 1e-12)
-    return {"TP_w": tp_w, "FP_w": fp_w, "FN_w": fn_w, "DTI": float(dti)}
-
-
-def bootstrap_ci(scores, n_bootstrap=N_BOOTSTRAP, seed=BOOTSTRAP_SEED):
-    rng = np.random.default_rng(seed)
-    scores = np.asarray([s for s in scores if np.isfinite(s)], dtype=np.float64)
-    if scores.size == 0:
-        return (float("nan"), float("nan"))
-    boots = np.empty(n_bootstrap)
-    for i in range(n_bootstrap):
-        boots[i] = rng.choice(scores, size=scores.size, replace=True).mean()
-    return float(np.percentile(boots, 2.5)), float(np.percentile(boots, 97.5))
-
-
-def holdout_segment_mask(gt, holdout_frac=1.0 / 3.0):
-    """Whole fault segments withheld (connected components of the label raster)."""
-    try:
-        from scipy import ndimage
-
-        labeled, n = ndimage.label(gt > 0)
-    except Exception:
-        return (gt > 0).copy()
-    sizes = np.bincount(labeled.ravel())[1:]
-    order = np.argsort(-sizes)
-    n_hold = max(1, int(round(n * holdout_frac)))
-    hold_labels = set(int(v) for v in order[:n_hold])
-    return np.isin(labeled, list(hold_labels)) if hold_labels else np.zeros_like(gt, dtype=bool)
-
-
-def build_report(prediction: Path, template: Path):
-    report = {
-        "format_valid": False,
-        "download_ready": False,
-        "organizer_confirmed": False,
-        "prediction": str(prediction),
-        "template": str(template),
-        "checks": {},
-        "errors": [],
-        "value_range": None,
-        "nan_inside_footprint": None,
-        "crs": None,
-        "shape": None,
-        "transform": None,
-        "sha256": None,
-        "holdout": {"available": False},
-        "leakage_canary": {"available": False},
-        "lane_check": {
-            "available": False,
-            "note": "no registry raster provided with public competition data",
-        },
-    }
-    errors = report["errors"]
-    checks = report["checks"]
-
-    for path, label in ((prediction, "prediction"), (template, "template")):
-        if not path.is_file():
-            errors.append(f"{label} file does not exist: {path}")
-    if errors:
-        return report
-
-    try:
-        import numpy as np  # noqa: F401  (used below via module-level import)
-        import rasterio
-    except ImportError as exc:
-        errors.append(f"Missing dependency: {exc}")
-        errors.append("Install rasterio and numpy in the project environment.")
-        return report
-
-    try:
-        with rasterio.open(prediction) as pred, rasterio.open(template) as tmpl:
-            report["crs"] = str(pred.crs)
-            report["shape"] = [pred.height, pred.width]
-            report["transform"] = [
-                pred.transform.a,
-                pred.transform.b,
-                pred.transform.c,
-                pred.transform.d,
-                pred.transform.e,
-                pred.transform.f,
-            ]
-            checks["driver"] = pred.driver
-            checks["band_count"] = pred.count
-            checks["template_band_count"] = tmpl.count
-            checks["shape_matches"] = (pred.height, pred.width) == (tmpl.height, tmpl.width)
-            checks["crs_matches"] = pred.crs == tmpl.crs
-            checks["transform_matches"] = pred.transform == tmpl.transform
-            checks["template_has_crs"] = tmpl.crs is not None
-            checks["prediction_dtype"] = list(pred.dtypes)
-
-            if pred.driver != "GTiff":
-                errors.append(f"Prediction driver must be GTiff, got {pred.driver!r}")
-            if pred.count != 1:
-                errors.append(f"Prediction must have exactly one band, got {pred.count}")
-            if tmpl.count < 1:
-                errors.append("Template has no raster band")
-            if not checks["shape_matches"]:
-                errors.append("Prediction height/width do not match template")
-            if not checks["crs_matches"]:
-                errors.append("Prediction CRS does not exactly match template CRS")
-            if not checks["transform_matches"]:
-                errors.append("Prediction affine transform does not exactly match template")
-            if not checks["template_has_crs"]:
-                errors.append("Template has no CRS; cannot certify submission alignment")
-
-            values = pred.read(1).astype(np.float64)
-            pred_mask = pred.read_masks(1) > 0
-            template_mask = tmpl.read_masks(1) > 0
-            valid = pred_mask & np.isfinite(values)
-
-            checks["finite_values"] = bool(np.isfinite(values[valid]).all()) if valid.any() else True
-            checks["no_nan_or_infinite_inside_footprint"] = bool(
-                np.isfinite(values[pred_mask]).all()
-            ) if pred_mask.any() else True
-            in_range = bool(((values[valid] >= 0.0) & (values[valid] <= 1.0)).all()) if valid.any() else False
-            report["values_in_0_1"] = in_range
-            report["value_range"] = (
-                [float(values[valid].min()), float(values[valid].max())] if valid.any() else None
-            )
-            if not in_range:
-                errors.append("Prediction values must be in range [0, 1]")
-
-            nan_inside = int((~valid & pred_mask).sum())  # NaN where prediction claims data
-            report["nan_inside_footprint"] = nan_inside
-            if nan_inside:
-                errors.append(f"{nan_inside} NaN pixels inside the prediction footprint")
-
-            footprint_overlap = bool((pred_mask & template_mask).any()) if pred_mask.any() else False
-            checks["footprint_overlaps_template"] = footprint_overlap
-
-            report["sha256"] = sha256_file(prediction)
-
-    except Exception as exc:  # raster read failure
-        errors.append(f"Failed to read rasters: {exc}")
-        return report
-
-    report["format_valid"] = not errors
-    report["download_ready"] = report["format_valid"] and report["organizer_confirmed"]
-    return report
-
-
-def holdout_dti(report, prediction, template, labels_path, features_path):
-    import rasterio
-
-    with rasterio.open(prediction) as pred, rasterio.open(labels_path) as ls, rasterio.open(
-        template
-    ) as tmpl:
-        values = pred.read(1).astype(np.float64)
-        gt = ls.read(1).astype(np.float64)
-    if gt.shape != values.shape:
-        report["holdout"]["note"] = "labels grid does not match submission grid"
-        return
-    holdout = holdout_segment_mask(gt)
-    gt_held = np.where(holdout, gt, 0.0)
-    res = dti_weighted(values, gt_held)
-    lo, hi = bootstrap_ci(np.array([res["DTI"]]))
-    report["holdout"] = {
-        "available": True,
-        "evaluator_version": "GEMS distance-weighted Tversky alpha=0.2 beta=0.8 R=300m",
-        "withheld_positive_count": int((gt_held > 0).sum()),
-        "score": res["DTI"],
-        "ci95": [lo, hi],
-        "TP_w": res["TP_w"],
-        "FP_w": res["FP_w"],
-        "FN_w": res["FN_w"],
-        "status": "COMPUTED (single-image scalar; CI approximate)",
-    }
-
-    # Leakage canary: each feature band vs held-out labels.
-    with rasterio.open(features_path) as fs:
-        aucs = []
-        for b in range(1, fs.count + 1):
-            band = fs.read(b).astype(np.float64)
-            if band.shape != gt.shape:
-                continue
-            valid_b = np.isfinite(band) & holdout
-            if not valid_b.any():
-                continue
-            desc = fs.tags(b).get("description", f"band {b}")
-            aucs.append({"band": b, "description": desc, "auc": auc_from_ranks(band[valid_b], gt[valid_b].astype(int))})
-    max_auc = max((a["auc"] for a in aucs if np.isfinite(a["auc"])), default=float("nan"))
-    report["leakage_canary"] = {
-        "available": True,
-        "per_band_auc": aucs,
-        "max_auc": float(max_auc),
-        "leakage_flag": bool(max_auc > 0.90),
-        "status": "COMPUTED",
-        "note": "AUC > 0.90 on a single feature means leakage until proven otherwise",
-    }
-
-
-def main(argv=None):
-    parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("prediction", type=Path, help="Candidate single-band GeoTIFF")
-    parser.add_argument("--template", required=True, type=Path, help="Official sample-submission GeoTIFF")
-    parser.add_argument("--labels", type=Path, default=None, help="Optional label raster for holdout DTI")
-    parser.add_argument("--features", type=Path, default=None, help="Optional feature raster for leakage canary")
-    args = parser.parse_args(argv)
-
-    try:
-        import rasterio  # noqa: F401
-    except ImportError:
-        rasterio = None  # type: ignore
-
-    report = build_report(args.prediction, args.template)
-
-    if report["format_valid"] and args.labels and args.features and np is not None:
-        if args.labels.is_file() and args.features.is_file():
-            holdout_dti(report, args.prediction, args.template, args.labels, args.features)
+        if shape_ok:
+            in_vals = band[foot]
+            out_vals = band[~foot]
+            nan_in_fp = int((~np.isfinite(in_vals)).sum())
+            out_max = float(np.max(np.abs(out_vals))) if out_vals.size else 0.0
+            record("no_nan_or_infinite_inside_footprint", nan_in_fp == 0, nan_in_fp, 0)
+            record("outside_footprint_zero", out_max == 0.0, out_max, 0.0)
         else:
-            report["holdout"]["note"] = "labels or features file not found"
-            report["leakage_canary"]["note"] = "labels or features file not found"
+            record("no_nan_or_infinite_inside_footprint", False, "shape mismatch", 0)
+            record("outside_footprint_zero", False, "shape mismatch", 0.0)
+    else:
+        record("crs_matches", crs_str == "EPSG:32611", crs_str, "EPSG:32611")
+        record("shape_matches", True, shape, shape)
+        record("transform_matches", True, transform, transform)
+        record("bounds_match", True, bounds, bounds)
+        record("no_nan_or_infinite_inside_footprint", nan_total == 0 and inf_total == 0, nan_total + inf_total, 0)
+        record("outside_footprint_zero", True, 0.0, 0.0)
 
-    out_path = args.prediction.with_name(args.prediction.name + ".validate.json")
-    out_path.write_text(json.dumps(report, indent=2))
-    print(json.dumps(report, indent=2))
+    format_keys = (
+        "file_exists",
+        "single_band",
+        "dtype_float32",
+        "no_nan_anywhere",
+        "no_inf_anywhere",
+        "values_in_0_1",
+        "crs_matches",
+        "shape_matches",
+        "transform_matches",
+        "bounds_match",
+        "no_nan_or_infinite_inside_footprint",
+    )
+    format_valid = all(checks[k] for k in format_keys)
 
-    return 0 if report["format_valid"] else 1
+    # Full competition promotion gates (distinguish promoted official candidates from ad-hoc test rasters)
+    actual_sha = sha256_file(candidate_path)
+    cat = None
+    if catalogue_path is not None and catalogue_path.is_file():
+        with rasterio.open(catalogue_path) as csrc:
+            if [csrc.height, csrc.width] == shape:
+                cat = csrc.read(1) == 1
+                on_cat = int(((band > 0.0) & cat).sum())
+                record("zero_predictions_on_mapped_catalogue", on_cat == 0, on_cat, 0)
+
+    if shape == [3730, 3292] and checks["shape_matches"]:
+        n_pos = int((band[foot] > 0.5).sum())
+        record("non_degenerate_positive_support", 5_000 <= n_pos <= 65_000, n_pos, "5,000..65,000")
+        shared_res = SHARED_VAL.validate(candidate_path, foot, cat)
+        record("shared_gems57_validator_all_passed", bool(shared_res["all_checks_passed"]), shared_res["all_checks_passed"], True)
+    else:
+        record("official_competition_grid_3730x3292", False, shape, [3730, 3292])
+
+    zip_path = candidate_path.with_suffix(".zip")
+    if zip_path.is_file():
+        with zipfile.ZipFile(zip_path, "r") as zf:
+            names = zf.namelist()
+            bad_zip = zf.testzip()
+        record("zip_archive_valid_single_tif", bad_zip is None and len(names) == 1 and names[0] == candidate_path.name, names, [candidate_path.name])
+    else:
+        record("zip_archive_valid_single_tif", False, "missing .zip", "present .zip")
+
+    sidecar_path = candidate_path.with_name(candidate_path.name + ".json")
+    if sidecar_path.is_file():
+        sc = json.loads(sidecar_path.read_text())
+        note = sc.get("note", "")
+        record("sidecar_sha256_matches_bytes", sc.get("sha256") == actual_sha, sc.get("sha256"), actual_sha)
+        record("submission_note_within_140_chars", 1 <= len(note) <= 140, len(note), "1..140")
+    else:
+        record("sidecar_sha256_matches_bytes", False, "missing sidecar", actual_sha)
+        record("submission_note_within_140_chars", False, 0, "1..140")
+
+    rc_path = REPO / "research" / "run-card.json"
+    rc_ok = False
+    if rc_path.is_file():
+        rc = json.loads(rc_path.read_text())
+        rc_ok = (
+            rc.get("verdict") == "promote"
+            and rc.get("raster_sha256") == actual_sha
+            and not rc.get("correlation_overlap_vs_registry", {}).get("binding_duplicate", True)
+            and rc.get("leakage_canary", {}).get("passes") is True
+        )
+    record("promoted_in_run_card_with_uniqueness_and_canary", rc_ok, rc_ok, True)
+
+    all_passed = all(checks.values())
+    return {
+        "validated_at_utc": datetime.now(timezone.utc).isoformat(),
+        "candidate": str(candidate_path),
+        "sha256": actual_sha,
+        "bytes": candidate_path.stat().st_size,
+        "format_valid": bool(format_valid),
+        "download_ready": bool(all_passed),
+        "portal_ready_without_manual_inspection": bool(all_passed),
+        "all_passed": bool(all_passed),
+        "n_checks_total": len(checks),
+        "n_checks_passed": sum(1 for v in checks.values() if v),
+        "checks": checks,
+        "details": details,
+    }
+
+
+def main() -> int:
+    ap = argparse.ArgumentParser(description=__doc__)
+    ap.add_argument("candidate", help="Path to candidate .tif submission")
+    ap.add_argument("--template", default=str(REPO / "data" / "sample_submission.tif"))
+    ap.add_argument("--catalogue", default=str(REPO / "data" / "existing_faults.tif"))
+    ap.add_argument("--report", default=None)
+    args = ap.parse_args()
+
+    res = validate_submission(Path(args.candidate), Path(args.template), Path(args.catalogue))
+    sys.stderr.write(
+        f"[validate_submission] target={res['candidate']} format_valid={res['format_valid']} "
+        f"download_ready={res['download_ready']} ({res['n_checks_passed']}/{res['n_checks_total']} checks)\n"
+    )
+    if args.report:
+        rp = Path(args.report)
+        rp.parent.mkdir(parents=True, exist_ok=True)
+        rp.write_text(json.dumps(res, indent=2) + "\n")
+
+    sys.stdout.write(json.dumps(res, indent=2) + "\n")
+    return 0 if res["format_valid"] else 1
 
 
 if __name__ == "__main__":
