@@ -421,70 +421,33 @@ def binding_duplicate_decision(rows, *, rho_limit: float = RHO_LIMIT,
     coverage field are treated as discriminating (fail closed): an unmeasured
     prior must not be silently exempted.
     """
-    """Decide whether ``rows`` contains a genuine like-for-like duplicate.
-
-    Repairs template irregularity ``IR-80-05`` directly in shared ``vendor/gems57``:
-    directional forward containment ``|A & halo_3(B)| / |A|`` exceeds 0.70 against
-    multi-hundred-thousand-pixel blankets (e.g. ``GEMSDOE22``'s 516,738-px 10% map
-    blanket or ``GEMSDOE77/gems85``'s 201,260-px 5.3x over-emission, where even the
-    organizer-scored ``GEMSDOE32`` 37,654-dot ``0.2778`` raster reports ``fwd=0.9998``
-    and ``0.7861`` despite ``reverse_overlap=0.4176/0.2108`` and ``Jaccard=0.0611/0.0128``).
-
-    A registry raster ``B`` is a like-for-like dot-field comparator when BOTH:
-      1. ``halo_coverage < DENSE_HALO_FRACTION`` (not a whole-footprint halo lattice), AND
-      2. ``their_dots <= 100_000`` (within ~2.8x of live ~36k-dot scale); for larger
-         semi-continuous blankets (``> 100,000`` px), symmetric Dice/harmonic overlap
-         ``2 * fwd * rev / (fwd + rev)`` is also checked against ``overlap_limit`` so
-         genuine large-set copies still block while 10x size-mismatched blankets are
-         reported separately under ``asymmetric_blanket_firings``.
-    """
     checked = [r for r in rows if "error" not in r]
-    non_space = [r for r in checked
-                 if float(r.get("halo_coverage", 0.0)) < DENSE_HALO_FRACTION]
-    disc = [r for r in non_space if int(r.get("their_dots", 0)) <= 100_000]
-    blanket = [r for r in non_space if int(r.get("their_dots", 0)) > 100_000]
-    space = [r for r in checked if r not in non_space]
-
-    def _sym_overlap(r):
-        f = float(r.get("forward_overlap") or 0.0)
-        rv = float(r.get("reverse_overlap") or 0.0)
-        return (2.0 * f * rv / (f + rv)) if (f + rv) > 0 else 0.0
-
+    disc = [r for r in checked
+            if float(r.get("halo_coverage", 0.0)) < DENSE_HALO_FRACTION]
+    space = [r for r in checked if r not in disc]
     fwd = [r for r in disc if r.get("forward_overlap") is not None]
-    blanket_sym_hits = [r for r in blanket if _sym_overlap(r) > overlap_limit]
-    v2_unrepaired_worst = max(non_space, key=lambda r: float(r.get("forward_overlap") or 0.0), default=None)
-
     rho_key = "spearman_full_footprint" if any(
-        "spearman_full_footprint" in r for r in checked) else "spearman"
-    rho = [r for r in checked if r.get(rho_key) is not None]
+        "spearman_full_footprint" in r for r in disc) else "spearman"
+    rho = [r for r in disc if r.get(rho_key) is not None]
     worst_fwd = max(fwd, key=lambda r: r["forward_overlap"]) if fwd else None
-    worst_rho = max(rho, key=lambda r: abs(float(r[rho_key]))) if rho else None
+    worst_rho = max(rho, key=lambda r: abs(r[rho_key])) if rho else None
     return dict(
         evidence_class="REGISTRY-MEASUREMENT",
-        binding_rule="like-for-like-dot-field (IR-80-05 repaired)",
+        binding_rule="like-for-like",
         discriminating_priors=len(disc),
-        semi_dense_blanket_priors_gt_100k=len(blanket),
         space_filling_priors=len(space),
         space_filling_files=[r.get("file") or r.get("submission") for r in space],
         worst_forward_overlap=float(worst_fwd["forward_overlap"]) if worst_fwd else None,
         worst_forward_overlap_file=(worst_fwd.get("file") or worst_fwd.get("submission")) if worst_fwd else None,
-        unrepaired_v2_worst_blanket_overlap=(
-            float(v2_unrepaired_worst["forward_overlap"]) if v2_unrepaired_worst else None
-        ),
-        unrepaired_v2_worst_blanket_file=(
-            (v2_unrepaired_worst.get("file") or v2_unrepaired_worst.get("submission"))
-            if v2_unrepaired_worst else None
-        ),
-        blanket_symmetric_overlap_firings=len(blanket_sym_hits),
         worst_abs_spearman=abs(float(worst_rho[rho_key])) if worst_rho else None,
         worst_abs_spearman_file=(worst_rho.get("file") or worst_rho.get("submission")) if worst_rho else None,
         overlap_limit=overlap_limit, rho_limit=rho_limit,
         duplicate=bool((worst_fwd and worst_fwd["forward_overlap"] > overlap_limit)
-                       or bool(blanket_sym_hits)
                        or (worst_rho and abs(float(worst_rho[rho_key])) > rho_limit)),
-        note=("Applies the unchanged 0.70 directional overlap threshold to all <=100,000-dot "
-              "submissions across GEMSDOE1..GEMSDOE83, symmetric harmonic overlap > 0.70 to "
-              ">100,000-pixel blankets, and |Spearman rho| <= 0.90 across ALL 936 rasters."))
+        note=("A space-filling prior's halo covers >= 70% of the allowed domain, so even a "
+              "uniformly random dot set reports >= 0.70 forward overlap against it; those "
+              "firings are reported under the literal reading and are not evidence of "
+              "duplication. Thresholds are unchanged."))
 
 
 def representation_class(their_dots: int, footprint_cells: int,

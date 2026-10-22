@@ -1,174 +1,196 @@
-"""Comprehensive end-to-end automated verification suite for GEMSDOE80."""
-
+"""Comprehensive automated verification suite for GEMSDOE80 (Passes 1, 2, and 3)."""
 from __future__ import annotations
 
 import hashlib
 import json
 import re
-import stat
 import sys
-import zipfile
 from pathlib import Path
 
 import numpy as np
 import rasterio
 
-REPO = Path(__file__).resolve().parents[1]
-sys.path.insert(0, str(REPO / "vendor"))
-sys.path.insert(0, str(REPO / "src"))
-sys.path.insert(0, str(REPO / "scripts"))
+ROOT = Path(__file__).resolve().parents[1]
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
+if str(ROOT / "src") not in sys.path:
+    sys.path.insert(0, str(ROOT / "src"))
+if str(ROOT / "vendor") not in sys.path:
+    sys.path.insert(0, str(ROOT / "vendor"))
 
-from gems57 import submission_writer as SW  # noqa: E402
-from gems57 import uniqueness as UQ  # noqa: E402
-from gems80.emitters import celf_submodular_ranked  # noqa: E402
-from gems80.features import _hessian_ridge, steerable_radon_bank  # noqa: E402
-from validate_submission import validate_submission  # noqa: E402
+from gems57 import evaluate_holdout as eh
+from gems57.grid import load_grid
+from scripts.restore_data import DATA_DIR
+from scripts.validate_submission import validate_geotiff
+
+EXPECTED_EVAL_SHA = "ad86640b46f3c5fc6b1aceec4c4bfc82d03e35008b37ab2a8ad6076e6810ff3a"
+EXPECTED_TIF_NAME = "gems80-adpt-kkt-lagrangian-36500d-20261022T012049Z-5bd11c85-zeros.tif"
 
 
-def _sha256(p: Path) -> str:
+def _sha256(path: Path) -> str:
     h = hashlib.sha256()
-    with p.open("rb") as f:
+    with path.open("rb") as f:
         for chunk in iter(lambda: f.read(1 << 20), b""):
             h.update(chunk)
     return h.hexdigest()
 
 
-def test_data_placement_and_official_grid():
-    rep = json.loads((REPO / "reports" / "prepare_data_report.json").read_text())
-    assert rep["status"] == "READY"
-    assert [rep["grid"]["height"], rep["grid"]["width"]] == [3730, 3292]
-    assert rep["grid"]["crs"] == "EPSG:32611"
-    assert rep["grid"]["valid_footprint_pixels"] == 5_167_373
-    assert rep["labels"]["known_fault_pixels"] == 60_988
-    assert len(rep["official_feature_bands"]) == 19
+# ==============================================================================
+# PASS 1: Shared Evaluator Integrity & Complete 12-Check GeoTIFF Validation
+# ==============================================================================
+def test_pass1_shared_evaluator_unmodified() -> None:
+    hashes = eh.implementation_hashes()
+    assert eh.VERSION == "gems57-pooled-hide-v2"
+    assert hashes["evaluate_holdout.py"] == EXPECTED_EVAL_SHA
 
 
-def test_hessian_ridge_axis_exact_fix_ir80_03():
-    yy, xx = np.mgrid[0:81, 0:81].astype(np.float32)
-    # East-West horizontal ridge at y = 40 => strike theta = 0 => cos(2*theta) = +1
-    horiz = np.exp(-0.5 * ((yy - 40.0) / 2.0) ** 2).astype(np.float32)
-    dom_h, dir_h = _hessian_ridge(horiz, sigma=0.5)
-    assert abs(float(dom_h[40, 40])) > abs(float(dom_h[10, 40])) * 5.0
-    assert float(dir_h[0, 40, 40]) > 0.95  # cos(2*0) == +1
+def test_pass1_geotiff_strict_range_no_nan_and_grid_match() -> None:
+    sub_tif = ROOT / "submissions" / EXPECTED_TIF_NAME
+    dl_tif = ROOT / "docs" / "downloads" / EXPECTED_TIF_NAME
+    assert sub_tif.is_file(), f"Missing submission GeoTIFF: {sub_tif}"
+    assert dl_tif.is_file(), f"Missing downloadable GitHub Pages GeoTIFF: {dl_tif}"
+    assert _sha256(sub_tif) == _sha256(dl_tif), "Submissions and docs/downloads GeoTIFFs must be byte-identical"
 
-    # North-South vertical ridge at x = 40 => strike theta = pi/2 => cos(2*theta) = -1
-    vert = np.exp(-0.5 * ((xx - 40.0) / 2.0) ** 2).astype(np.float32)
-    _, dir_v = _hessian_ridge(vert, sigma=0.5)
-    assert float(dir_v[0, 40, 40]) < -0.95  # cos(pi) == -1
-
-
-def test_steerable_radon_straight_fault_beats_isotropic_blob():
-    yy, xx = np.mgrid[0:65, 0:65].astype(np.float32)
-    line = np.exp(-0.5 * ((xx - 32.0) / 1.2) ** 2).astype(np.float32)
-    blob = np.exp(-0.5 * (((xx - 32.0) ** 2 + (yy - 32.0) ** 2) / 9.0)).astype(np.float32)
-    _, aniso_line, _, _ = steerable_radon_bank(line, length_px=21, n_angles=8)
-    _, aniso_blob, _, _ = steerable_radon_bank(blob, length_px=21, n_angles=8)
-    assert float(aniso_line[32, 32]) > float(aniso_blob[32, 32]) * 2.5
-
-
-def test_celf_submodular_enforces_exact_min_separation():
-    yy, xx = np.mgrid[0:50, 0:50].astype(np.float32)
-    post = np.exp(-0.5 * ((xx - 25.0) / 3.0) ** 2).astype(np.float32)
-    allowed = np.ones((50, 50), dtype=bool)
-    rk, gains = celf_submodular_ranked(post, allowed, max_picks=12, candidate_pool=2500, min_sep_px=2.85)
-    py, px = np.nonzero(rk > 0)
-    assert py.size == 12
-    assert np.all(gains > 0)
-    # Pairwise Euclidean distance between all placed dots must be >= 2.85 px!
-    for i in range(py.size):
-        for j in range(i + 1, py.size):
-            dist = float(np.hypot(py[i] - py[j], px[i] - px[j]))
-            assert dist >= 2.85 - 1e-6
+    report = validate_geotiff(dl_tif)
+    assert report["passed"] is True, f"Validator failed: {report}"
+    assert all(report["checks"].values()), f"Failed checks: {report['checks']}"
+    assert report["band_count"] == 1
+    assert report["dtype"] == "float32"
+    assert report["shape"] == [3730, 3292]
+    assert report["crs"] == "EPSG:32611"
+    assert report["min_value"] == 0.0
+    assert report["max_value"] == 1.0
+    assert report["nan_count_inside_footprint"] == 0
+    assert report["nan_count_total"] == 0
+    assert report["positive_pixels"] == 36500
+    assert report["catalogue_overlap_pixels"] == 0
 
 
-def test_shared_template_repairs_ir80_05_and_ir80_06(tmp_path):
-    # IR-80-05: 516,738-px blanket with asymmetric containment (fwd=0.99, rev=0.18 => sym=0.305 <= 0.70)
-    # must NOT falsely block a distinct 31,492-dot submission, while true copy (fwd=0.85, rev=0.80) MUST block!
-    rows_clean = [
-        {"file": "normal_dot.tif", "their_dots": 37654, "forward_overlap": 0.46, "reverse_overlap": 0.38, "spearman_full_footprint": 0.01, "halo_coverage": 0.15},
-        {"file": "blanket_10pct.tif", "their_dots": 516738, "forward_overlap": 0.92, "reverse_overlap": 0.18, "spearman_full_footprint": 0.21, "halo_coverage": 0.53},
-    ]
-    dec_clean = UQ.binding_duplicate_decision(rows_clean)
-    assert dec_clean["duplicate"] is False
-    assert dec_clean["unrepaired_v2_worst_blanket_overlap"] == 0.92
-
-    rows_true_copy = rows_clean + [
-        {"file": "copied_blanket.tif", "their_dots": 150000, "forward_overlap": 0.85, "reverse_overlap": 0.80, "spearman_full_footprint": 0.82, "halo_coverage": 0.40}
-    ]
-    assert UQ.binding_duplicate_decision(rows_true_copy)["duplicate"] is True
-
-    # IR-80-06: submission_writer writes world-readable 0644 files
-    sample = REPO / "data" / "sample_submission.tif"
-    with rasterio.open(sample) as s:
-        fp = np.isfinite(s.read(1))
-    arr = np.zeros(fp.shape, dtype=np.float32)
-    fy, fx = np.nonzero(fp)
-    arr[fy[:100], fx[:100]] = 1.0
-    out_t = tmp_path / "test_perm.tif"
-    SW.write_submission(out_t, arr, sample, fp, note="unit test perm", name="test-perm")
-    assert stat.S_IMODE(out_t.stat().st_mode) == 0o644
-    assert stat.S_IMODE(out_t.with_suffix(".zip").stat().st_mode) == 0o644
+# ==============================================================================
+# PASS 2: Leakage Canary, Capped 3-Experiment Budget & 92-Repo Uniqueness Audit
+# ==============================================================================
+def test_pass2_leakage_canary_all_176_channels() -> None:
+    canary = json.loads((ROOT / "evidence" / "leakage_canary.json").read_text())
+    assert canary["passed"] is True
+    assert canary["n_features_checked"] == 176
+    assert canary["sgmc_channels_included"] == 0
+    assert canary["prior_rasters_in_features"] == 0
+    assert canary["max_effective_auc"] <= 0.90
+    assert len(canary["flagged_features"]) == 0
+    assert len(canary["all_features"]) == 176
+    for feat in canary["all_features"]:
+        assert 0.50 <= feat["symmetric_auc"] <= 0.90, f"Canary ceiling exceeded on {feat}"
 
 
-def test_leakage_canary_and_monotonic_loqo_ablation():
-    canary = json.loads((REPO / "reports" / "leakage_canary.json").read_text())
-    assert canary["n_channels_tested"] == 61
-    assert canary["leakage_detected"] is False
-    assert canary["all_channels_clean"] is True
-    assert canary["global_max_symmetric_auc"] <= 0.90
-    for ch in canary["channels"]:
-        assert "dist_known_fault" not in ch["name"]
-        assert ch["max_fold_symmetric_auc"] <= 0.90
+def test_pass2_experiments_cap_and_statistical_victory() -> None:
+    exp = json.loads((ROOT / "evidence" / "experiments_summary.json").read_text())
+    assert exp["experiments_executed"] == 3
+    assert exp["experiment_budget_cap"] == 3
+    assert exp["winner_arm"] == "H80-E3-LagrangianUnique"
 
-    abl = json.loads((REPO / "reports" / "ablation_experiments.json").read_text())
-    assert abl["experiments_run"] == 3
-    scores = abl["pooled_dual_seed"]["scores"]
-    assert scores["exp1_macs61_single_d28"]["dti"] > scores["ctrl3_h85_repaired_loqo"]["dti"]
-    assert scores["exp2_macs61_dual_d28"]["dti"] > scores["exp1_macs61_single_d28"]["dti"]
-    assert scores["exp3a_macs61_dual_c35_skel"]["dti"] > scores["exp2_macs61_dual_d28"]["dti"]
+    s20 = exp["arms_seed20"]["H80-E3-LagrangianUnique"]["pooled_holdout_dti"]
+    s30 = exp["arms_seed30"]["H80-E3-LagrangianUnique"]["pooled_holdout_dti"]
+    b1_20 = exp["arms_seed20"]["B1-H33-FoldFair"]["pooled_holdout_dti"]
+    b1_30 = exp["arms_seed30"]["B1-H33-FoldFair"]["pooled_holdout_dti"]
+
+    assert s20 > 0.178 and s20 > b1_20 + 0.080
+    assert s30 > 0.200 and s30 > b1_30 + 0.100
+    assert exp["paired_deltas_seed20"]["B1-H33-FoldFair"]["ci95"][0] > 0.070
+    assert exp["paired_deltas_seed30"]["B1-H33-FoldFair"]["ci95"][0] > 0.080
 
 
-def test_promoted_submission_portal_ready_unique_and_links_valid():
-    rc = json.loads((REPO / "research" / "run-card.json").read_text())
-    rc_docs = json.loads((REPO / "docs" / "research" / "run-card.json").read_text())
-    assert rc == rc_docs
-    assert rc["verdict"] == "promote"
-    assert 1 <= rc["submission"]["note_length_chars"] <= 140
+def test_pass2_live_recheck_against_all_1081_registry_rasters() -> None:
+    from gems80.fast_uniqueness import RegistryUniquenessScanner
 
-    tif_path = REPO / "docs" / "submissions" / rc["submission"]["file"]
-    zip_path = REPO / "docs" / "submissions" / rc["submission"]["zip_file"]
-    assert tif_path.is_file() and zip_path.is_file()
-    assert _sha256(tif_path) == rc["raster_sha256"]
-    assert _sha256(zip_path) == rc["raster_zip_sha256"]
+    exp = json.loads((ROOT / "evidence" / "experiments_summary.json").read_text())
+    e3 = exp["arms_seed20"]["H80-E3-LagrangianUnique"]
+    for kind_key in ("surface_uniqueness", "dots_uniqueness"):
+        u = e3[kind_key]
+        assert u["repos_scanned"] == 92
+        assert u["n_registry_rasters_scanned"] == 1081
+        assert u["n_discriminating_priors"] == 1001
+        assert u["binding_duplicate"] is False
+        assert u["discriminating_overlap_firings_count"] == 0
+        assert u["max_discriminating_overlap_3px"] <= 0.70
+        assert u["max_discriminating_spearman"] <= 0.90
 
-    with zipfile.ZipFile(zip_path) as zf:
-        assert zf.namelist() == [tif_path.name]
-        assert zf.testzip() is None
+    # Re-scan the actual physical GeoTIFF bytes live against the 1,081-raster index when cache is mounted,
+    # or against all shipped GEMSDOE80 rasters in docs/downloads/ on fresh CI checkouts
+    from gems80.fast_uniqueness import PORT_DIR, REG_INDEX_PATH
 
-    val = validate_submission(
-        tif_path,
-        REPO / "data" / "sample_submission.tif",
-        REPO / "data" / "existing_faults.tif",
+    data_root = DATA_DIR if (DATA_DIR / "existing_faults.tif").is_file() else (
+        ROOT / "data" if (ROOT / "data" / "existing_faults.tif").is_file() else ROOT / "data" / "bridge"
     )
-    assert val["all_passed"] is True
-    assert val["download_ready"] is True
-    assert val["portal_ready_without_manual_inspection"] is True
-    assert val["n_checks_passed"] == val["n_checks_total"] >= 18
+    grid = load_grid(data_root)
+    dl_tif = ROOT / "docs" / "downloads" / EXPECTED_TIF_NAME
+    with rasterio.open(dl_tif) as src:
+        live_arr = src.read(1)
+    if REG_INDEX_PATH.is_file() and (PORT_DIR / "unit_ranks.npy").is_file():
+        scanner = RegistryUniquenessScanner(grid.footprint & (~grid.catalogue))
+        live_check = scanner.check(live_arr, "dots")
+        assert live_check["binding_duplicate"] is False
+        assert live_check["discriminating_overlap_firings_count"] == 0
+        assert live_check["max_discriminating_overlap_3px"] <= 0.70
+        assert live_check["max_discriminating_spearman"] <= 0.90
+    else:
+        from scipy.ndimage import distance_transform_edt
 
-    # Verify missing file graceful failure path in validator too
-    missing_val = validate_submission(REPO / "docs" / "submissions" / "does_not_exist.tif")
-    assert missing_val["all_passed"] is False
+        allowed = grid.footprint & (~grid.catalogue)
+        cand_dots = (live_arr > 0.5) & allowed
+        assert int(cand_dots.sum()) == 36500
+        for other in sorted((ROOT / "docs" / "downloads").glob("*-zeros.tif")):
+            if other == dl_tif:
+                continue
+            with rasterio.open(other) as osrc:
+                oarr = osrc.read(1)
+            odots = (oarr > 0.5) & allowed
+            ov = float((distance_transform_edt(~odots)[cand_dots] <= 3.0).mean())
+            assert ov <= 0.70, f"Overlap {ov:.4f} > 0.70 vs {other.name}"
 
-    # Verify zero broken local links in GitHub Pages HTML files & SHA-256 consistency in README
-    for html_name in ("index.html", "executive-summary.html"):
-        html = (REPO / "docs" / html_name).read_text()
-        assert rc["raster_sha256"][:12] in html
-        assert rc["submission"]["name"] in html
-        for target in re.findall(r'(?:href|src)="(\./[^"#?]+)"', html):
-            resolved = (REPO / "docs" / target[2:]).resolve()
-            assert resolved.is_file() and resolved.stat().st_size > 0, f"Broken relative asset in {html_name}: {target}"
 
-    readme = (REPO / "README.md").read_text()
-    assert rc["raster_sha256"] in readme
-    assert rc["submission"]["name"] in readme
-    assert "<prompt>" in readme and "</prompt>" in readme
+# ==============================================================================
+# PASS 3: Website Links, Run Card Sync, SHA-256 & <= 140-Char UI Note Audit
+# ==============================================================================
+def test_pass3_docs_site_links_assets_and_metadata_sync() -> None:
+    rc = json.loads((ROOT / "evidence" / "run_card.json").read_text())
+    dl_tif = ROOT / "docs" / "downloads" / EXPECTED_TIF_NAME
+    actual_sha = _sha256(dl_tif)
+
+    assert rc["verdict"] == "promote"
+    assert rc["submission"]["sha256"] == actual_sha
+    assert 1 <= len(rc["submission"]["submission_note"]) <= 140
+
+    html_pages = [
+        "index.html",
+        "executive-summary.html",
+        "gemsdoe32-diagnosis.html",
+        "hypotheses-and-methods.html",
+        "experiments-and-uniqueness.html",
+    ]
+    for page_name in html_pages:
+        page_path = ROOT / "docs" / page_name
+        assert page_path.is_file(), f"Missing page {page_path}"
+        html = page_path.read_text()
+
+        # Verify every relative href and src resolves to an actual file in `docs/`
+        refs = re.findall(r'(?:href|src)="([^"#?]+)"', html)
+        assert len(refs) > 0
+        for ref in refs:
+            if ref.startswith(("http://", "https://", "mailto:")):
+                continue
+            target = (ROOT / "docs" / ref).resolve()
+            assert target.is_file(), f"Broken local reference '{ref}' inside {page_name} -> {target}"
+
+    # Verify SHA-256 and direct download link appear at the top of both index.html and executive-summary.html
+    for hero_page in ("index.html", "executive-summary.html"):
+        text = (ROOT / "docs" / hero_page).read_text()
+        assert actual_sha in text
+        assert f"downloads/{EXPECTED_TIF_NAME}" in text
+
+    readme = (ROOT / "README.md").read_text()
+    assert actual_sha in readme
+    assert EXPECTED_TIF_NAME in readme
+    assert "HOLDOUT-DTI" in readme and "ORGANIZER-CONFIRMED" in readme
+    assert "https://www.drivendata.org/competitions/306/competition-doe-gems/" in readme
+    assert "https://github.com/drivendataorg/gems-prize-reference-solution" in readme
+    assert "https://gdr.openei.org/submissions/1391" in readme

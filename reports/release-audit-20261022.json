@@ -1,0 +1,30 @@
+{
+  "schema": "gems80.release-audit.v1",
+  "checks": {
+    "single_band": true,
+    "float32": true,
+    "no_nan_anywhere": true,
+    "values_in_0_1": true,
+    "crs_matches_mirror_pin": true,
+    "shape_matches_mirror_pin": true,
+    "transform_matches_mirror_pin": true,
+    "sha256_matches_card": true,
+    "zip_single_identical_tif": true
+  },
+  "format_consistent_with_mirror_pin": true,
+  "organizer_template_authenticated": false,
+  "uniqueness": {
+    "surface_abs_rho": 0.48561,
+    "dots_abs_rho": 0.18682,
+    "all_registry_forward_overlap": 1.0,
+    "passed": false,
+    "duplicate": true,
+    "reason": "literal all-raster thresholds; no space-filling exemption"
+  },
+  "ok_to_download": true,
+  "ok_to_submit": false,
+  "verdict": "negative",
+  "new_experiments": 0,
+  "weekly_slots_used": 0,
+  "reason": "Recorded overlap exceeds literal protocol; experiment budget exhausted. Not slot-selected."
+}

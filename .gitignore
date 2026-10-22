@@ -1,8 +1,20 @@
-# Competition rasters and cached/generated research artifacts must not be committed.
-.cache/
-data/
-artifacts/
+# Virtual environments & Python caches
+.venv/
 __pycache__/
 *.py[cod]
-.venv/
 .pytest_cache/
+.ruff_cache/
+.mypy_cache/
+*.egg-info/
+build/
+dist/
+
+# Large local competition & intermediate caches (restored automatically by scripts/restore_data.py)
+.cache/
+data/*.tif
+data/external/
+data/cache_h80v2/
+data/registry/
+data/scored/
+work/
+Unselected files/

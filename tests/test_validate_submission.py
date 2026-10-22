@@ -47,12 +47,14 @@ class SubmissionValidatorTests(unittest.TestCase):
         )
         self.assertIn(result.returncode, (0, 1), result.stderr)
         report = json.loads(result.stdout)
-        self.assertFalse(report["download_ready"])
+        self.assertFalse(report["organizer_confirmed"])
         return report
 
     def test_valid_raster_is_format_valid_but_not_auto_promoted(self) -> None:
         report = self.validate("valid", np.full((2, 3), 0.4, dtype="float32"))
         self.assertTrue(report["format_valid"])
+        self.assertTrue(report["download_ready"])
+        self.assertFalse(report["organizer_confirmed"])
         self.assertTrue(report["checks"]["crs_matches"])
         self.assertTrue(report["checks"]["transform_matches"])
 
@@ -75,6 +77,41 @@ class SubmissionValidatorTests(unittest.TestCase):
         self.assertFalse(report["checks"]["transform_matches"])
         report = self.validate("shape", np.full((2, 2), 0.4, dtype="float32"))
         self.assertFalse(report["checks"]["shape_matches"])
+
+class FootprintRegressionTests(SubmissionValidatorTests):
+    def test_nan_nodata_hole_cannot_hide_inside_template(self):
+        prediction = self.root / 'hole.tif'
+        values = np.full((2, 3), 0.5, dtype='float32')
+        values[0, 0] = np.nan
+        self.write(prediction, values, nodata=np.nan)
+        import importlib.util
+        spec = importlib.util.spec_from_file_location('validator', self.script)
+        module = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(module)
+        report = module.build_report(prediction, self.template)
+        self.assertFalse(report['format_valid'])
+        self.assertEqual(report['missing_inside_footprint'], 1)
+
+    def test_masked_sentinel_is_rejected(self):
+        prediction = self.root / 'sentinel.tif'
+        values = np.full((2, 3), 0.5, dtype='float32')
+        values[0, 0] = -9999
+        self.write(prediction, values, nodata=-9999)
+        import importlib.util
+        spec = importlib.util.spec_from_file_location('validator', self.script)
+        module = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(module)
+        report = module.build_report(prediction, self.template)
+        self.assertFalse(report['format_valid'])
+        self.assertFalse(report['values_in_0_1'])
+
+    def test_generator_never_fabricates_missing_data(self):
+        script = self.script.with_name('generate_submission.py')
+        result = subprocess.run([sys.executable, str(script), '--template', str(self.root/'absent.tif'),
+                                 '--features', str(self.root/'absent-features.tif'),
+                                 '--out', str(self.root/'must-not-exist.tif')], capture_output=True)
+        self.assertEqual(result.returncode, 2)
+        self.assertFalse((self.root/'must-not-exist.tif').exists())
 
 
 if __name__ == "__main__":

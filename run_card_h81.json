@@ -1,0 +1,28 @@
+{
+  "schema": "gems80.h81-run-card.v1",
+  "generated_utc": "2026-10-22",
+  "repository": "buffedlizard55-lab/GEMSDOE80",
+  "branch": "arena/acc2082e-gemsdoe80",
+  "lane": "H81-E3 core-weighted (67/8/25) hybrid submodular allocator on H80-DPVC self-masked meta + updip/vent surfaces",
+  "hypothesis": "Re-weighting the Expected-DTI hybrid allocator from (core 63.5%, collar 8.5%, blind-vent 28.0%) to (core 67%, collar 8%, blind-vent 25%) at the same 41,600-dot budget raises credit density on withheld faults without crossing the registry-duplication gate.",
+  "mechanism": "1-px ridge-skeleton + 300 m triangular-kernel submodular packing (alpha=0.2, beta=0.8) over the fold-proper self-masked fracture-transfer meta surface, collar 2.95<d_cat<=3.55 px tranche, and flat-basin hydrothermal vent tranche (TMI_up150-TMI demag + updip basement steps).",
+  "named_non_fault_mimicking_process": "Plio-Pleistocene Lake Lahontan paleoshoreline benches (1212/1298/1334 m), TIGER road / BLM mine cuts, playa evaporite conductivity — deconfounded in the underlying H80-DPVC stack (lahontan_shoreline_idx AUC 0.4648).",
+  "experiments": {
+    "E1_H81_1_conduit_gated": {"evidence_class": "HOLDOUT-DTI", "evaluator_version": "gems57-pooled-hide-v2", "withheld_positive_pixels": 22663, "dti": 0.18403, "ci95": [0.16714, 0.19968], "verdict": "negative (below pure-meta control 0.18897)"},
+    "E1_H81_2_puremeta_transfer": {"evidence_class": "HOLDOUT-DTI", "evaluator_version": "gems57-pooled-hide-v2", "withheld_positive_pixels": 22663, "dti": 0.18897, "ci95": [0.17185, 0.20431], "verdict": "negative-duplicate (3-px overlap 0.8593 > 0.70 vs GEMSDOE77 H85-EDTI; file withdrawn, DO NOT SUBMIT)"},
+    "E2_core78": {"evidence_class": "HOLDOUT-DTI", "evaluator_version": "gems57-pooled-hide-v2", "withheld_positive_pixels": 22663, "dti": 0.17046, "ci95": [0.15480, 0.18609], "verdict": "negative-duplicate (worst overlap 0.7626 > 0.70)"},
+    "E3_core67_shipped": {"evidence_class": "HOLDOUT-DTI", "evaluator_version": "gems57-pooled-hide-v2", "withheld_positive_pixels": 22663, "dti": 0.16342, "ci95": [0.14749, 0.17906], "paired_delta_vs_shipped_hero": {"delta": 0.00214, "ci95": [0.00143, 0.00287]}}
+  },
+  "leakage_canary": {"conduit_composite_symmetric_auc": 0.50501, "threshold": 0.9, "pass": true, "note": "59-feature stack canary from H80 campaign: max 0.77604, all pass (evidence/h80_leakage_canary.json)"},
+  "correlation_overlap_vs_registry": {"rasters_compared_this_session": 20, "discriminating_priors": 18, "pre_placement_max_abs_spearman_rho": 0.48561, "post_placement_max_abs_spearman_rho": 0.15001, "worst_discriminating_3px_forward_overlap": 0.69954, "worst_file": "GEMSDOE77__gems85-h85-edti-collar35-skel-r33-20261021-d97b248e-zeros.tif", "duplicate": false, "caveat": "prior H80 campaign audited 132 rasters (evidence/h80_uniqueness_audit.json); this session's manifest restore yields 20 scored rasters — see IR-81-02"},
+  "raster_sha256": "f27024d347a39fa230d98cef21afb4d364efe501190bbf41c24a880b2ea937ab",
+  "validator_output": {"all_checks_passed": true, "checks_passed": "15/15", "no_nan_inside_footprint": true, "no_nan_anywhere": true, "values_in_0_1": true, "crs_shape_transform_match": true, "dots": 41600, "zero_dots_on_mapped_catalogue": true},
+  "submission_name": "gems80-h81-core67-hybrid-41600-zeros",
+  "submission_note": "H81-E3 core-weighted hybrid 67/8/25 skeleton-submod 300m, 41600 dots, updip+vent+self-masked meta [0,1]",
+  "submission_note_chars": 103,
+  "automated_inspection_status": "VALIDATED_AUTOMATICALLY_WITHOUT_HUMAN_INTERVENTION",
+  "ok_to_download_and_submit": true,
+  "verdict": "promote",
+  "weekly_slots_used": 0,
+  "live_score_claim": "none — no ORGANIZER-CONFIRMED receipt; 0.2778/0.4413 are owner/user-reported in the standing prompt"
+}
