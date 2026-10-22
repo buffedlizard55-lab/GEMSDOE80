@@ -11,6 +11,8 @@
 > - **Unconstrained Self-Masked Ablation (`E80-2`):** `HOLDOUT-DTI (gems57-pooled-hide-v2, K=22663 withheld positives, 95% CI [0.17216, 0.20466]) = 0.18937` (`+94.2%` over `H33` fold-fair).
 > - **Registry Uniqueness Gate (`132` Accessible Rasters / `126` Discriminating Priors):** **`PASS`** — Pre-placement surface `max |Spearman rho| = 0.48561 <= 0.90`; Post-placement dots `max |Spearman rho| = 0.18682 <= 0.90`; Worst discriminating 3-px dot overlap = **`0.68250 <= 0.70`** (`0.37111` vs `GEMSDOE32 H33`, `0.65144` vs `GEMSDOE76 H76-3`, `0.68250` vs `GEMSDOE77 H85-EDTI`; `binding_like_for_like_duplicate = false`).
 > - **Single-Feature Holdout Leakage Canary (`59` Features):** **`59/59 PASS`** — `max_symmetric_auc = 0.77604 <= 0.90` (`vis_updip_relay_coupler`, `0` violations).
+>
+> **Parallel-lane boundary:** the current primary is H80-DPVC. The older H80-C strain-accommodation lane was not selected or re-run here; see [`reports/lane-h80c-review-20261022.md`](reports/lane-h80c-review-20261022.md). No weekly slot selection was made by that review.
 
 ---
 
@@ -20,11 +22,11 @@
 https://www.drivendata.org/competitions/311/competition-doe-gems/leaderboard/
 
 https://github.com/buffedlizard55-lab/GEMSDOE32/tree/arena/0253a3d8-gemsdoe32 - h33-h33-2-b2-20261004T220000Z-e5eb6e7e-zeros scored 0.2778
-Explain at a PhD level why and how we can score higher by studying this and the other repos and everything related to the competition. 
+Explain at a PhD level why and how we can score higher by studying this and the other repos and everything related to the competition.
 
 Look at all other GEMSDOE repos on github. We MUST generate a unique .tif submission for this competition and put the link to download it on our github pages site for this repo. Do not copy a previous submission, except as a baseline or reference for learning and comparison. Also we need to give it a unique name and A short comment to help you or your team tell submissions apart later e.g. clustering with k=25. Make sure to include all the previous submission scores from the other GEMSDOE repos in tables in our documentation. We want to score higher than 0.2778 and 0.3195 and 0.4413 which is the top high score of the competition. Make sure our submission won't get the error: "Error: Predicted values must be in range [0, 1]". It must be immediately obvious on the site (at the very beginning and in an executive summary subpage) whether or not the .tif was generated and is ok to download and submit, and must be validated automatically without human intervention — no human inspector is available.
 
-Look for other data from official sources that we can import into our model (not leaked data). Look for geothermal vents or something else. 
+Look for other data from official sources that we can import into our model (not leaked data). Look for geothermal vents or something else.
 
 Study the problem and related repos and come up with a plan, first. Execute the plan across 3 passes: Pass 1 — implement and verify; Pass 2 — review and fix any bugs, edge cases, or missing requirements; Pass 3 — final check against the original request. Then create and merge a PR into main.
 
