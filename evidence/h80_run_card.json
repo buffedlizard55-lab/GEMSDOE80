@@ -1,6 +1,6 @@
 {
   "schema": "gems80.run-card.v1",
-  "generated_utc": "2026-10-22T00:31:53Z",
+  "generated_utc": "2026-10-22T02:02:52Z",
   "repository": "buffedlizard55-lab/GEMSDOE80",
   "branch": "arena/b2371d68-gemsdoe80",
   "lane": "H80-DPVC: Updip 60-Deg Dip-Projected Basement-to-Surface Coupler, Hydrothermal Magnetite-Destruction / Clay-Cap / Geothermometer Vent Conduit & Self-Masked Fracture-Transfer OOF Ensemble with Expected-DTI Hybrid Submodular Emission",
@@ -16,31 +16,31 @@
     "seed_20": {
       "withheld_positive_pixels": 11321,
       "E80_3_hero_hybrid_44800": {
-        "dti": 0.160642,
+        "dti": 0.159319,
         "ci95": [
-          0.142086,
-          0.179831
+          0.140735,
+          0.178088
         ]
       },
       "E80_3_hero_matched_37654": {
-        "dti": 0.163703,
+        "dti": 0.162677,
         "ci95": [
-          0.144777,
-          0.18298
+          0.143901,
+          0.182124
         ]
       },
       "E80_2_selfmask_updip_37654": {
-        "dti": 0.185624,
+        "dti": 0.184927,
         "ci95": [
-          0.167065,
-          0.205565
+          0.166082,
+          0.204579
         ]
       },
       "E80_1_pure_updip_vent_physics_37654": {
-        "dti": 0.095612,
+        "dti": 0.095139,
         "ci95": [
-          0.079746,
-          0.112799
+          0.078824,
+          0.113182
         ]
       },
       "GEMSDOE32_H33_fold_fair": {
@@ -54,31 +54,31 @@
     "seed_30": {
       "withheld_positive_pixels": 11342,
       "E80_3_hero_hybrid_44800": {
-        "dti": 0.163328,
+        "dti": 0.163243,
         "ci95": [
-          0.144512,
-          0.181869
+          0.144407,
+          0.181797
         ]
       },
       "E80_3_hero_matched_37654": {
-        "dti": 0.164666,
+        "dti": 0.164571,
         "ci95": [
-          0.145995,
-          0.182696
+          0.145814,
+          0.182615
         ]
       },
       "E80_2_selfmask_updip_37654": {
-        "dti": 0.193109,
+        "dti": 0.192996,
         "ci95": [
-          0.172821,
-          0.213936
+          0.172731,
+          0.213842
         ]
       },
       "E80_1_pure_updip_vent_physics_37654": {
-        "dti": 0.100805,
+        "dti": 0.100772,
         "ci95": [
-          0.086672,
-          0.115128
+          0.086636,
+          0.114765
         ]
       },
       "GEMSDOE32_H33_fold_fair": {
@@ -92,31 +92,31 @@
     "dual_seed_pooled": {
       "withheld_positive_pixels": 22663,
       "E80_3_hero_hybrid_44800": {
-        "dti": 0.161988,
+        "dti": 0.161285,
         "ci95": [
-          0.145687,
-          0.177595
+          0.145641,
+          0.176688
         ]
       },
       "E80_3_hero_matched_37654": {
-        "dti": 0.164185,
+        "dti": 0.163625,
         "ci95": [
-          0.147932,
-          0.179673
+          0.147612,
+          0.179329
         ]
       },
       "E80_2_selfmask_updip_37654": {
-        "dti": 0.189373,
+        "dti": 0.188968,
         "ci95": [
-          0.17216,
-          0.204664
+          0.171853,
+          0.20431
         ]
       },
       "E80_1_pure_updip_vent_physics_37654": {
-        "dti": 0.098211,
+        "dti": 0.097958,
         "ci95": [
-          0.083562,
-          0.112906
+          0.08305,
+          0.112956
         ]
       },
       "GEMSDOE32_H33_fold_fair": {
@@ -129,20 +129,20 @@
       "paired_delta_vs_H33_fold_fair": {
         "evidence_class": "HOLDOUT-DTI",
         "evaluator_version": "gems57-pooled-hide-v2",
-        "delta": 0.06449448952228434,
+        "delta": 0.06379161940384309,
         "ci95": [
-          0.05194847008032346,
-          0.07613398726357652
+          0.05134480153669394,
+          0.07526695486152125
         ],
         "withheld_positive_pixels": 22663
       },
       "paired_delta_vs_D28_static": {
         "evidence_class": "HOLDOUT-DTI",
         "evaluator_version": "gems57-pooled-hide-v2",
-        "delta": 0.06875333511113028,
+        "delta": 0.06805046499268903,
         "ci95": [
-          0.05640570442447815,
-          0.08039406188316417
+          0.055928154450038466,
+          0.0796279506751698
         ],
         "withheld_positive_pixels": 22663
       }
@@ -158,16 +158,16 @@
   },
   "correlation_overlap_vs_registry": {
     "evidence_class": "REGISTRY-UNIQUENESS-MEASUREMENT",
-    "rasters_compared": 132,
-    "discriminating_priors": 126,
-    "space_filling_priors": 6,
+    "rasters_compared": 20,
+    "discriminating_priors": 18,
+    "space_filling_priors": 2,
     "pre_placement_max_abs_spearman_rho": 0.48561,
-    "post_placement_max_abs_spearman_rho": 0.18682,
-    "worst_discriminating_3px_forward_overlap": 0.6825,
+    "post_placement_max_abs_spearman_rho": 0.14472,
+    "worst_discriminating_3px_forward_overlap": 0.68245,
     "worst_discriminating_overlap_file": "GEMSDOE77__gems85-h85-edti-collar35-skel-r33-20261021-d97b248e-zeros.tif",
-    "overlap_vs_GEMSDOE32_H33_02778": 0.37111,
-    "overlap_vs_GEMSDOE76_H76_3": 0.65144,
-    "overlap_vs_GEMSDOE77_H85_EDTI": 0.6825,
+    "overlap_vs_GEMSDOE32_H33_02778": 0.37084,
+    "overlap_vs_GEMSDOE76_H76_3": 0.65147,
+    "overlap_vs_GEMSDOE77_H85_EDTI": 0.68245,
     "binding_like_for_like_duplicate": false,
     "literal_space_filling_overlap": 1.0
   },
@@ -180,16 +180,16 @@
     "regime_continuation_le_1km_share": 0.6093,
     "regime_stepover_1_to_2p6km_share": 0.1073,
     "regime_blind_basin_gt_2p6km_share": 0.2834,
-    "steep_terrain_share_dots": 0.3514,
+    "steep_terrain_share_dots": 0.3516,
     "steep_terrain_share_true_catalogue": 0.3175,
     "neotectonic_steep_calibration_pass": true,
-    "lidar_coverage_share_dots": 0.8238
+    "lidar_coverage_share_dots": 0.8237
   },
   "raster_file": "docs/downloads/gems80-h80-dpvc-updip-vent-submod-41600-20261021-zeros.tif",
   "zip_file": "docs/downloads/gems80-h80-dpvc-updip-vent-submod-41600-20261021-zeros.zip",
-  "raster_sha256": "b5a6b686ca06af635d682f38cc898156649ae6508fa27fc651455a031f6261a5",
-  "zip_sha256": "16688e5ff9022411fa7464679ac6e07850fc651697983dbc371d9cb551211795",
-  "raster_bytes": 143670,
+  "raster_sha256": "f3117cc16a3b3a02689798992a92b2c405e36b87227a3f275550da0191186a66",
+  "zip_sha256": "b38e00d98cbd515b21dd3868f14ebc9873d8d30c95c5e5329c26e6399d8efca1",
+  "raster_bytes": 143630,
   "validator_output": {
     "all_checks_passed": true,
     "no_nan_inside_footprint": true,

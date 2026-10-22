@@ -1,14 +1,14 @@
 {
   "file": "gems80-h80-dpvc-updip-vent-submod-41600-20261021-zeros.tif",
-  "sha256": "b5a6b686ca06af635d682f38cc898156649ae6508fa27fc651455a031f6261a5",
-  "bytes": 143670,
+  "sha256": "f3117cc16a3b3a02689798992a92b2c405e36b87227a3f275550da0191186a66",
+  "bytes": 143630,
   "submission_name": "gems80-h80-dpvc-updip-vent-submod-41600-zeros",
   "note": "H80-DPVC: Updip 60deg basement+GDR vent/MT/demag+deconf 1m/10m DEM+self-masked fracture OOF+Expected-DTI 300m skeleton-submod [0,1]",
   "note_chars": 131,
   "validator": {
     "file": "/home/user/GEMSDOE80/submissions/gems80-h80-dpvc-updip-vent-submod-41600-20261021-zeros.tif",
-    "bytes": 143670,
-    "sha256": "b5a6b686ca06af635d682f38cc898156649ae6508fa27fc651455a031f6261a5",
+    "bytes": 143630,
+    "sha256": "f3117cc16a3b3a02689798992a92b2c405e36b87227a3f275550da0191186a66",
     "meta": {
       "crs": "EPSG:32611",
       "shape": [
@@ -63,8 +63,8 @@
   },
   "template_report": {
     "path": "/home/user/GEMSDOE80/submissions/gems80-h80-dpvc-updip-vent-submod-41600-20261021-zeros.tif",
-    "bytes": 143670,
-    "sha256": "b5a6b686ca06af635d682f38cc898156649ae6508fa27fc651455a031f6261a5",
+    "bytes": 143630,
+    "sha256": "f3117cc16a3b3a02689798992a92b2c405e36b87227a3f275550da0191186a66",
     "bands": 1,
     "dtype": "float32",
     "crs": "EPSG:32611",
@@ -111,15 +111,15 @@
     "validation_class": "local on-disk template/range check; not organizer upload acceptance"
   },
   "zip_file": "gems80-h80-dpvc-updip-vent-submod-41600-20261021-zeros.zip",
-  "zip_sha256": "16688e5ff9022411fa7464679ac6e07850fc651697983dbc371d9cb551211795",
+  "zip_sha256": "b38e00d98cbd515b21dd3868f14ebc9873d8d30c95c5e5329c26e6399d8efca1",
   "approved_for_weekly_slot": false,
   "promoted": false,
   "submission_slots_used": 0,
   "status": "locally validated within separately recorded inventory scope; not organizer acceptance or slot approval",
   "metadata": {
     "lane": "H80-DPVC",
-    "holdout_dti_seed20": 0.16064181799388785,
-    "holdout_dti_seed30": 0.1633282258419324,
-    "holdout_dti_dual_seed_pooled": 0.16198754131725104
+    "holdout_dti_seed20": 0.1593190151182479,
+    "holdout_dti_seed30": 0.16324309336787698,
+    "holdout_dti_dual_seed_pooled": 0.1612846711988098
   }
 }

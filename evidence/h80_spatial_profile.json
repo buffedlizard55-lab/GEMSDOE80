@@ -7,8 +7,8 @@
   "regime_continuation_le_1km_share": 0.6093,
   "regime_stepover_1_to_2p6km_share": 0.1073,
   "regime_blind_basin_gt_2p6km_share": 0.2834,
-  "steep_terrain_share_dots": 0.3514,
+  "steep_terrain_share_dots": 0.3516,
   "steep_terrain_share_true_catalogue": 0.3175,
   "neotectonic_steep_calibration_pass": true,
-  "lidar_coverage_share_dots": 0.8238
+  "lidar_coverage_share_dots": 0.8237
 }

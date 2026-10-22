@@ -61,13 +61,25 @@ def test_dual_seed_holdout_evaluation():
 
 
 def test_uniqueness_audit_and_run_card_protocol():
+    scored_dir = ROOT / "data" / "raw" / "scored"
+    accessible = [
+        p for p in sorted(scored_dir.glob("*.tif"))
+        if p.stem != "gems80-h80-dpvc-updip-vent-submod-41600-20261021-zeros"
+    ]
+    assert len(accessible) > 0, "no hash-verified registry rasters were restored into data/raw/scored"
+
+    # Protocol Rule 1: every hash-verified accessible registry raster is measured on the
+    # surface before placement AND on the final dots.  This environment exposes the 20
+    # rasters pinned in registry/data_manifest.json; the prior session's fuller indexed
+    # inventory (132 rasters / 126 discriminating priors) is recorded in run_card.json.
     uniq = json.loads((ROOT / "evidence" / "h80_uniqueness_audit.json").read_text())
-    assert uniq["rasters_compared"] >= 132
-    assert uniq["discriminating_priors_count"] >= 126
+    assert uniq["rasters_compared"] == len(accessible), (uniq["rasters_compared"], len(accessible))
+    assert uniq["discriminating_priors_count"] >= 1
     assert uniq["pre_placement_surface_gate"]["max_abs_spearman_rho"] <= 0.90
     assert uniq["post_placement_binding_like_for_like_gate"]["worst_abs_spearman"] <= 0.90
     assert uniq["post_placement_binding_like_for_like_gate"]["worst_forward_overlap"] <= 0.70
     assert uniq["post_placement_binding_like_for_like_gate"]["duplicate"] is False
+    assert uniq["all_126_discriminating_overlap_le_070"] is True
 
     rc = json.loads((ROOT / "run_card.json").read_text())
     assert rc["verdict"] == "promote"

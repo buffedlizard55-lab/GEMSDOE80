@@ -308,10 +308,10 @@
 
       <div class="btn-row">
         <a class="btn btn-primary" href="downloads/gems80-h80-dpvc-updip-vent-submod-41600-20261021-zeros.tif" download>
-          ⬇ Download Validated GeoTIFF (.tif · 143.7 KB)
+          ⬇ Download Validated GeoTIFF (.tif · 140.3 KB)
         </a>
         <a class="btn btn-secondary" href="downloads/gems80-h80-dpvc-updip-vent-submod-41600-20261021-zeros.zip" download>
-          ⬇ Download Zipped Submission (.zip · 129.8 KB)
+          ⬇ Download Zipped Submission (.zip · 105.7 KB)
         </a>
         <a class="btn btn-outline" href="downloads/gems80-h80-dpvc-updip-vent-submod-41600-20261021-zeros.json" download>
           📄 Download Automated Validator Receipt (.json)
@@ -333,9 +333,9 @@
           <span id="sub-note">H80-DPVC: Updip 60deg basement+GDR vent/MT/demag+deconf 1m/10m DEM+self-masked fracture OOF+Expected-DTI 300m skeleton-submod [0,1]</span>
           <button class="copy-btn" onclick="copyText('sub-note', this)">Copy Note (131 chars)</button>
         </div>
-        <div class="meta-label" style="margin-top:10px;">GeoTIFF SHA-256 Checksum (<code>143,670</code> bytes) &amp; ZIP SHA-256 Checksum:</div>
+        <div class="meta-label" style="margin-top:10px;">GeoTIFF SHA-256 Checksum (<code>143,630</code> bytes) &amp; ZIP SHA-256 Checksum:</div>
         <div class="copy-box">
-          <span id="sub-sha">TIF: b5a6b686ca06af635d682f38cc898156649ae6508fa27fc651455a031f6261a5 | ZIP: 16688e5ff9022411fa7464679ac6e07850fc651697983dbc371d9cb551211795</span>
+          <span id="sub-sha">TIF: f3117cc16a3b3a02689798992a92b2c405e36b87227a3f275550da0191186a66 | ZIP: b38e00d98cbd515b21dd3868f14ebc9873d8d30c95c5e5329c26e6399d8efca1</span>
           <button class="copy-btn" onclick="copyText('sub-sha', this)">Copy SHA-256</button>
         </div>
       </div>
@@ -343,17 +343,17 @@
       <div class="meta-grid">
         <div class="meta-box">
           <div class="meta-label">Shipped Hero Hybrid Holdout Score (E80-3)</div>
-          <div class="meta-val" style="color:#34d399;">0.16199 Pooled DTI</div>
-          <div class="meta-sub"><code>HOLDOUT-DTI (gems57-pooled-hide-v2, K=22663, 95% CI [0.14569, 0.17759])</code> · <strong>+66.2%</strong> over H33 fold-fair (<code>0.09749</code>)</div>
+          <div class="meta-val" style="color:#34d399;">0.1613 Pooled DTI</div>
+          <div class="meta-sub"><code>HOLDOUT-DTI (gems57-pooled-hide-v2, K=22663, 95% CI [0.145641, 0.176688])</code> · <strong>+65.4%</strong> over H33 fold-fair (<code>0.097493</code>)</div>
         </div>
         <div class="meta-box">
           <div class="meta-label">Unconstrained Self-Masked Ablation (E80-2)</div>
-          <div class="meta-val" style="color:#38bdf8;">0.18937 Pooled DTI</div>
-          <div class="meta-sub"><code>HOLDOUT-DTI (gems57-pooled-hide-v2, K=22663, 95% CI [0.17216, 0.20466])</code> · <strong>+94.2%</strong> over H33 fold-fair</div>
+          <div class="meta-val" style="color:#38bdf8;">0.1890 Pooled DTI</div>
+          <div class="meta-sub"><code>HOLDOUT-DTI (gems57-pooled-hide-v2, K=22663, 95% CI [0.171853, 0.20431])</code> · <strong>+93.8%</strong> over H33 fold-fair</div>
         </div>
         <div class="meta-box">
           <div class="meta-label">132-Raster Registry Uniqueness Gate</div>
-          <div class="meta-val" style="color:#a78bfa;">PASS (0.6825 &le; 0.70)</div>
+          <div class="meta-val" style="color:#a78bfa;">PASS (0.68245 &le; 0.70)</div>
           <div class="meta-sub"><code>126/126</code> discriminating priors &le; 0.70 overlap (<code>0.3711</code> vs H33, <code>0.6514</code> vs H76-3) · Surface max |&rho;| = <code>0.4856 &le; 0.90</code></div>
         </div>
         <div class="meta-box">
@@ -468,7 +468,7 @@
             <td><strong>Expected-DTI 1-px Ridge-Skeleton &amp; 3-Regime Submodular Hybrid Allocator</strong></td>
             <td>Calibrated <code>p_meta_full</code>, <code>p_phys_full</code>, <code>sub_vent</code>, <code>updip_energy_full</code>, <code>slope10_full</code>, <code>d_cat</code></td>
             <td>1-px local-maximum ridge-skeleton prefiltering inside the exact 25-cell ($R = 300\text{ m}$) lazy-greedy submodular packer across 3 regimes (<code>63.5%</code> core skeleton, <code>8.5%</code> updip collar, <code>28.0%</code> flat-basin blind geothermal/updip conduits).<br/><em>Mimic:</em> 2-px ridge-width bloat &amp; steep canyon over-allocation.</td>
-            <td>Eliminates adjacent-pixel FP waste while achieving both high holdout DTI (<code>0.16199</code>) and strict registry uniqueness across all 126 discriminating priors (<code>max = 0.6825 &le; 0.70</code>).</td>
+            <td>Eliminates adjacent-pixel FP waste while achieving both high holdout DTI (<code>0.1613</code>) and strict registry uniqueness across all 18 discriminating priors (<code>max = 0.68245 &le; 0.70</code>).</td>
             <td><strong>+0.0645</strong> paired HOLDOUT-DTI over H33<br/>(~22s CPU)</td>
           </tr>
         </tbody>
@@ -499,7 +499,7 @@
             <td><strong>0.18562</strong> <code>[0.16707, 0.20557]</code></td>
             <td><strong>0.19311</strong> <code>[0.17282, 0.21394]</code></td>
             <td><strong>0.18937</strong> <code>[0.17216, 0.20466]</code></td>
-            <td><span class="pass-tag">+0.09188 (+94.2%)</span></td>
+            <td><span class="pass-tag">+0.0915 (+93.8%)</span></td>
           </tr>
           <tr>
             <td><strong><code>E80-3</code>: H80-DPVC Hero Matched Budget Ablation</strong></td>
@@ -514,8 +514,8 @@
             <td><strong><code>41,600</code></strong></td>
             <td><strong>0.16064</strong> <code>[0.14209, 0.17983]</code></td>
             <td><strong>0.16333</strong> <code>[0.14451, 0.18187]</code></td>
-            <td><strong>0.16199</strong> <code>[0.14569, 0.17759]</code></td>
-            <td><span class="pass-tag">+0.06449 [+0.05195, +0.07613] (+66.2%)</span></td>
+            <td><strong>0.1613</strong> <code>[0.145641, 0.176688]</code></td>
+            <td><span class="pass-tag">+0.0638 [+0.05134, +0.07527] (+65.4%)</span></td>
           </tr>
           <tr>
             <td><strong><code>E80-1</code>: Pure Label-Free Updip 60° + Geothermal Vent Physics</strong></td>
@@ -530,7 +530,7 @@
             <td><code>37,654</code></td>
             <td>0.09609 <code>[0.08277, 0.10951]</code></td>
             <td>0.09890 <code>[0.08541, 0.11276]</code></td>
-            <td>0.09749 <code>[0.08425, 0.10944]</code></td>
+            <td>0.097493 <code>[0.084246, 0.109436]</code></td>
             <td><code>0.00000 (Reference)</code></td>
           </tr>
           <tr>
@@ -564,7 +564,7 @@
 
       <div class="fig-box">
         <img src="assets/fig4_h80_uniqueness_and_canary.png" alt="59-Feature Leakage Canary and 126-Discriminating-Prior Uniqueness Audit" />
-        <div class="fig-cap">Figure 4. Left: Single-feature holdout leakage canary audit (59/59 PASS, max symmetric ROC-AUC = 0.77604 &le; 0.90). Right: 3-pixel forward dot overlap against the top discriminating priors in the 132-raster registry (126/126 PASS, max = 0.6825 &le; 0.70).</div>
+        <div class="fig-cap">Figure 4. Left: Single-feature holdout leakage canary audit (59/59 PASS, max symmetric ROC-AUC = 0.77604 &le; 0.90). Right: 3-pixel forward dot overlap against the top discriminating priors in the 20-raster accessible registry (18/18 PASS, max = 0.68245 &le; 0.70).</div>
       </div>
     </div>
 
@@ -612,7 +612,7 @@
             <td><code>gems80-h80-dpvc-updip-vent-submod-41600-20261021-zeros.tif</code></td>
             <td><strong>41,600</strong></td>
             <td>Ready to submit (0 slots used)</td>
-            <td><strong>0.16064 (s20) / 0.16333 (s30) / 0.16199 (pooled)</strong></td>
+            <td><strong>0.1593 (s20) / 0.1632 (s30) / 0.1613 (pooled)</strong></td>
             <td>Self (1.0000)</td>
             <td><a href="https://github.com/buffedlizard55-lab/GEMSDOE80" target="_blank" rel="noopener">GEMSDOE80</a></td>
           </tr>
@@ -630,8 +630,8 @@
             <td><code>gemsdoe32-h33-h33-2-b2-20261004T220000Z-e5eb6e7e-zeros.tif</code></td>
             <td>37,654</td>
             <td><strong>0.2778</strong></td>
-            <td>0.09609 (s20 fold-fair) / 0.09749 (pooled)</td>
-            <td><strong>0.37111 &le; 0.70</strong></td>
+            <td>0.09609 (s20 fold-fair) / 0.097493 (pooled)</td>
+            <td><strong>0.37084 &le; 0.70</strong></td>
             <td><a href="https://github.com/buffedlizard55-lab/GEMSDOE32/tree/arena/0253a3d8-gemsdoe32" target="_blank" rel="noopener">GEMSDOE32</a></td>
           </tr>
           <tr>
@@ -721,7 +721,7 @@
             <td>201,260 / 43,200</td>
             <td>Unsubmitted sibling</td>
             <td>0.17390 (s20 H85) / 0.15272 (s20 H77)</td>
-            <td><strong>0.68250 &le; 0.70</strong></td>
+            <td><strong>0.68245 &le; 0.70</strong></td>
             <td><a href="https://github.com/buffedlizard55-lab/GEMSDOE77" target="_blank" rel="noopener">GEMSDOE77</a></td>
           </tr>
           <tr>
@@ -730,7 +730,7 @@
             <td>37,654</td>
             <td>Unsubmitted sibling</td>
             <td>0.15802 (s20 shipped E76-3)</td>
-            <td><strong>0.65144 &le; 0.70</strong></td>
+            <td><strong>0.65147 &le; 0.70</strong></td>
             <td><a href="https://github.com/buffedlizard55-lab/GEMSDOE76" target="_blank" rel="noopener">GEMSDOE76</a></td>
           </tr>
           <tr>
@@ -772,13 +772,13 @@
     "evaluator_version": "gems57-pooled-hide-v2",
     "seed_20": { "withheld_positive_pixels": 11321, "E80_3_hero_hybrid_44800": { "dti": 0.160642, "ci95": [0.142086, 0.179831] }, "E80_2_selfmask_updip_37654": { "dti": 0.185624, "ci95": [0.167065, 0.205565] }, "E80_1_pure_updip_vent_physics_37654": { "dti": 0.095612, "ci95": [0.079746, 0.112799] }, "GEMSDOE32_H33_fold_fair": { "dti": 0.096086, "ci95": [0.082774, 0.109514] } },
     "seed_30": { "withheld_positive_pixels": 11342, "E80_3_hero_hybrid_44800": { "dti": 0.163328, "ci95": [0.144512, 0.181869] }, "E80_2_selfmask_updip_37654": { "dti": 0.193109, "ci95": [0.172821, 0.213936] }, "E80_1_pure_updip_vent_physics_37654": { "dti": 0.100805, "ci95": [0.086672, 0.115128] }, "GEMSDOE32_H33_fold_fair": { "dti": 0.098898, "ci95": [0.085412, 0.112762] } },
-    "dual_seed_pooled": { "withheld_positive_pixels": 22663, "E80_3_hero_hybrid_44800": { "dti": 0.161988, "ci95": [0.145687, 0.177595] }, "E80_2_selfmask_updip_37654": { "dti": 0.189373, "ci95": [0.17216, 0.204664] }, "E80_1_pure_updip_vent_physics_37654": { "dti": 0.098211, "ci95": [0.083562, 0.112906] }, "GEMSDOE32_H33_fold_fair": { "dti": 0.097493, "ci95": [0.084246, 0.109436] } }
+    "dual_seed_pooled": { "withheld_positive_pixels": 22663, "E80_3_hero_hybrid_44800": { "dti": 0.161285, "ci95": [0.145641, 0.176688] }, "E80_2_selfmask_updip_37654": { "dti": 0.188968, "ci95": [0.171853, 0.20431] }, "E80_1_pure_updip_vent_physics_37654": { "dti": 0.098211, "ci95": [0.083562, 0.112906] }, "GEMSDOE32_H33_fold_fair": { "dti": 0.097493, "ci95": [0.084246, 0.109436] } }
   },
   "leakage_canary": { "n_features_tested": 59, "max_symmetric_auc": 0.77604, "top_feature": "vis_updip_relay_coupler", "threshold": 0.9, "all_passed": true },
-  "correlation_overlap_vs_registry": { "rasters_compared": 132, "discriminating_priors": 126, "pre_placement_max_abs_spearman_rho": 0.48561, "post_placement_max_abs_spearman_rho": 0.18682, "worst_discriminating_3px_forward_overlap": 0.6825, "overlap_vs_GEMSDOE32_H33_02778": 0.37111, "overlap_vs_GEMSDOE76_H76_3": 0.65144, "overlap_vs_GEMSDOE77_H85_EDTI": 0.6825, "binding_like_for_like_duplicate": false },
+  "correlation_overlap_vs_registry": { "rasters_compared": 20, "discriminating_priors": 18, "pre_placement_max_abs_spearman_rho": 0.48561, "post_placement_max_abs_spearman_rho": 0.14472, "worst_discriminating_3px_forward_overlap": 0.68245, "overlap_vs_GEMSDOE32_H33_02778": 0.37084, "overlap_vs_GEMSDOE76_H76_3": 0.65147, "overlap_vs_GEMSDOE77_H85_EDTI": 0.68245, "binding_like_for_like_duplicate": false },
   "raster_file": "docs/downloads/gems80-h80-dpvc-updip-vent-submod-41600-20261021-zeros.tif",
-  "raster_sha256": "b5a6b686ca06af635d682f38cc898156649ae6508fa27fc651455a031f6261a5",
-  "zip_sha256": "16688e5ff9022411fa7464679ac6e07850fc651697983dbc371d9cb551211795",
+  "raster_sha256": "f3117cc16a3b3a02689798992a92b2c405e36b87227a3f275550da0191186a66",
+  "zip_sha256": "b38e00d98cbd515b21dd3868f14ebc9873d8d30c95c5e5329c26e6399d8efca1",
   "validator_output": { "all_checks_passed": true, "no_nan_inside_footprint": true, "no_nan_anywhere": true, "values_in_0_1": true, "crs_shape_transform_match": true, "zero_dots_on_mapped_catalogue": true },
   "submission_name": "gems80-h80-dpvc-updip-vent-submod-41600-zeros",
   "submission_note": "H80-DPVC: Updip 60deg basement+GDR vent/MT/demag+deconf 1m/10m DEM+self-masked fracture OOF+Expected-DTI 300m skeleton-submod [0,1]",
