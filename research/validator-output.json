@@ -1,0 +1,183 @@
+{
+  "format_valid": true,
+  "download_ready": true,
+  "organizer_confirmed": false,
+  "prediction": "docs/downloads/gemsdoe80-h80g-choquet-tworegime-20261022T000000Z-zeros.tif",
+  "template": "data/sample_submission.tif",
+  "checks": {
+    "driver": "GTiff",
+    "band_count": 1,
+    "template_band_count": 1,
+    "shape_matches": true,
+    "crs_matches": true,
+    "transform_matches": true,
+    "template_has_crs": true,
+    "prediction_dtype": [
+      "float32"
+    ],
+    "finite_values": true,
+    "no_nan_or_infinite_inside_footprint": true,
+    "footprint_overlaps_template": true
+  },
+  "errors": [],
+  "value_range": [
+    0.0,
+    1.0
+  ],
+  "nan_inside_footprint": 0,
+  "crs": "EPSG:32611",
+  "shape": [
+    3730,
+    3292
+  ],
+  "transform": [
+    100.0,
+    0.0,
+    243350.0,
+    0.0,
+    -100.0,
+    4508550.0
+  ],
+  "sha256": "a3c14d76d1f58802c8bd3f13378cbeb037ad3618d5fbd9dbf5f5a0dae4a35ede",
+  "holdout": {
+    "available": true,
+    "label": "HOLDOUT-DTI",
+    "evaluator_version": "GEMSDOE80-evaluate_holdout.py-v2 (DTI alpha=0.2 beta=0.8 R=300m triangular kernel, Voronoi multinomial cluster CI)",
+    "withheld_positive_count": 18313,
+    "score": 0.0009407193189672633,
+    "ci95": [
+      0.0006950452096202029,
+      0.001215953442325926
+    ],
+    "TP_w": 23.503277240664488,
+    "FP_w": 51646.33454823718,
+    "FN_w": 18289.496722759337,
+    "spatial_quadrant_dti": {
+      "NW": 0.0012304386375029477,
+      "NE": 0.0008917305769336445,
+      "SW": 0.0006752892266451395,
+      "SE": 0.0011266224855543698
+    },
+    "status": "COMPUTED",
+    "note": "Direct evaluation of this GeoTIFF against labels.tif. Note: live submission rasters explicitly mask existing_faults.tif (= labels.tif) plus a 200 m collar to avoid wasting false positives on known faults, so only 200-300 m fringe kernels touch labels.tif; see research/h80_experiments_summary.json and data/cache_h80v2/holdout_exp3_choquet.tif for blind hide-and-recover HOLDOUT-DTI."
+  },
+  "leakage_canary": {
+    "available": true,
+    "per_band_auc": [
+      {
+        "band": 1,
+        "description": "Magnetic anomaly - deviation from expected Earth's magnetic field",
+        "auc": 0.48368
+      },
+      {
+        "band": 2,
+        "description": "Reduced to pole magnetic data - magnetic anomaly corrected for latitude effects",
+        "auc": 0.497255
+      },
+      {
+        "band": 3,
+        "description": "Total magnetic intensity horizontal gradient - rate of change in horizontal direction",
+        "auc": 0.541864
+      },
+      {
+        "band": 4,
+        "description": "Geodetic second invariant - measure of strain rate tensor magnitude",
+        "auc": 0.586539
+      },
+      {
+        "band": 5,
+        "description": "Isostatic gravity anomaly slope - gradient of gravity after isostatic correction",
+        "auc": 0.521789
+      },
+      {
+        "band": 6,
+        "description": "Tilt angle or total curvature - magnetic field derivative for edge detection",
+        "auc": 0.449752
+      },
+      {
+        "band": 7,
+        "description": "Geodetic shear rate - rate of angular deformation from GPS/InSAR",
+        "auc": 0.580261
+      },
+      {
+        "band": 8,
+        "description": "Geodetic dilatation rate - rate of volumetric strain (expansion/contraction)",
+        "auc": 0.556467
+      },
+      {
+        "band": 9,
+        "description": "Total magnetic intensity vertical gradient - rate of change in vertical direction",
+        "auc": 0.479909
+      },
+      {
+        "band": 10,
+        "description": "Distance to earthquake (n=100km radius, a=15\u00b0 azimuth parameters)",
+        "auc": 0.568559
+      },
+      {
+        "band": 11,
+        "description": "Isostatic gravity anomaly vertical gradient - vertical rate of change",
+        "auc": 0.52333
+      },
+      {
+        "band": 12,
+        "description": "Detrended elevation - topography with regional trends removed",
+        "auc": 0.505698
+      },
+      {
+        "band": 13,
+        "description": "Isostatic gravity anomaly - gravity after compensating for topographic mass",
+        "auc": 0.468822
+      },
+      {
+        "band": 14,
+        "description": "Total magnetic intensity - total strength of magnetic field",
+        "auc": 0.483251
+      },
+      {
+        "band": 15,
+        "description": "Depth to basement surface - thickness of sedimentary cover",
+        "auc": 0.505202
+      },
+      {
+        "band": 16,
+        "description": "Earthquake intensity or density (n=100km radius, a=15\u00b0 parameters)",
+        "auc": 0.585705
+      },
+      {
+        "band": 17,
+        "description": "Conductivity surface - electrical conductivity of subsurface",
+        "auc": 0.484019
+      },
+      {
+        "band": 18,
+        "description": "Isostatic gravity anomaly horizontal gradient - horizontal rate of change",
+        "auc": 0.511887
+      },
+      {
+        "band": 19,
+        "description": "Detrended elevation slope - gradient of elevation after detrending",
+        "auc": 0.571118
+      }
+    ],
+    "max_auc": 0.586539,
+    "leakage_flag": false,
+    "status": "COMPUTED",
+    "note": "AUC > 0.90 on a single feature means leakage until proven otherwise"
+  },
+  "lane_check": {
+    "available": true,
+    "registry_count": 20,
+    "duplicate_lane": false,
+    "max_abs_spearman_surface": 0.047525,
+    "max_abs_spearman_dots": 0.047525,
+    "max_dot_fraction_within_3px": 0.651615,
+    "thresholds": {
+      "spearman": 0.9,
+      "overlap_3px": 0.7
+    }
+  },
+  "values_in_0_1": true,
+  "missing_inside_footprint": 0,
+  "submit_format_ok": true
+}

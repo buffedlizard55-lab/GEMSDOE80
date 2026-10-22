@@ -13,5 +13,8 @@ dist/
 .cache/
 data/*.tif
 data/external/
+data/cache_h80v2/
+data/registry/
+data/scored/
 work/
 Unselected files/

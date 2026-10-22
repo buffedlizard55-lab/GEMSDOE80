@@ -1,3 +1,5 @@
-"""GEMSDOE80 — Lane H80: Anisotropic Dip-Polarity Normal-Fault Tomography (ADPT-80)."""
+"""GEMSDOE80 unique-lane tools: official-grid I/O, DTI metric, holdout, emission."""
 
-__version__ = "0.1.0"
+from .metric import ALPHA, BETA, RADIUS_M, dti_binary, dti_from_components
+
+__all__ = ["ALPHA", "BETA", "RADIUS_M", "dti_binary", "dti_from_components"]
