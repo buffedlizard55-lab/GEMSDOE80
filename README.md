@@ -5,7 +5,7 @@
 [![Uniqueness Audit](https://img.shields.io/badge/92_Repos_%2F_1%2C001_Priors-0_Overlap_Violations-0f766e)](#organization-wide-uniqueness-audit-92-repositories--1081-rasters)
 [![Leakage Canary](https://img.shields.io/badge/176--Feature_Canary-PASSED_(Max_AUC_0.7805_%E2%89%A4_0.90)-4f46e5)](#leakage-canary--non-fault-mimic-rejection-audits)
 
-Autonomous PhD-level structural-geological research, multi-physics forward modeling, and verified submission artifact for the **[DOE Geothermal Exploration using Machine Learning and Data Science (GEMS): Finding Faults](https://www.drivendata.org/competitions/311/gems-faults/)** competition on DrivenData.
+Autonomous PhD-level structural-geological research, multi-physics forward modeling, and verified submission artifact for the **[DOE Geothermal Exploration using Machine Learning and Data Science (GEMS): Finding Faults](https://www.drivendata.org/competitions/306/competition-doe-gems/page/967/)** competition on DrivenData (official reference implementation verified via GitHub API: [`drivendataorg/gems-prize-reference-solution`](https://github.com/drivendataorg/gems-prize-reference-solution), HEAD `aebe92f7c8a990f0e3443451b7a825d9afd6336b`).
 
 - **GitHub Pages Portal & One-Click Download:** `https://buffedlizard55-lab.github.io/GEMSDOE80/` (`docs/index.html`)
 - **Executive Summary & Upload Checklist:** `https://buffedlizard55-lab.github.io/GEMSDOE80/executive-summary.html` (`docs/executive-summary.html`)
@@ -86,6 +86,8 @@ All experiments were strictly capped at **3 experiments** (`total evaluation & E
 | **`B0-Random-Uniform`** | `HOLDOUT-DTI` | `0.047768 [0.0409, 0.0545]` | `0.044956 [0.0398, 0.0496]` | `0.046362` | `0 / 1,001` | Null baseline |
 | **`B1-H33-FoldFair`** | `HOLDOUT-DTI` | `0.093994 [0.0812, 0.1078]` | `0.099498 [0.0860, 0.1131]` | `0.096746` | Prior fold-fair rebuild | Fold-fair H33 |
 | **`GEMSDOE70 (P8-OOF38k)`** | `HOLDOUT-DTI` | `0.111300` | `0.116800` | `0.114050` | Prior OOF GBDT (`0.2478` live) | Historical |
+| **`GEMSDOE80` Sibling (`H81-A`)** | `HOLDOUT-DTI` | `0.060700` | — | `0.060700` | `0.1491` ov / `0.0154` ρ vs win | Superseded sibling lane |
+| **`GEMSDOE80` Sibling (`H80-DPVC`)** | `HOLDOUT-DTI` | `0.161990 [0.1457, 0.1776]` (2-seed) | — | `0.161990` | `0.3489` ov / `0.0453` ρ vs win | Superseded sibling lane |
 | **`GEMSDOE77 (H82-GMNS)`** | `HOLDOUT-DTI` | `0.172129 [0.1533, 0.1908]` | `0.190001 [0.1684, 0.2112]` | `0.181065` | Prior fleet #1 | Superseded |
 | **`H80-E1-PurePhysics`** | `HOLDOUT-DTI` | `0.108540 [0.0881, 0.1282]` | `0.116269 [0.0958, 0.1364]` | `0.112405` | `0 / 1,001` (`0.6670`) · `0 / 1,001` (`0.6870`) | Beats H33 blind (`+16.2%`) |
 | **`H80-E2-Unconstrained`** | `HOLDOUT-DTI` | **`0.208135 [0.1883, 0.2275]`** | **`0.231054 [0.2077, 0.2535]`** | **`0.219595`** | `114 / 1,001` (`0.9840`) · `35 / 1,001` (`0.9756`) | Held back (duplicate gate) |
@@ -102,7 +104,8 @@ All experiments were strictly capped at **3 experiments** (`total evaluation & E
 
 `scripts/build_registry_index.py` scanned **all `92` accessible `buffedlizard55-lab` repositories (`errors = 0`)**, indexing **`1,081` unique valid SHA-256 GeoTIFFs**: `1,001` discriminating rasters (`halo_coverage < 0.70`) and `80` continuous/lattice space-filling archive surfaces (`halo_coverage >= 0.70`, documented protocol irregularity `IR-H85-01` in `vendor/gems57/uniqueness.py`).
 - **Pre-Placement Continuous Surface (`kind="surface"`)**: `binding_duplicate = false`, **`0 / 1,001` discriminating overlap violations** (`max = 0.561274 <= 0.70` vs `GEMSDOE46:gems46-r9-conformal-s5-20261006T110751Z.tif`), **`0 / 1,081` Spearman violations** (`max = 0.484607 <= 0.90` vs `57GEMSDOE:gems57-twohost-relay-bend-surface-20261010T201504Z-47ccc38b6bec.tif`).
-- **Final Binary Dots GeoTIFF (`kind="dots"`)**: `binding_duplicate = false`, **`0 / 1,001` discriminating overlap violations** (`max = 0.686438 <= 0.70` vs `57GEMSDOE:gems57-relative-strand-surface-20261009T195324Z-88e3bcb35a95.tif`), **`0 / 1,081` Spearman violations** (`max = 0.127714 <= 0.90` vs `GEMSDOE77:gems77-h82gmns-lagrangian-36500dots-20261021-1c9a641b-zeros.tif`).
+- **Same-Repo Parallel Lanes Verified Directly (`origin/main`):** `gems80-h80-dpvc-updip-vent-submod-41600-20261021-zeros.tif` (`overlap_3px = 0.348877 <= 0.70`, `spearman = 0.045299 <= 0.90`) and `gemsdoe80-h81a-relay-20261022T010259Z-zeros.tif` (`overlap_3px = 0.149096 <= 0.70`, `spearman = 0.015445 <= 0.90`). Literal unfiltered positive-pixel overlap across the `74` full-footprint continuous archive surfaces (`17GEMSDOE_E-proba-multiscale.tif`, etc., whose `> 0` support covers `100.0%` of Nevada) is `1.0000` by set identity and reported without concealment alongside the `0 / 1,003` discriminating result.
+- **Scope Note (Fault Structure vs. Geothermal Vents):** GEMS scores concealed/unmapped fault structure (`DTI` on unmapped fault traces); while fault intersections and step-overs host most Great Basin geothermal upflow zones, viable hydrothermal vents additionally require open fracture permeability, elevated thermal gradient, and fluid recharge not directly observed in fault-trace labels alone.
 
 ---
 
@@ -149,7 +152,7 @@ All experiments were strictly capped at **3 experiments** (`total evaluation & E
 
 ## 8. Verified Official Sources & References
 
-1. **DrivenData / U.S. DOE Geothermal Technologies Office (GTO):** *Geothermal Exploration using Machine Learning and Data Science (GEMS): Finding Faults*, <https://www.drivendata.org/competitions/311/gems-faults/>.
+1. **DrivenData / U.S. DOE Geothermal Technologies Office (GTO):** *Geothermal Exploration using Machine Learning and Data Science (GEMS): Finding Faults*, <https://www.drivendata.org/competitions/306/competition-doe-gems/page/967/> and dataset portal <https://www.drivendata.org/competitions/306/competition-doe-gems/data/> (reference solution verified via GitHub API: <https://github.com/drivendataorg/gems-prize-reference-solution>, commit `aebe92f7c8a990f0e3443451b7a825d9afd6336b`).
 2. **Great Basin Center for Geothermal Energy (UNR / NBMG) — INGENIOUS Archive:** *Regional Geoscience Dataset for the Great Basin (DOE Geothermal Data Repository Submission #1391)*, <https://gdr.openei.org/submissions/1391>.
 3. **U.S. Geological Survey (USGS):** *Quaternary Fault and Fold Database of the United States*, <https://www.usgs.gov/programs/earthquake-hazards/faults>.
 4. **Faulds, J. E., & Hinz, N. H. (2015):** *Favorable tectonic and structural settings of geothermal systems in the Great Basin region, western USA: Proxies for discovering blind geothermal systems*, Proceedings World Geothermal Congress 2015, Melbourne, Australia.

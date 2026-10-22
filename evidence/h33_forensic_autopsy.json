@@ -1,0 +1,50 @@
+{
+  "evidence_class": "BYTE-FORENSIC-MEASUREMENT + MATHEMATICAL-ALGEBRA",
+  "d28_sha256": "91eae1ca42ec845eaa8c2ba32da49806e24751743459b8a10017c479bbe639b8",
+  "h33_sha256": "c55bafc470054e8271dcb89347a17e07fefe50de6af6e6ba6c4b169ef7ab6fa9",
+  "d28_positive_dots": 44090,
+  "h33_positive_dots": 37654,
+  "dots_removed_by_2px_collar": 6436,
+  "xor_pixels_between_h33_and_d28_gt_2px": 0,
+  "exact_bitwise_subset_verified": true,
+  "removed_dots_min_dist_px": 1.0,
+  "removed_dots_max_dist_px": 2.0,
+  "kept_dots_min_dist_px": 2.2361,
+  "kept_dots_median_dist_px": 19.6469,
+  "h33_has_zero_nan_across_full_grid": true,
+  "pruning_ladder": [
+    {
+      "name": "GEMSDOE24 D1.5",
+      "dots": 60069,
+      "reported_live_dti": 0.2477,
+      "evidence_class": "ORGANIZER-CONFIRMED (owner-reported)"
+    },
+    {
+      "name": "GEMSDOE25 D2.8",
+      "dots": 44090,
+      "reported_live_dti": 0.26,
+      "evidence_class": "ORGANIZER-CONFIRMED (owner-reported)"
+    },
+    {
+      "name": "GEMSDOE28/31 H27-4",
+      "dots": 40199,
+      "reported_live_dti": 0.2708,
+      "evidence_class": "ORGANIZER-CONFIRMED (owner-reported)"
+    },
+    {
+      "name": "GEMSDOE36 Anderson-PINN",
+      "dots": 38854,
+      "reported_live_dti": 0.275,
+      "evidence_class": "ORGANIZER-CONFIRMED (owner-reported)"
+    },
+    {
+      "name": "GEMSDOE32 H33-2-B2",
+      "dots": 37654,
+      "reported_live_dti": 0.2778,
+      "evidence_class": "ORGANIZER-CONFIRMED (owner-reported)"
+    }
+  ],
+  "reciprocal_dti_vs_dot_count_pearson_r": 0.999261,
+  "reciprocal_dti_vs_dot_count_all5_pearson_r": 0.95998,
+  "physical_explanation": "GEMSDOE32 h33-h33-2-b2-20261004T220000Z-e5eb6e7e-zeros.tif (37,654 dots) is pixel-for-pixel identical (0 XOR pixels across all 12,279,160 cells) to pruning the 6,436 dots of GEMSDOE25 D2.8 (44,090 dots) that lie at Euclidean distance 1.0 <= d_cat <= 2.0 px (100-200 m) from mapped existing_faults.tif. Under the Dilated Tversky Index (alpha=0.2, beta=0.8, 300 m kernel), known faults are masked out of evaluation; dots within <= 200 m of known traces respond to the known fault's own scarp/potential-field halo and earn near-zero new-fault TP credit while paying full alpha=0.2 false-positive denominator weight."
+}

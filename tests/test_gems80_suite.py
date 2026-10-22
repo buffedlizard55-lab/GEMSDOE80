@@ -170,5 +170,6 @@ def test_pass3_docs_site_links_assets_and_metadata_sync() -> None:
     assert actual_sha in readme
     assert EXPECTED_TIF_NAME in readme
     assert "HOLDOUT-DTI" in readme and "ORGANIZER-CONFIRMED" in readme
-    assert "https://www.drivendata.org/competitions/311/gems-faults/" in readme
+    assert "https://www.drivendata.org/competitions/306/competition-doe-gems/" in readme
+    assert "https://github.com/drivendataorg/gems-prize-reference-solution" in readme
     assert "https://gdr.openei.org/submissions/1391" in readme

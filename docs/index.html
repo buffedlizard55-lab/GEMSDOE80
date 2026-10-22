@@ -36,11 +36,12 @@
       <h1 id="hero-heading">GEMSDOE80: Anisotropic Dislocation, Piedmont-Deconfounded Multi-Physics &amp; KKT-Lagrangian Submodular Allocation (<span class="mono">ADPT-80</span>)</h1>
       <p class="lead">
         Autonomous PhD-level research, physical forward modeling, and verified submission artifact for the
-        <a href="https://www.drivendata.org/competitions/311/gems-faults/" target="_blank" rel="noopener">DOE Geothermal Exploration using Machine Learning and Data Science (GEMS): Finding Faults</a>
-        competition. Our promoted GeoTIFF passes <strong>12 / 12 programmatic integrity checks</strong> with strict
+        <a href="https://www.drivendata.org/competitions/306/competition-doe-gems/page/967/" target="_blank" rel="noopener">DOE Geothermal Exploration using Machine Learning and Data Science (GEMS): Finding Faults</a>
+        competition (official reference repo: <a href="https://github.com/drivendataorg/gems-prize-reference-solution" target="_blank" rel="noopener">drivendataorg/gems-prize-reference-solution</a>).
+        Our promoted GeoTIFF passes <strong>12 / 12 programmatic integrity checks</strong> with strict
         <code>float32</code> values in <code>[0.0, 1.0]</code>, <code>0</code> NaNs across all <code>12,279,160</code> pixels,
-        exact <code>EPSG:32611</code> <code>(3730, 3292)</code> grid alignment, and genuine organization-wide uniqueness across all
-        <code>1,081</code> unique valid GeoTIFFs in <code>buffedlizard55-lab</code>.
+        exact <code>EPSG:32611</code> <code>(3730, 3292)</code> grid alignment, and <strong><code>0 / 1,003</code> discriminating overlap violations</strong>
+        across all <code>92</code> sibling repositories plus both parallel <code>GEMSDOE80</code> lanes (<code>H80-DPVC</code>: <code>0.3489</code>; <code>H81-A</code>: <code>0.1491</code>; literal all-blob archive surface reading <code>1.0000</code> on 74 full-footprint surfaces documented transparently below).
       </p>
 
       <div class="cta-box">
@@ -202,6 +203,23 @@
             <td>0.114050</td>
             <td>Prior OOF GBDT</td>
             <td>Historical reference</td>
+          </tr>
+          <tr>
+            <td><strong>GEMSDOE80 Sibling (H81-A Relay)</strong></td>
+            <td><span class="tag-holdout">HOLDOUT-DTI</span></td>
+            <td>0.060700</td>
+            <td>&mdash;</td>
+            <td>0.060700</td>
+            <td><code>0.1491</code> ov / <code>0.0154</code> &rho; vs win</td>
+            <td>Superseded sibling lane</td>
+          </tr>
+          <tr>
+            <td><strong>GEMSDOE80 Sibling (H80-DPVC)</strong></td>
+            <td><span class="tag-holdout">HOLDOUT-DTI</span></td>
+            <td colspan="2" style="text-align:center;">0.161990 pooled across 2 seeds <code>[0.1457, 0.1776]</code></td>
+            <td>0.161990</td>
+            <td><code>0.3489</code> ov / <code>0.0453</code> &rho; vs win</td>
+            <td>Superseded sibling lane</td>
           </tr>
           <tr>
             <td><strong>GEMSDOE77 (H82-GMNS)</strong> (Prior #1 SOTA)</td>
